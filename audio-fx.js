@@ -235,17 +235,16 @@
     pickVoice() {
       if (!this.synth) return null;
       const voices = this.synth.getVoices() || [];
+      const norm = (v) => String(v.lang || "").replace("_", "-").toLowerCase();
       return (
-        voices.find((v) => v.lang && v.lang.toLowerCase() === "zh-tw") ||
-        voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("zh")) ||
+        voices.find((v) => norm(v) === "zh-tw") ||
+        voices.find((v) => norm(v).includes("zh-hant") || norm(v).includes("cmn-hant")) ||
+        voices.find((v) => norm(v).startsWith("zh")) ||
         null
       );
     }
 
-    stop() {
-      if (this.synth) {
-        try { this.synth.cancel(); } catch (_) {}
-      }
+    resetBtn() {
       if (this.activeBtn) {
         this.activeBtn.classList.remove("speaking");
         this.activeBtn.textContent = this.activeBtn.dataset.idleLabel || "🔊 聽語音";
@@ -253,21 +252,32 @@
       }
     }
 
+    stop() {
+      if (this.synth && (this.synth.speaking || this.synth.pending)) {
+        try { this.synth.cancel(); } catch (_) {}
+      }
+      this.currentUtter = null;
+      this.resetBtn();
+    }
+
     toggle(text, btnEl) {
       if (!this.synth) {
-        alert("目前的瀏覽器不支援語音朗讀功能喔！");
+        alert("目前的瀏覽器不支援語音朗讀功能喔！請改用手機的 Safari 或 Chrome 開啟。");
         return;
       }
       const isSame = this.activeBtn === btnEl;
+      const wasSpeaking = this.synth.speaking || this.synth.pending;
       this.stop();
       if (isSame) return;
 
       const utter = new SpeechSynthesisUtterance(this.formatForSpeech(text));
       utter.lang = "zh-TW";
-      utter.rate = 0.9; // 一般偏舒適語速，不會念太快
+      utter.rate = 0.9;
       utter.pitch = 1.0;
+      utter.volume = 1.0;
       const v = this.pickVoice();
       if (v) utter.voice = v;
+      this.currentUtter = utter;
 
       if (btnEl) {
         this.activeBtn = btnEl;
@@ -275,24 +285,42 @@
         btnEl.textContent = "⏹️ 停止朗讀";
       }
 
-      utter.onend = () => this.stop();
-      utter.onerror = () => this.stop();
-      this.synth.speak(utter);
+      utter.onend = () => {
+        if (this.currentUtter === utter) this.resetBtn();
+      };
+      utter.onerror = () => {
+        if (this.currentUtter === utter) this.resetBtn();
+      };
+
+      try { if (this.synth.paused) this.synth.resume(); } catch (_) {}
+      if (wasSpeaking) {
+        setTimeout(() => {
+          try { this.synth.speak(utter); } catch (_) { this.resetBtn(); }
+        }, 60);
+      } else {
+        try { this.synth.speak(utter); } catch (_) { this.resetBtn(); }
+      }
     }
 
     // 單次語音說話（給 Q 版小人物與互動提示用）
     speak(text, pitch = 1.12, rate = 0.96) {
       if (!this.synth || !text) return;
+      const wasSpeaking = this.synth.speaking || this.synth.pending;
       this.stop();
       const utter = new SpeechSynthesisUtterance(this.formatForSpeech(text));
       utter.lang = "zh-TW";
       utter.rate = rate;
       utter.pitch = pitch;
+      utter.volume = 1.0;
       const v = this.pickVoice();
       if (v) utter.voice = v;
-      try {
-        this.synth.speak(utter);
-      } catch (_) {}
+      this.currentUtter = utter;
+      try { if (this.synth.paused) this.synth.resume(); } catch (_) {}
+      if (wasSpeaking) {
+        setTimeout(() => { try { this.synth.speak(utter); } catch (_) {} }, 60);
+      } else {
+        try { this.synth.speak(utter); } catch (_) {}
+      }
     }
   }
 
