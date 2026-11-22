@@ -3,7 +3,7 @@
  * 1. 療癒八音盒背景音樂（Web Audio API 零外部音檔）
  * 2. 島嶼「白天／夕陽／星空夜景」氛圍切換
  * 3. 個人專屬「數學小博士獎狀」生成器（下載 PNG / 列印）
- * 4. 60 秒限時心算閃電賽（最高紀錄存檔＋送金幣）
+ * 4. 60 秒限時心算閃電賽（最高記錄存檔＋送金幣）
  * 5. 雙人同機 PK 搶答模式（10 回合對戰＋鍵盤/觸控搶答）
  */
 (function () {
@@ -395,7 +395,7 @@
           window.VisualFX.celebrationRain();
           arena.innerHTML = `
             <div class="blitz-finish">
-              <h3>⚡ 60 秒閃電賽結束！${isRecord ? "🎉 刷新個人最高紀錄！" : ""}</h3>
+              <h3>⚡ 60 秒閃電賽結束！${isRecord ? "🎉 刷新個人最高記錄！" : ""}</h3>
               <p>共答對 <strong>${solved} 題</strong>｜最終得分 <strong>${score} 分</strong>｜獲得 <strong>🪙 +${earnedCoins} 閃亮金幣</strong>！</p>
             </div>
           `;

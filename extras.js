@@ -7,7 +7,7 @@
  * 5. 三款互動數學小教具（互動時鐘、互動分數披薩、互動直尺）
  * 6. 四大領域學習診斷雷達圖（原創 SVG）
  * 7. 一鍵列印 A4 單元練習卷 / 錯題補考卷（含教師解答卷）
- * 8. 學習紀錄 JSON 匯出／匯入備份
+ * 8. 學習記錄 JSON 匯出／匯入備份
  */
 (function () {
   // 1. 島嶼金幣商店商品目錄（共 112 款會動的超可愛島嶼裝飾，含 20 位會說話的 Q 版小人物、12 種交通工具、多種房型、樹花草與動物，分 8 大主題！）
@@ -696,7 +696,7 @@
 
     const hasAny = domains.some((d) => stats[d.key].total > 0);
     if (!hasAny) {
-      summaryEl.innerHTML = `<p style="color:var(--muted);font-weight:700;">目前還沒有足夠的答題紀錄喔！快去冒險島闖幾關，雷達圖就會自動分析孩子的強項與待加強領域！</p>`;
+      summaryEl.innerHTML = `<p style="color:var(--muted);font-weight:700;">目前還沒有足夠的答題記錄喔！快去冒險島闖幾關，雷達圖就會自動分析孩子的強項與待加強領域！</p>`;
     } else {
       summaryEl.innerHTML = domains
         .map((d, i) => {
@@ -790,7 +790,7 @@
     });
   }
 
-  // ==================== 8. 學習紀錄匯出／匯入備份 ====================
+  // ==================== 8. 學習記錄匯出／匯入備份 ====================
   function initBackupControls(getStoreFn, setStoreFn) {
     const expBtn = document.getElementById("btn-export-backup");
     const impInput = document.getElementById("input-import-backup");
@@ -823,7 +823,7 @@
           const parsed = JSON.parse(reader.result);
           if (!parsed || !parsed.users) throw new Error("格式不符");
           setStoreFn(parsed);
-          alert("🎉 學習紀錄匯入成功！畫面已同步還原！");
+          alert("🎉 學習記錄匯入成功！畫面已同步還原！");
         } catch (_) {
           alert("匯入失敗：請確認選擇的是本網站匯出的 JSON 備份檔喔！");
         }

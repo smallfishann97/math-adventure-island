@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <!-- ==================== 登入頁面（多帳號紀錄儲存） ==================== -->
+  <!-- ==================== 登入頁面（多帳號記錄儲存） ==================== -->
   <section id="view-login" class="login-screen active">
     <div class="login-card">
       <div class="login-crest">🍃 MATH ADVENTURE ISLAND 🍃</div>
@@ -38,7 +38,8 @@
       </div>
 
       <form id="login-form" class="login-form">
-        <h3>建立新冒險者（自動保存闖關與答題紀錄）</h3>
+        <h3 style="margin-bottom:4px;">建立新冒險者</h3>
+        <p class="login-form-note">（自動保存闖關與答題記錄）</p>
         <div class="avatar-picker" id="avatar-picker" role="radiogroup" aria-label="選擇原創動物頭像"></div>
         <div class="login-input-row">
           <input type="text" id="login-name-input" class="luxury-input" placeholder="請輸入名字或暱稱（例：小安）" maxlength="16" required />
@@ -74,7 +75,7 @@
             🛠️ 錯題特訓
             <span class="badge-count" id="mistake-badge">0</span>
           </button>
-          <button class="nav-pill" id="nav-history" type="button">📜 答題紀錄</button>
+          <button class="nav-pill" id="nav-history" type="button">📜 答題記錄</button>
           <button class="nav-pill" id="nav-sources" type="button">📚 課綱出處</button>
         </nav>
 
@@ -549,14 +550,14 @@
         </div>
       </section>
 
-      <!-- ==================== 視圖 8：歷史答題紀錄館 ==================== -->
+      <!-- ==================== 視圖 8：歷史答題記錄館 ==================== -->
       <section id="view-history" class="view">
         <div class="panel-card">
           <div class="panel-header">
             <button class="btn btn-ghost" id="btn-history-back" type="button">← 返回冒險島地圖</button>
-            <h2>📜 我的歷史答題紀錄館</h2>
+            <h2>📜 我的歷史答題記錄館</h2>
           </div>
-          <p class="panel-desc">完整保存你每一次闖關的紀錄，點選任一筆紀錄即可回顧當時答過的每一題、自己的答案與圖形解析！</p>
+          <p class="panel-desc">完整保存你每一次闖關的記錄，點選任一筆記錄即可回顧當時答過的每一題、自己的答案與圖形解析！</p>
           <div id="history-list" class="history-list"></div>
         </div>
       </section>
@@ -568,7 +569,7 @@
             <button class="btn btn-ghost" id="btn-arcade-back" type="button">← 返回冒險島地圖</button>
             <h2>⚡ 60 秒限時心算閃電賽</h2>
           </div>
-          <p class="panel-desc">60 秒內挑戰連續心算搶分，破紀錄還能獲得額外閃亮金幣！個人最高紀錄：<strong id="blitz-best-score">0</strong> 分</p>
+          <p class="panel-desc">60 秒內挑戰連續心算搶分，破記錄還能獲得額外閃亮金幣！個人最高記錄：<strong id="blitz-best-score">0</strong> 分</p>
           <div class="hero-cta-row" style="margin-bottom:16px;">
             <select id="blitz-topic-select" class="luxury-select">
               <option value="ALL">🌈 綜合心算（加減＋乘除＋單位）</option>
@@ -640,7 +641,7 @@
             <button class="btn btn-ghost" id="btn-tools-back" type="button">← 返回冒險島地圖</button>
             <h2>🧰 互動數學小教具 & 家長老師學習工具</h2>
           </div>
-          <p class="panel-desc">動手玩教具理解抽象數學、檢視四大領域診斷雷達圖、一鍵列印 A4 紙本練習卷，還能備份學習紀錄！</p>
+          <p class="panel-desc">動手玩教具理解抽象數學、檢視四大領域診斷雷達圖、一鍵列印 A4 紙本練習卷，還能備份學習記錄！</p>
 
           <div class="tools-grid">
             <!-- 教具 1：互動時鐘 -->
@@ -685,7 +686,7 @@
             <div id="radar-summary" class="diag-list"></div>
           </div>
 
-          <!-- 列印 A4 考卷 + 紀錄備份 -->
+          <!-- 列印 A4 考卷 + 記錄備份 -->
           <div class="panel-card">
             <h3 class="section-subtitle">🖨️ 一鍵列印 A4 練習卷（含教師詳解卷）</h3>
             <div class="worksheet-form">
@@ -708,11 +709,11 @@
 
             <hr class="soft-divider" />
 
-            <h3 class="section-subtitle">💾 學習紀錄匯出／匯入備份</h3>
-            <p style="font-size:0.86rem;color:var(--muted);margin:0 0 12px;">換電腦或平板時，可以將所有帳號的星星、金幣、裝飾與答題紀錄匯出成檔案帶著走！</p>
+            <h3 class="section-subtitle">💾 學習記錄匯出／匯入備份</h3>
+            <p style="font-size:0.86rem;color:var(--muted);margin:0 0 12px;">換電腦或平板時，可以將所有帳號的星星、金幣、裝飾與答題記錄匯出成檔案帶著走！</p>
             <div class="backup-btn-row">
               <button type="button" class="btn btn-gold" id="btn-export-backup">⬇️ 匯出備份檔 (.json)</button>
-              <button type="button" class="btn btn-ghost" id="btn-import-backup">⬆️ 匯入還原紀錄</button>
+              <button type="button" class="btn btn-ghost" id="btn-import-backup">⬆️ 匯入還原記錄</button>
               <input type="file" id="input-import-backup" accept=".json,application/json" class="hidden" />
             </div>
           </div>
@@ -797,7 +798,7 @@
         </div>
         <div class="legal-card">
           <h4>3. 本機儲存與備份還原說明</h4>
-          <p>您的闖關星等、閃亮金幣、島嶼裝飾擺設、錯題本、熟記字卡與歷史答題紀錄，皆<strong>僅保存在您目前瀏覽器的本機儲存空間（localStorage）</strong>，不會傳送至任何外部伺服器。如需跨裝置保留進度，可至「🧰 教具報告」使用 JSON 匯出／匯入備份功能。</p>
+          <p>您的闖關星等、閃亮金幣、島嶼裝飾擺設、錯題本、熟記字卡與歷史答題記錄，皆<strong>僅保存在您目前瀏覽器的本機儲存空間（localStorage）</strong>，不會傳送至任何外部伺服器。如需跨裝置保留進度，可至「🧰 教具報告」使用 JSON 匯出／匯入備份功能。</p>
         </div>
         <div class="legal-card">
           <h4>4. 安全架構與零惡意程式</h4>
@@ -915,7 +916,7 @@
         <ol style="margin:0;padding-left:20px;font-size:0.9rem;line-height:1.7;">
           <li>拿起手機打開「相機」或掃碼器對準上方 QR 碼即可直接進入數學遊戲冒險島。</li>
           <li>如需在手機桌面快速開啟，可透過瀏覽器選單點選<strong>「加入主畫面」</strong>。</li>
-          <li>闖關紀錄與星星金幣會自動保存在手機本機瀏覽器中，外出搭車也能隨時練習！</li>
+          <li>闖關記錄與星星金幣會自動保存在手機本機瀏覽器中，外出搭車也能隨時練習！</li>
         </ol>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
@@ -988,7 +989,7 @@
     </div>
   </div>
 
-  <!-- 歷史紀錄詳細回顧彈窗 -->
+  <!-- 歷史記錄詳細回顧彈窗 -->
   <div id="history-detail-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-top">

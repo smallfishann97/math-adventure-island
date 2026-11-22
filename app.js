@@ -1,7 +1,7 @@
 /**
  * 小三數學秘境島｜主互動引擎
  * 整合：多帳號登入存檔、2D冒險島地圖、16單元×10關闖關動畫、800題SVG圖形題、
- * 國小生對錯雙欄與圖形解析、過關小禮物迷你遊戲、歷史答題紀錄館、3D數學名詞字卡、四段字體調整
+ * 國小生對錯雙欄與圖形解析、過關小禮物迷你遊戲、歷史答題記錄館、3D數學名詞字卡、四段字體調整
  */
 (function () {
   const STORE_KEY = "grade3_math_atelier_accounts_v2";
@@ -363,7 +363,7 @@
                 <span>⭐ ${totalStars} ｜ 🪙 ${u.coins || 0}</span>
               </div>
             </button>
-            <button type="button" class="profile-del-btn" data-delete-uid="${esc(u.id)}" title="刪除此冒險者紀錄" aria-label="刪除 ${esc(u.name)}">✕</button>
+            <button type="button" class="profile-del-btn" data-delete-uid="${esc(u.id)}" title="刪除此冒險者記錄" aria-label="刪除 ${esc(u.name)}">✕</button>
           </div>
         `;
       })
@@ -1182,7 +1182,7 @@
   }
 
   // ===========================================================================
-  // 6. 結算成績單、儲存歷史紀錄與過關小禮物
+  // 6. 結算成績單、儲存歷史記錄與過關小禮物
   // ===========================================================================
   function finishQuiz() {
     stopQuizTimer();
@@ -1227,7 +1227,7 @@
       if (stars > prev) user.originalStars[quiz.unitId] = stars;
     }
 
-    // 存入「歷史答題紀錄」（最多保留最近 60 筆）
+    // 存入「歷史答題記錄」（最多保留最近 60 筆）
     user.history.unshift({
       id: "h_" + Date.now(),
       date: new Date().toLocaleString("zh-TW", { hour12: false }),
@@ -1469,7 +1469,7 @@
   }
 
   // ===========================================================================
-  // 8. 分單元錯題特訓 & 歷史答題紀錄館 & 課綱出處
+  // 8. 分單元錯題特訓 & 歷史答題記錄館 & 課綱出處
   // ===========================================================================
   function renderMistakesHub() {
     const user = currentUser();
@@ -1513,7 +1513,7 @@
     const user = currentUser();
     const listEl = document.getElementById("history-list");
     if (!user.history || user.history.length === 0) {
-      listEl.innerHTML = `<p style="text-align:center;color:var(--muted);padding:24px;font-weight:800;">尚無答題紀錄，快去 2D 秘境島挑戰第一關吧！</p>`;
+      listEl.innerHTML = `<p style="text-align:center;color:var(--muted);padding:24px;font-weight:800;">尚無答題記錄，快去 2D 秘境島挑戰第一關吧！</p>`;
       return;
     }
     listEl.innerHTML = user.history
@@ -1590,7 +1590,7 @@
         const target = store.users[uid];
         if (!target) return;
         window.SoundFX.playClick();
-        if (confirm(`確定要刪除冒險者「${target.name}」的紀錄嗎？刪除後將無法復原喔！`)) {
+        if (confirm(`確定要刪除冒險者「${target.name}」的記錄嗎？刪除後將無法復原喔！`)) {
           delete store.users[uid];
           if (store.activeUserId === uid) store.activeUserId = null;
           saveStore();
