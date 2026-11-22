@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-font-size="md">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>數學遊戲冒險島｜108課綱互動闖關與教學題庫</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 全螢幕粒子特效畫布 & 浮動加分提示層 -->
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+  <div id="floating-fx-layer" aria-hidden="true"></div>
+
+  <!-- 闖關開場動畫遮罩 -->
+  <div id="stage-intro-overlay" class="stage-intro-overlay hidden" aria-hidden="true">
+    <div class="stage-intro-card">
+      <div class="stage-intro-emblem">✦ STAGE <span id="intro-stage-num">01</span> ✦</div>
+      <h2 id="intro-unit-title">一萬以內的數</h2>
+      <p id="intro-subtitle">準備出發！共 5 道精選關卡題目</p>
+      <div class="stage-intro-shimmer"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 登入頁面（多帳號紀錄儲存） ==================== -->
+  <section id="view-login" class="login-screen active">
+    <div class="login-card">
+      <div class="login-crest">🍃 MATH ADVENTURE ISLAND 🍃</div>
+      <h1 class="login-title">數學遊戲冒險島</h1>
+      <p class="login-subtitle">108 課綱不分版本・16 座島嶼景點・800 題精編互動闖關題庫</p>
+
+      <div id="existing-profiles-wrap" class="profiles-section hidden">
+        <h3>選擇冒險者身分快速登入</h3>
+        <div id="existing-profiles-list" class="profiles-grid"></div>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <h3>建立新冒險者（自動保存闖關與答題紀錄）</h3>
+        <div class="avatar-picker" id="avatar-picker" role="radiogroup" aria-label="選擇原創動物頭像"></div>
+        <div class="login-input-row">
+          <input type="text" id="login-name-input" class="luxury-input" placeholder="請輸入名字或暱稱（例：小安）" maxlength="16" required />
+          <button type="submit" class="btn btn-gold btn-lg">登島啟程 ✦</button>
+        </div>
+      </form>
+
+      <p class="login-copyright">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
+    </div>
+  </section>
+
+  <!-- ==================== 主應用程式外框（登入後顯示） ==================== -->
+  <div id="app-shell" class="hidden">
+    <!-- 頂部精品導覽列 -->
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="brand" id="btn-go-home" type="button" title="回到冒險島地圖">
+          <span class="brand-icon" aria-hidden="true"><img src="favicon.svg" alt="" class="brand-logo-svg" /></span>
+          <div class="brand-text">
+            <h1>數學遊戲冒險島 <span class="brand-author">Designed by Ann Lu</span></h1>
+            <p>16 單元・800 題・108 課綱國小三年級</p>
+          </div>
+        </button>
+
+        <nav class="topbar-actions" aria-label="主功能選單">
+          <button class="nav-pill active" id="nav-home" type="button">🗺️ 冒險島地圖</button>
+          <button class="nav-pill" id="nav-original" type="button">✨ 原創挑戰區</button>
+          <button class="nav-pill" id="nav-arcade" type="button">⚡ 閃電與PK</button>
+          <button class="nav-pill" id="nav-shop" type="button">🛍️ 商店徽章</button>
+          <button class="nav-pill" id="nav-tools" type="button">🧰 教具報告</button>
+          <button class="nav-pill" id="nav-glossary" type="button">🃏 名詞字卡</button>
+          <button class="nav-pill" id="nav-mistakes" type="button">
+            🛠️ 錯題特訓
+            <span class="badge-count" id="mistake-badge">0</span>
+          </button>
+          <button class="nav-pill" id="nav-history" type="button">📜 答題紀錄</button>
+          <button class="nav-pill" id="nav-sources" type="button">📚 課綱出處</button>
+        </nav>
+
+        <div class="topbar-tools">
+          <!-- 即時日期、星期與時間顯示 -->
+          <div id="live-clock-pill" class="live-clock-pill" aria-live="off" title="現在日期與時間">
+            <span>📅 載入中…</span>
+          </div>
+
+          <!-- 字體大小調節器 -->
+          <div class="font-size-control" role="group" aria-label="字體大小調整">
+            <span class="tool-hint">字</span>
+            <button type="button" class="fs-btn" data-fs="sm" title="小字體">小</button>
+            <button type="button" class="fs-btn active" data-fs="md" title="中字體">中</button>
+            <button type="button" class="fs-btn" data-fs="lg" title="大字體">大</button>
+            <button type="button" class="fs-btn" data-fs="xl" title="特大字體">特大</button>
+          </div>
+
+          <button class="icon-toggle" id="btn-bgm-toggle" type="button" aria-pressed="false" title="開啟／關閉八音盒背景音樂">
+            <span id="bgm-icon">🎵</span>
+          </button>
+
+          <button class="icon-toggle" id="btn-sound-toggle" type="button" aria-pressed="true" title="切換答題音效">
+            <span id="sound-icon">🔊</span>
+          </button>
+
+          <button class="user-chip" id="btn-switch-user" type="button" title="切換冒險者帳號">
+            <span id="user-avatar">🦊</span>
+            <span id="user-name">冒險者</span>
+            <span class="user-switch-hint">切換</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-container">
+      <!-- ==================== 視圖 1：首頁 2D 秘境島地圖 ==================== -->
+      <section id="view-home" class="view active">
+        <!-- 精品深焙暖棕金 Hero 橫幅（無藍色） -->
+        <div class="hero-banner">
+          <div class="hero-content">
+            <span class="hero-tag">🍃 數學遊戲冒險島・完整對應 108 課綱國小三年級 24 項學習條目</span>
+            <h2>歡迎登島！分單元闖關收集星星與閃亮金幣！</h2>
+            <p>全站 16 個主題單元獨立分開、絕不混題！每單元 50 題分為 10 道關卡，過關即贈送「迷你小遊戲小禮物」，每題皆附詳細對錯解析與圖形說明。</p>
+            <div class="hero-cta-row">
+              <select id="quick-unit-select" class="quick-unit-select" aria-label="快速選擇數學單元"></select>
+              <button class="btn btn-gold btn-lg" id="btn-quick-enter-stages" type="button">🗺️ 進入此單元闖關</button>
+              <button class="btn btn-outline-light btn-lg" id="btn-quick-lesson-unit" type="button">📘 先看教學講義</button>
+            </div>
+          </div>
+          <div class="hero-stats-card">
+            <div class="stat-item">
+              <span class="stat-label">已通關關卡</span>
+              <strong class="stat-value" id="stat-cleared-stages">0 / 160</strong>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">典藏星光數</span>
+              <strong class="stat-value" id="stat-total-stars">⭐ 0</strong>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">小遊戲金幣</span>
+              <strong class="stat-value" id="stat-coins">🪙 0</strong>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">待複習錯題</span>
+              <strong class="stat-value" id="stat-mistake-count">0 題</strong>
+            </div>
+            <button type="button" class="btn btn-gold btn-sm" id="btn-open-rules" style="margin-top:4px;width:100%;">📖 星星、金幣與闖關規則說明</button>
+          </div>
+        </div>
+
+        <!-- 互動冒險島冒險地圖 -->
+        <section class="island-section panel-card">
+          <div class="island-header">
+            <div>
+              <span class="section-eyebrow">🍃 MATH ISLAND ADVENTURE MAP</span>
+              <h3>🗺️ 數學遊戲冒險島地圖（拖曳可轉動視角，點選地標進入各單元的 10 道關卡，共 160 關）</h3>
+            </div>
+            <div class="island-controls-row">
+              <div class="map-legend">
+                <span><i class="dot dot-done"></i> 已全破</span>
+                <span><i class="dot dot-progress"></i> 探險中</span>
+                <span><i class="dot dot-new"></i> 待啟程</span>
+              </div>
+              <div class="theme-switcher" aria-label="切換島嶼天色氛圍">
+                <button type="button" class="theme-pill active" data-island-theme="day" title="晴朗白天">
+                  <svg viewBox="0 0 28 28" class="theme-icon" aria-hidden="true">
+                    <circle cx="14" cy="14" r="7.5" fill="#FFD15C" stroke="#D98218" stroke-width="1.8" />
+                    <g stroke="#F29E2E" stroke-width="2" stroke-linecap="round">
+                      <line x1="14" y1="2" x2="14" y2="4.5" /><line x1="14" y1="23.5" x2="14" y2="26" />
+                      <line x1="2" y1="14" x2="4.5" y2="14" /><line x1="23.5" y1="14" x2="26" y2="14" />
+                      <line x1="5.5" y1="5.5" x2="7.3" y2="7.3" /><line x1="20.7" y1="20.7" x2="22.5" y2="22.5" />
+                      <line x1="22.5" y1="5.5" x2="20.7" y2="7.3" /><line x1="7.3" y1="20.7" x2="5.5" y2="22.5" />
+                    </g>
+                    <circle cx="11.6" cy="13.2" r="1.1" fill="#5A4031" /><circle cx="16.4" cy="13.2" r="1.1" fill="#5A4031" />
+                    <path d="M 11.5 16 Q 14 18.2 16.5 16" fill="none" stroke="#5A4031" stroke-width="1.3" stroke-linecap="round" />
+                  </svg>
+                  <span>白天</span>
+                </button>
+                <button type="button" class="theme-pill" data-island-theme="cloudy" title="涼爽陰天">
+                  <svg viewBox="0 0 28 28" class="theme-icon" aria-hidden="true">
+                    <path d="M 7 21 H 21 A 4.8 4.8 0 0 0 21.4 11.5 A 6.4 6.4 0 0 0 9.4 10.2 A 4.6 4.6 0 0 0 7 21 Z" fill="#E6ECE9" stroke="#7E9189" stroke-width="1.7" stroke-linejoin="round" />
+                    <circle cx="11.8" cy="15.5" r="1.1" fill="#5A4031" />
+                    <circle cx="16.4" cy="15.5" r="1.1" fill="#5A4031" />
+                    <path d="M 12.2 18 Q 14.1 19.4 16 18" fill="none" stroke="#5A4031" stroke-width="1.2" stroke-linecap="round" />
+                  </svg>
+                  <span>陰天</span>
+                </button>
+                <button type="button" class="theme-pill" data-island-theme="sunset" title="溫柔夕陽">
+                  <svg viewBox="0 0 28 28" class="theme-icon" aria-hidden="true">
+                    <circle cx="14" cy="14" r="7" fill="#FF9A6C" stroke="#D95D48" stroke-width="1.6" />
+                    <circle cx="11.8" cy="13" r="1" fill="#5A4031" /><circle cx="16.2" cy="13" r="1" fill="#5A4031" />
+                    <path d="M 11.8 15.5 Q 14 17.2 16.2 15.5" fill="none" stroke="#5A4031" stroke-width="1.2" stroke-linecap="round" />
+                    <path d="M 4 21 Q 8 17 14 19 Q 20 17 24 21 Q 22 25 14 25 Q 6 25 4 21 Z" fill="#FFE1C6" stroke="#E8846B" stroke-width="1.4" />
+                  </svg>
+                  <span>夕陽</span>
+                </button>
+                <button type="button" class="theme-pill" data-island-theme="night" title="閃耀星空夜景">
+                  <svg viewBox="0 0 28 28" class="theme-icon" aria-hidden="true">
+                    <path d="M 17 5 A 9.5 9.5 0 1 0 23 19.5 A 7.5 7.5 0 1 1 17 5 Z" fill="#FFE07D" stroke="#C98A1C" stroke-width="1.6" stroke-linejoin="round" />
+                    <circle cx="20.5" cy="8.5" r="1.8" fill="#FFF3B0" />
+                    <circle cx="23.5" cy="13.5" r="1.2" fill="#FFF3B0" />
+                  </svg>
+                  <span>星空</span>
+                </button>
+              </div>
+              <button type="button" class="btn btn-gold btn-sm" id="btn-toggle-decorate" title="自由移動商店購買的島嶼裝飾">✨ 自由佈置小島</button>
+              <div class="camera-controls" aria-label="轉動島嶼視角">
+                <button type="button" class="cam-btn" id="btn-cam-left" title="向左轉動島嶼">↺</button>
+                <button type="button" class="cam-btn" id="btn-cam-reset" title="重設視角">⌖</button>
+                <button type="button" class="cam-btn" id="btn-cam-right" title="向右轉動島嶼">↻</button>
+              </div>
+            </div>
+          </div>
+          <!-- 群島切換船票（全部 4 座主題島直接開放！） -->
+          <div id="archipelago-bar" class="archipelago-bar" role="tablist" aria-label="群島切換船票">
+            <span class="archipelago-label">🎫 群島切換船票：</span>
+            <button type="button" class="island-ticket-btn active" data-island-tab="main" role="tab" aria-selected="true">
+              <span class="ticket-num">1號島・01~04</span>
+              <strong>🌲 陽光森林島</strong>
+            </button>
+            <button type="button" class="island-ticket-btn" data-island-tab="garden" role="tab" aria-selected="false">
+              <span class="ticket-num">2號島・05~08</span>
+              <strong>🌸 花園動物島</strong>
+            </button>
+            <button type="button" class="island-ticket-btn" data-island-tab="park" role="tab" aria-selected="false">
+              <span class="ticket-num">3號島・09~12</span>
+              <strong>🎡 甜點遊樂園</strong>
+            </button>
+            <button type="button" class="island-ticket-btn" data-island-tab="bay" role="tab" aria-selected="false">
+              <span class="ticket-num">4號島・13~16</span>
+              <strong>⛵ 星空海灣島</strong>
+            </button>
+            <button type="button" class="island-ticket-btn is-locked" data-island-tab="town" role="tab" aria-selected="false">
+              <span class="ticket-num">5號島</span>
+              <strong>🏘️ 職人小鎮島</strong>
+              <em class="ticket-lock-tag">🔒 ★30解鎖</em>
+            </button>
+            <button type="button" class="island-ticket-btn is-locked" data-island-tab="kingdom" role="tab" aria-selected="false">
+              <span class="ticket-num">6號島</span>
+              <strong>👑 皇冠天空島</strong>
+              <em class="ticket-lock-tag">🔒 ★80解鎖</em>
+            </button>
+          </div>
+          <div id="island-unlock-toast" class="island-unlock-toast hidden" role="status" aria-live="polite"></div>
+          <div id="decorate-bar" class="decorate-bar hidden">
+            <div class="decorate-bar-top">
+              <span id="decorate-hint">✨ 佈置模式：先從下方點選一件裝飾（或點島上的裝飾），再點島上任何地方就能放過去！</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-decorate-reset">↺ 恢復預設位置</button>
+                <button type="button" class="btn btn-forest btn-sm" id="btn-decorate-done">✓ 完成佈置</button>
+              </div>
+            </div>
+            <div id="decorate-tray" class="decorate-tray"></div>
+          </div>
+          <div id="island-map-container" class="island-map-container"></div>
+        </section>
+
+        <!-- 領域篩選與精品單元卡片總覽 -->
+        <div class="section-divider-row">
+          <h3>🏛️ 全部 16 座主題單元一覽</h3>
+          <div class="filter-bar" role="tablist" aria-label="數學領域篩選">
+            <button class="filter-chip active" data-domain="ALL" type="button">全部 (16)</button>
+            <button class="filter-chip" data-domain="數與量" type="button">數與量</button>
+            <button class="filter-chip" data-domain="空間與形狀" type="button">空間與形狀</button>
+            <button class="filter-chip" data-domain="關係" type="button">關係與規律</button>
+            <button class="filter-chip" data-domain="資料與不確定性" type="button">統計表格</button>
+          </div>
+        </div>
+        <div id="units-grid" class="units-grid"></div>
+      </section>
+
+      <!-- ==================== 視圖 2：單一單元 10 關闖關地圖 ==================== -->
+      <section id="view-stages" class="view">
+        <div class="lesson-toolbar">
+          <button class="btn btn-ghost" id="btn-stages-back" type="button">← 返回冒險島地圖</button>
+          <div class="toolbar-right-group">
+            <label class="unlock-toggle" title="開啟後可直接挑戰任意關卡">
+              <input type="checkbox" id="chk-free-unlock" />
+              <span>自由選關模式</span>
+            </label>
+            <button class="btn btn-forest" id="btn-stages-to-lesson" type="button">📘 看本單元教學講義</button>
+          </div>
+        </div>
+
+        <div class="panel-card stage-map-panel">
+          <div class="stage-map-header">
+            <div id="stages-badges" class="lesson-badges"></div>
+            <h2 id="stages-unit-title">單元標題</h2>
+            <p id="stages-unit-summary" class="panel-desc"></p>
+            <div class="stage-progress-summary">
+              <span>本單元共 <strong>50 題</strong>（分 10 關・每關 5 題）</span>
+              <span>｜</span>
+              <span>已獲得 <strong id="stages-unit-stars">⭐ 0 / 30</strong></span>
+            </div>
+          </div>
+          <div id="stages-grid" class="stages-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 3：單元教學講義 ==================== -->
+      <section id="view-lesson" class="view">
+        <div class="lesson-toolbar">
+          <button class="btn btn-ghost" id="btn-lesson-back" type="button">← 返回冒險島地圖</button>
+          <button class="btn btn-gold" id="btn-lesson-start-stages" type="button">🗺️ 前往本單元 10 關闖關 →</button>
+        </div>
+
+        <article class="panel-card lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-badges" id="lesson-badges"></div>
+            <h2 id="lesson-title"></h2>
+            <p id="lesson-summary" class="lesson-summary"></p>
+          </div>
+
+          <div class="lesson-grid">
+            <div class="lesson-box box-gold">
+              <h3>📘 老師重點整理</h3>
+              <ul id="lesson-keypoints"></ul>
+            </div>
+            <div class="lesson-box box-forest">
+              <h3>🔑 核心公式與口訣</h3>
+              <div id="lesson-formulas" class="formula-list"></div>
+            </div>
+            <div class="lesson-box box-ivory">
+              <h3>💡 生活例題示範</h3>
+              <p class="example-problem" id="lesson-example-problem"></p>
+              <ol id="lesson-example-steps" class="example-steps"></ol>
+              <div class="example-answer-box">
+                <span>例題解答：</span>
+                <strong id="lesson-example-answer"></strong>
+              </div>
+            </div>
+            <div class="lesson-box box-burgundy">
+              <h3>⚠️ 常見迷思提醒</h3>
+              <ul id="lesson-mistakes"></ul>
+            </div>
+          </div>
+
+          <div class="lesson-footer">
+            <div class="lesson-refs">
+              <span>📚 課綱與參考出處：</span>
+              <span id="lesson-references"></span>
+            </div>
+            <button class="btn btn-gold btn-xl" id="btn-lesson-start-stages-bottom" type="button">🚀 我學會了！進入 10 關冒險</button>
+          </div>
+        </article>
+      </section>
+
+      <!-- ==================== 視圖 4：互動答題遊戲 ==================== -->
+      <section id="view-quiz" class="view">
+        <div class="quiz-hud">
+          <button class="btn btn-ghost btn-sm" id="btn-quiz-exit" type="button">✕ 離開關卡</button>
+          <div class="hud-center">
+            <div class="hud-title-row">
+              <span id="quiz-mode-title" class="hud-mode-title">關卡練習</span>
+              <span id="quiz-progress-text" class="hud-progress-text">第 1 / 5 題</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+              <div id="quiz-progress-bar" class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="hud-metrics">
+            <div class="metric-pill score-pill">🏆 <span id="hud-score">0</span></div>
+            <div class="metric-pill combo-pill" id="hud-combo-pill">🔥 <span id="hud-combo">0</span> 連擊</div>
+            <div class="metric-pill timer-pill">⏱️ <span id="hud-timer">00:00</span></div>
+          </div>
+        </div>
+
+        <div class="panel-card quiz-card" id="quiz-card">
+          <div class="quiz-card-top-row">
+            <div class="question-meta" style="margin-bottom:0;">
+              <span class="meta-tag tag-unit" id="q-unit-tag">單元</span>
+              <span class="meta-tag tag-diff" id="q-diff-tag">基礎</span>
+              <span class="meta-tag tag-code" id="q-code-tag">N-3-1</span>
+              <span class="meta-tag tag-type" id="q-type-tag">選擇題</span>
+            </div>
+            <div class="quiz-helper-btns">
+              <button type="button" class="fc-speak-btn hint-toggle-btn" id="btn-toggle-hint">💡 解題提示</button>
+              <button type="button" class="fc-speak-btn" id="btn-read-question" data-idle-label="🔊 念題目給我聽">🔊 念題目給我聽</button>
+              <button type="button" class="fc-speak-btn" id="btn-toggle-scratchpad">✏️ 打開草稿紙</button>
+            </div>
+          </div>
+
+          <h3 class="question-text" id="q-text">題目載入中…</h3>
+
+          <!-- 解題方向小提示（不爆雷答案！） -->
+          <div id="quiz-hint-box" class="quiz-hint-box hidden" role="note">
+            <strong>💡 解題思考方向：</strong>
+            <p id="quiz-hint-text"></p>
+          </div>
+
+          <!-- 內建手寫計算草稿紙（小黑板） -->
+          <div id="scratchpad-panel" class="scratchpad-panel hidden">
+            <div class="scratchpad-bar">
+              <span>✏️ 手寫計算草稿紙（可用滑鼠或手指寫直式！）</span>
+              <div class="scratchpad-tools">
+                <span class="pad-pen-badge" title="選擇畫筆顏色">
+                  <svg viewBox="0 0 24 24" class="pad-pen-svg" aria-hidden="true">
+                    <path d="M4 20 L8.5 19 L19.5 8 C20.5 7 20.5 5.5 19.5 4.5 C18.5 3.5 17 3.5 16 4.5 L5 15.5 Z" fill="#FFD452" stroke="#5A4031" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M14.5 6 L18 9.5" stroke="#E86A5A" stroke-width="2"/>
+                    <path d="M4 20 L6.5 17.5" stroke="#5A4031" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  <span>畫筆</span>
+                </span>
+                <button type="button" class="pen-dot active" data-pen-color="#5a4031" style="background:#5a4031;" title="深棕畫筆"></button>
+                <button type="button" class="pen-dot" data-pen-color="#388d5c" style="background:#388d5c;" title="森綠畫筆"></button>
+                <button type="button" class="pen-dot" data-pen-color="#e8635e" style="background:#e8635e;" title="珊瑚紅畫筆"></button>
+                <label class="pad-size-ctrl" title="調整畫筆筆尖細到粗">
+                  <span>筆尖大小</span>
+                  <small class="size-end">細</small>
+                  <input type="range" id="pen-size-range" min="1" max="14" step="1" value="4" />
+                  <small class="size-end">粗</small>
+                  <em id="pen-size-val">4</em>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" data-pen-color="ERASER">🧽 橡皮擦</button>
+                <label class="pad-size-ctrl" title="調整橡皮擦小到大">
+                  <span>橡皮擦大小</span>
+                  <small class="size-end">小</small>
+                  <input type="range" id="eraser-size-range" min="8" max="48" step="2" value="20" />
+                  <small class="size-end">大</small>
+                  <em id="eraser-size-val">20</em>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-expand-scratchpad" title="放大手寫計算空間">⤢ 展開畫布</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-scratchpad">🗑️ 清空</button>
+              </div>
+            </div>
+            <canvas id="scratchpad-canvas" width="760" height="220" class="scratchpad-canvas"></canvas>
+          </div>
+
+          <!-- 題目專屬看圖 SVG 區（若有圖形題自動顯示） -->
+          <div id="question-visual-slot" class="question-visual-slot hidden"></div>
+
+          <!-- 選擇題區域 -->
+          <div id="choice-area" class="choice-grid"></div>
+
+          <!-- 填空／計算題區域（直接鍵盤打字輸入） -->
+          <div id="input-area" class="input-answer-area hidden">
+            <div class="input-row">
+              <input type="text" id="answer-input" class="answer-input" placeholder="請直接輸入數字答案（例：123 或 2.5），按 Enter 送出" autocomplete="off" inputmode="decimal" />
+              <button class="btn btn-gold btn-lg" id="btn-submit-input" type="button">送出答案 ✓</button>
+            </div>
+          </div>
+
+          <!-- 上一題／下一題自由切換列 -->
+          <div class="quiz-nav-row" id="quiz-nav-row">
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-prev-question">← 上一題</button>
+            <span class="quiz-nav-status" id="quiz-nav-status">第 1 / 5 題（已作答 0 題）</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-skip-next-question">下一題 →</button>
+          </div>
+
+          <!-- 即時回饋：對與錯雙欄原因說明 + 圖形化 SVG 解說 -->
+          <div id="feedback-box" class="feedback-box hidden" role="status" aria-live="polite">
+            <div class="feedback-header">
+              <span id="feedback-icon" class="feedback-icon">🎉</span>
+              <div>
+                <h4 id="feedback-title">答對了！</h4>
+                <p id="feedback-answer-line" class="feedback-answer-line"></p>
+              </div>
+            </div>
+            <div id="feedback-rich-body" class="feedback-rich-body"></div>
+            <div class="feedback-actions">
+              <button class="btn btn-gold btn-lg" id="btn-next-question" type="button">下一題 →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 5：結算成績單、過關小禮物與完整解析 ==================== -->
+      <section id="view-result" class="view">
+        <div class="panel-card result-summary-card">
+          <div class="result-trophy-row">
+            <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+            <h2 id="result-headline">恭喜通關！</h2>
+            <p id="result-subtext">一起來看看每一題的完整對錯解析，並拆開你的過關小禮物吧！</p>
+          </div>
+
+          <div class="result-stats-grid">
+            <div class="result-stat"><span>總得分</span><strong id="res-score">0</strong></div>
+            <div class="result-stat"><span>答對題數</span><strong id="res-correct">0 / 0</strong></div>
+            <div class="result-stat"><span>正確率</span><strong id="res-accuracy">0%</strong></div>
+            <div class="result-stat"><span>最高連擊</span><strong id="res-max-combo">0</strong></div>
+            <div class="result-stat"><span>花費時間</span><strong id="res-time">00:00</strong></div>
+          </div>
+
+          <!-- 過關小禮物區塊（過關即解鎖迷你小遊戲！） -->
+          <div id="reward-gift-banner" class="reward-gift-banner hidden">
+            <div class="gift-info">
+              <span class="gift-icon">🎁</span>
+              <div>
+                <h3 id="gift-banner-title">恭喜過關！獲得「過關小禮物」1 次！</h3>
+                <p id="gift-banner-desc">【規則】每次過關只能從以下 6 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！</p>
+              </div>
+            </div>
+            <div class="gift-buttons">
+              <button type="button" class="btn btn-gold" data-play-mg="catcher">🌟 金幣接接樂</button>
+              <button type="button" class="btn btn-forest" data-play-mg="memory">🃏 記憶翻牌</button>
+              <button type="button" class="btn btn-burgundy" data-play-mg="whack">🎯 寶箱敲敲樂</button>
+              <button type="button" class="btn btn-gold" data-play-mg="wheel">🎡 幸運大轉盤</button>
+              <button type="button" class="btn btn-forest" data-play-mg="bubble">🫧 數字戳泡泡</button>
+              <button type="button" class="btn btn-burgundy" data-play-mg="make10">🍬 湊10消消樂</button>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button class="btn btn-gold btn-lg hidden" id="btn-next-stage" type="button">🚀 挑戰下一關 →</button>
+            <button class="btn btn-forest btn-lg" id="btn-retry-quiz" type="button">🔄 再挑戰本關</button>
+            <button class="btn btn-burgundy btn-lg hidden" id="btn-retry-wrong" type="button">🛠️ 重練本次錯題</button>
+            <button class="btn btn-ghost btn-lg" id="btn-result-stages" type="button">🗺️ 回到關卡地圖</button>
+          </div>
+        </div>
+
+        <div class="panel-card review-panel">
+          <div class="review-header">
+            <div>
+              <h3>📋 完整答題結果與對錯圖形化解析</h3>
+              <p>每一題皆包含詳細解題步驟、為什麼對、為什麼錯、圖形化說明與課綱出處</p>
+            </div>
+            <div class="review-filter">
+              <button class="filter-chip active" id="btn-filter-all" type="button">顯示全部</button>
+              <button class="filter-chip" id="btn-filter-wrong" type="button">只看錯題</button>
+            </div>
+          </div>
+          <div id="review-list" class="review-list"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 6：數學名詞翻轉字卡館 ==================== -->
+      <section id="view-glossary" class="view">
+        <div class="panel-card">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-glossary-back" type="button">← 返回冒險島地圖</button>
+            <h2>🃏 國小三年級數學名詞字卡館</h2>
+          </div>
+          <p class="panel-desc">點選字卡即可翻面！正面看重點與專屬圖示，背面看詳細說明、生活例子與老師口訣。</p>
+          <div class="glossary-toolbar">
+            <select id="glossary-unit-filter" class="luxury-select" aria-label="依單元篩選字卡"></select>
+            <span class="glossary-progress">已熟記：<strong id="glossary-mastered-count">0</strong> 張</span>
+          </div>
+          <div id="glossary-grid" class="glossary-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 7：分單元錯題特訓營 ==================== -->
+      <section id="view-mistakes-hub" class="view">
+        <div class="panel-card">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-mistakes-back" type="button">← 返回冒險島地圖</button>
+            <h2>🛠️ 分單元錯題特訓營</h2>
+          </div>
+          <p class="panel-desc">依單元清楚分類曾答錯的題目，答對後即自動移出錯題本！</p>
+          <div id="mistakes-unit-list" class="units-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 8：歷史答題紀錄館 ==================== -->
+      <section id="view-history" class="view">
+        <div class="panel-card">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-history-back" type="button">← 返回冒險島地圖</button>
+            <h2>📜 我的歷史答題紀錄館</h2>
+          </div>
+          <p class="panel-desc">完整保存你每一次闖關的紀錄，點選任一筆紀錄即可回顧當時答過的每一題、自己的答案與圖形解析！</p>
+          <div id="history-list" class="history-list"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 13：60秒心算閃電賽 & 雙人同機 PK ==================== -->
+      <section id="view-arcade" class="view">
+        <div class="panel-card" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-arcade-back" type="button">← 返回冒險島地圖</button>
+            <h2>⚡ 60 秒限時心算閃電賽</h2>
+          </div>
+          <p class="panel-desc">60 秒內挑戰連續心算搶分，破紀錄還能獲得額外閃亮金幣！個人最高紀錄：<strong id="blitz-best-score">0</strong> 分</p>
+          <div class="hero-cta-row" style="margin-bottom:16px;">
+            <select id="blitz-topic-select" class="luxury-select">
+              <option value="ALL">🌈 綜合心算（加減＋乘除＋單位）</option>
+              <option value="addsub">➕ 加減心算衝刺</option>
+              <option value="mul">✖️ 九九乘除反應賽</option>
+              <option value="unit">📏 長度／時間／重量換算</option>
+            </select>
+            <button type="button" class="btn btn-gold btn-lg" id="btn-blitz-start">⚡ 開始 60 秒閃電賽！</button>
+          </div>
+          <div id="blitz-arena" class="arcade-arena">
+            <p style="color:var(--muted);font-weight:800;margin:8px 0;">選好主題後按下「開始 60 秒閃電賽」，立刻出發！</p>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2>🧑‍🤝‍🧑 雙人同機 PK 搶答大賽（10 回合）</h2>
+          </div>
+          <p class="panel-desc">同一台電腦或平板即可親子／手足雙人對戰！左邊嫩葉隊（鍵盤 1~4）對決右邊蜜桃隊（鍵盤 7~0），也可以直接雙人點擊搶答！</p>
+          <button type="button" class="btn btn-burgundy btn-lg" id="btn-pk-start" style="margin-bottom:16px;">🥊 開始雙人 PK 對戰！</button>
+          <div id="pk-arena" class="arcade-arena">
+            <p style="color:var(--muted);font-weight:800;margin:8px 0;">找一位夥伴準備好，按下按鈕立刻開戰！</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 12：原創素養挑戰專區（獨立 8 關 × 每關 20 題） ==================== -->
+      <section id="view-original" class="view">
+        <div class="panel-card">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-original-back" type="button">← 返回冒險島地圖</button>
+            <h2>✨ 原創素養挑戰專區（每關 20 題・共 160 題）</h2>
+          </div>
+          <p class="panel-desc">
+            這區收錄 8 大全新自創的冒險島生活故事主題關卡，獨立於 16 單元主線題庫之外！每一關皆有 <strong>20 道全新原創題</strong>（含看圖題與詳細對錯圖解），過關一樣能收集星星與解鎖 6 款過關小遊戲！
+          </p>
+          <div id="original-stages-grid" class="units-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 10：島嶼金幣商店、簽到與徽章 ==================== -->
+      <section id="view-shop" class="view">
+        <div class="panel-card" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-shop-back" type="button">← 返回冒險島地圖</button>
+            <h2>🛍️ 島嶼金幣商店 & 榮譽徽章牆</h2>
+          </div>
+          <div id="daily-checkin-box" class="daily-checkin-box"></div>
+        </div>
+
+        <div class="panel-card" style="margin-bottom:20px;">
+          <h3 class="section-subtitle">🏆 我的榮譽徽章牆</h3>
+          <div id="badges-grid" class="badges-grid"></div>
+        </div>
+
+        <div class="panel-card">
+          <div class="section-divider-row">
+            <h3 class="section-subtitle" style="margin:0;">🏝️ 佈置我的冒險群島（共 112 款動態裝飾：含 Q 版小人物、交通工具、多種房型、樹花草與動物，可自由擺放到 6 座小島！）</h3>
+            <div id="shop-category-bar" class="filter-bar"></div>
+          </div>
+          <div id="shop-grid" class="shop-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 11：互動小教具、學習雷達圖、列印考卷與備份 ==================== -->
+      <section id="view-tools" class="view">
+        <div class="panel-card" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-tools-back" type="button">← 返回冒險島地圖</button>
+            <h2>🧰 互動數學小教具 & 家長老師學習工具</h2>
+          </div>
+          <p class="panel-desc">動手玩教具理解抽象數學、檢視四大領域診斷雷達圖、一鍵列印 A4 紙本練習卷，還能備份學習紀錄！</p>
+
+          <div class="tools-grid">
+            <!-- 教具 1：互動時鐘 -->
+            <div class="tool-card">
+              <h3>🕒 互動時鐘教具</h3>
+              <div id="tool-clock-svg" class="tool-visual-center"></div>
+              <div class="tool-sliders">
+                <label>小時 (0-23)：<input type="range" id="tool-clock-hr" min="0" max="23" value="15" /></label>
+                <label>分鐘 (0-59)：<input type="range" id="tool-clock-min" min="0" max="59" value="0" /></label>
+              </div>
+              <div id="tool-clock-info" class="tool-info-box"></div>
+            </div>
+
+            <!-- 教具 2：互動分數披薩 -->
+            <div class="tool-card">
+              <h3>🍕 互動分數披薩</h3>
+              <div id="tool-pizza-svg" class="tool-visual-center"></div>
+              <div class="tool-sliders">
+                <label>平分成幾塊 (2-12)：<input type="range" id="tool-pizza-den" min="2" max="12" value="8" /></label>
+              </div>
+              <div id="tool-pizza-info" class="tool-info-box"></div>
+            </div>
+
+            <!-- 教具 3：互動直尺測量 -->
+            <div class="tool-card tool-card-wide">
+              <h3>📏 互動直尺與小數換算</h3>
+              <div id="tool-ruler-svg"></div>
+              <div class="tool-sliders tool-sliders-row">
+                <label>紙條起點 (mm)：<input type="range" id="tool-ruler-start" min="0" max="75" value="15" /></label>
+                <label>紙條終點 (mm)：<input type="range" id="tool-ruler-end" min="10" max="100" value="58" /></label>
+              </div>
+              <div id="tool-ruler-info" class="tool-info-box"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tools-bottom-grid">
+          <!-- 學習診斷雷達圖 -->
+          <div class="panel-card">
+            <h3 class="section-subtitle">📈 四大領域學習診斷雷達圖</h3>
+            <div id="radar-chart-slot" class="tool-visual-center"></div>
+            <div id="radar-summary" class="diag-list"></div>
+          </div>
+
+          <!-- 列印 A4 考卷 + 紀錄備份 -->
+          <div class="panel-card">
+            <h3 class="section-subtitle">🖨️ 一鍵列印 A4 練習卷（含教師詳解卷）</h3>
+            <div class="worksheet-form">
+              <label>選擇單元或錯題卷：
+                <select id="print-unit-select" class="luxury-select" style="width:100%;margin-top:6px;"></select>
+              </label>
+              <label>列印題數：
+                <select id="print-count-select" class="luxury-select" style="width:100%;margin-top:6px;">
+                  <option value="10">10 題（平時小考）</option>
+                  <option value="20">20 題（單元測驗）</option>
+                  <option value="50">50 題（全單元總複習）</option>
+                </select>
+              </label>
+              <label class="unlock-toggle" style="width:fit-content;">
+                <input type="checkbox" id="print-with-answers" checked />
+                <span>一併附上「教師解答與詳解卷」</span>
+              </label>
+              <button type="button" class="btn btn-forest btn-lg" id="btn-print-worksheet">🖨️ 開啟 A4 列印預覽</button>
+            </div>
+
+            <hr class="soft-divider" />
+
+            <h3 class="section-subtitle">💾 學習紀錄匯出／匯入備份</h3>
+            <p style="font-size:0.86rem;color:var(--muted);margin:0 0 12px;">換電腦或平板時，可以將所有帳號的星星、金幣、裝飾與答題紀錄匯出成檔案帶著走！</p>
+            <div class="backup-btn-row">
+              <button type="button" class="btn btn-gold" id="btn-export-backup">⬇️ 匯出備份檔 (.json)</button>
+              <button type="button" class="btn btn-ghost" id="btn-import-backup">⬆️ 匯入還原紀錄</button>
+              <input type="file" id="input-import-backup" accept=".json,application/json" class="hidden" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 個人專屬學習獎狀生成器 -->
+        <div class="panel-card" style="margin-top:20px;">
+          <h3 class="section-subtitle">🏅 個人專屬「數學榮譽獎狀」產生器（一鍵下載 PNG 或列印！）</h3>
+          <div class="cert-toolbar">
+            <select id="cert-title-select" class="luxury-select">
+              <option value="國小三年級數學小博士">🏆 國小三年級數學小博士</option>
+              <option value="冒險島計算閃電小達人">⚡ 冒險島計算閃電小達人</option>
+              <option value="熱愛學習全勤模範生">🌟 熱愛學習全勤模範生</option>
+              <option value="單元全破冠軍挑戰王">👑 單元全破冠軍挑戰王</option>
+            </select>
+            <button type="button" class="btn btn-gold" id="btn-cert-download">⬇️ 下載獎狀圖片 (PNG)</button>
+            <button type="button" class="btn btn-forest" id="btn-cert-print">🖨️ 直接列印獎狀</button>
+          </div>
+          <div class="cert-preview-wrap">
+            <canvas id="cert-canvas" width="840" height="540" class="cert-canvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 9：權威出處與課綱總覽 ==================== -->
+      <section id="view-sources" class="view">
+        <div class="panel-card">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-sources-back" type="button">← 返回冒險島地圖</button>
+            <h2>📚 108 課綱條目與權威參考出處</h2>
+          </div>
+          <p class="panel-desc">
+            本網站 16 單元、800 道題庫與教學講義依循中華民國教育部《十二年國民基本教育課程綱要：數學領域》（108 課綱）編製，不分版本，完整涵蓋三年級全部 24 項學習內容條目。
+          </p>
+          <div id="sources-list" class="sources-grid"></div>
+          <h3 class="section-subtitle">📌 涵蓋之 108 課綱國小三年級學習內容條目（共 24 項）</h3>
+          <div id="curriculum-codes-wrap" class="codes-wrap"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 頁尾非官方學習工具宣告與版權 -->
+    <footer class="site-footer">
+      <div class="footer-disclaimer-wrap">
+        <div class="footer-notice-badge">🍃 學習輔助網站宣告</div>
+        <p class="footer-disclaimer-text">
+          本平台「數學遊戲冒險島」係由設計者 Ann Lu 規劃製作之國小數學互動學習網站，非中華民國教育部或任何政府官方機構，亦非各教科書出版社之官方網站。本站全部題庫（共 960 題）、圖形化解析、數學名詞字卡，參考教育部公開之《十二年國民基本教育課程綱要（108 課綱）》學習目標編寫與製作，不索取任何機敏個資，公開課綱條目與課程標準均以中華民國教育部最新公告為準；若任何單位對內容有指正建議，歡迎來信聯繫我們處理。
+        </p>
+        <div class="footer-links-row">
+          <button type="button" class="footer-link-btn" data-open-legal="privacy">🔒 隱私權保護宣告</button>
+          <span class="footer-sep">｜</span>
+          <button type="button" class="footer-link-btn" data-open-legal="terms">📜 服務條款與非官方聲明</button>
+          <span class="footer-sep">｜</span>
+          <button type="button" class="footer-link-btn" data-open-legal="changelog">📢 最新更版日誌</button>
+          <span class="footer-sep">｜</span>
+          <button type="button" class="footer-link-btn" data-open-legal="qrcode">📱 手機掃碼開啟</button>
+          <span class="footer-sep">｜</span>
+          <a href="mailto:smallfishann97@gmail.com" class="footer-link-btn">✉️ 聯絡我們</a>
+        </div>
+      </div>
+      <p class="footer-brand">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
+      <p class="footer-copy">聯絡信箱：<a href="mailto:smallfishann97@gmail.com" class="footer-email-link">smallfishann97@gmail.com</a> ｜ Copyright © 2026 Ann Lu. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <!-- ==================== 法律宣告、更版日誌與手機掃碼 4 大彈窗 ==================== -->
+  <!-- 彈窗 A：隱私權保護與資安宣告 -->
+  <div id="modal-legal-privacy" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="title-legal-privacy">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="title-legal-privacy">🔒 隱私權保護與資安宣告</h3>
+        <button type="button" class="btn btn-ghost btn-sm" data-close-legal>關閉 ✕</button>
+      </div>
+      <div class="legal-cards">
+        <div class="legal-card">
+          <h4>1. 純教育輔助與免費自修用途</h4>
+          <p>本平台「數學遊戲冒險島」係由獨立教學設計者維護之非營利教育學習工具，旨在協助國小三年級學生透過遊戲化互動複習 108 課綱數學。本站免費開放自修，絕無強制收費機制。</p>
+        </div>
+        <div class="legal-card">
+          <h4>2. 絕無機敏個資收集</h4>
+          <p>本站<strong>不要求註冊雲端帳號，絕不收集任何個人身分證字號、真實姓名、密碼、電話、電子郵件或信用卡帳戶等機敏隱私資料</strong>。登島時輸入的暱稱僅供您自己的裝置區分角色使用；若您在其他網站看到索取上述資料，請勿輸入並小心防範詐騙。</p>
+        </div>
+        <div class="legal-card">
+          <h4>3. 本機儲存與備份還原說明</h4>
+          <p>您的闖關星等、閃亮金幣、島嶼裝飾擺設、錯題本、熟記字卡與歷史答題紀錄，皆<strong>僅保存在您目前瀏覽器的本機儲存空間（localStorage）</strong>，不會傳送至任何外部伺服器。如需跨裝置保留進度，可至「🧰 教具報告」使用 JSON 匯出／匯入備份功能。</p>
+        </div>
+        <div class="legal-card">
+          <h4>4. 安全架構與零惡意程式</h4>
+          <p>本平台為 100% 開放標準之純靜態前端網頁架構，不提供任何可執行安裝檔（.exe / .apk），完整符合 W3C 網頁安全標準並透過 HTTPS 安全加密傳輸。</p>
+        </div>
+      </div>
+      <div class="legal-footer-actions">
+        <button type="button" class="btn btn-gold btn-lg" data-close-legal>關閉宣告</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 彈窗 B：服務條款與非官方聲明 -->
+  <div id="modal-legal-terms" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="title-legal-terms">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="title-legal-terms">📜 服務條款與非官方聲明</h3>
+        <button type="button" class="btn btn-ghost btn-sm" data-close-legal>關閉 ✕</button>
+      </div>
+      <div class="legal-cards">
+        <div class="legal-card">
+          <h4>1. 非官方機構聲明</h4>
+          <p>本站<strong>非中華民國教育部、非國家教育研究院，亦非康軒、南一、翰林等任何教科書出版社之官方機構或官方網站</strong>。本站僅為獨立規劃設計之民間國小數學自修互動網站。</p>
+        </div>
+        <div class="legal-card">
+          <h4>2. 原創題庫與智慧財產權聲明</h4>
+          <p>本站收錄之 16 單元主線題庫（800 題）、8 大原創素養挑戰關卡（160 題）、數學名詞字卡、原創動物角色與向量圖解，均係<strong>參考教育部公開之 108 課綱學習目標獨立編寫與製作</strong>，未轉載任何出版社或外部平台受著作權保護之原文題目。若任何單位對內容有指正建議，歡迎來信 <a href="mailto:smallfishann97@gmail.com" class="footer-email-link">smallfishann97@gmail.com</a> 聯繫我們協助處理。</p>
+        </div>
+        <div class="legal-card">
+          <h4>3. 自修輔助參考與原創影音聲明</h4>
+          <p>本平台所有「題目與字卡語音朗讀」、「答題互動音效」與「八音盒背景音樂」，皆由瀏覽器原生語音引擎與 Web Audio API 即時合成，<strong>非官方機構所錄製或發布之音檔</strong>。本站內容僅供課後練習與興趣培養輔助，實際學校課程與評量標準請以各校老師教學與課本為準。</p>
+        </div>
+      </div>
+      <div class="legal-footer-actions">
+        <button type="button" class="btn btn-gold btn-lg" data-close-legal>我已詳細閱讀並瞭解</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 彈窗 C：最新更版日誌 -->
+  <div id="modal-legal-changelog" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="title-legal-changelog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <div>
+          <h3 id="title-legal-changelog">🚀 數學遊戲冒險島・最新版本公告</h3>
+          <p style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">近三個版本重點功能與使用者體驗優化 (v1.1.0 ~ v1.3.0)</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" data-close-legal>關閉 ✕</button>
+      </div>
+      <div class="legal-cards">
+        <div class="legal-card changelog-latest">
+          <div class="changelog-head">
+            <span class="ver-badge latest">v1.3.0 (最新)</span>
+            <span class="ver-tag">🏝️ 自由佈置小島 & ⚡ 接接樂零延遲</span>
+          </div>
+          <h4>✨ 自由擺放島嶼裝飾、過關小禮物規則與網站安全宣告上線</h4>
+          <ul>
+            <li><strong>🏝️ 6 座主題群島與 72 款裝飾</strong>：新增 6 座主題群島船票（1～4 號島直接開放、5～6 號島集星星解鎖），72 款動態裝飾與會說話的 Q 版小人物皆可跨島自由擺放並自動存檔。</li>
+            <li><strong>⚡ 接接樂 60FPS 零延遲重構</strong>：改為純向量高速繪製，徹底消除左右滑動卡頓，同時新增方向鍵支援與「每次過關限選 1 款小遊戲」規則鎖定。</li>
+            <li><strong>🍃 專屬分頁 Logo 與完整宣告</strong>：換上焦糖棕色小葉子分頁圖示，並新增隱私權宣告、非官方聲明、更版日誌與手機掃碼開啟 QR 碼。</li>
+          </ul>
+        </div>
+        <div class="legal-card">
+          <div class="changelog-head">
+            <span class="ver-badge">v1.2.0</span>
+            <span class="ver-tag">🌦️ 四種天氣特效 & ⚡ 閃電賽與雙人 PK</span>
+          </div>
+          <h4>☀️ 四季天氣島嶼動畫、原創 20 題挑戰區與親子雙人 PK</h4>
+          <ul>
+            <li><strong>🌦️ 動態天氣與可愛生物</strong>：支援白天（微笑大太陽＋三色繪本小鳥）、陰天（灰雨雲＋細雨＋閃電）、夕陽與星空夜景四種氛圍。</li>
+            <li><strong>✨ 原創挑戰區與 60 款會動的裝飾</strong>：新增 8 大生活主題原創關卡（每關 20 題共 160 題）、6 款過關小遊戲、60 秒心算閃電賽、雙人 PK 與個人榮譽獎狀產生器。</li>
+          </ul>
+        </div>
+        <div class="legal-card">
+          <div class="changelog-head">
+            <span class="ver-badge">v1.1.0</span>
+            <span class="ver-tag">📚 16 單元 800 題 & 🧰 互動教具</span>
+          </div>
+          <h4>🗺️ 108 課綱 16 單元完整題庫、語音字卡與手寫草稿紙</h4>
+          <ul>
+            <li><strong>📚 分單元 160 關冒險</strong>：完整對應 108 課綱國小三年級 24 項條目，每題皆附對錯雙欄解析與原創 SVG 圖形說明。</li>
+            <li><strong>🧰 學習好幫手</strong>：內建 27 張語音翻轉名詞字卡、答題手寫草稿紙、互動時鐘／分數披薩／直尺教具、學習診斷雷達圖與 A4 列印練習卷。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="changelog-footer">
+        <label class="unlock-toggle" style="font-size:0.86rem;">
+          <input type="checkbox" id="chk-hide-changelog" checked />
+          <span>本次更新不再自動彈出</span>
+        </label>
+        <button type="button" class="btn btn-gold btn-lg" data-close-legal>🚀 我知道了，開始冒險</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 彈窗 D：手機相機掃碼・直接開啟學習網頁 -->
+  <div id="modal-legal-qrcode" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="title-legal-qrcode">
+    <div class="modal-dialog" style="text-align:center;">
+      <div class="modal-top">
+        <h3 id="title-legal-qrcode">📱 手機相機掃碼・直接開啟學習網頁</h3>
+        <button type="button" class="btn btn-ghost btn-sm" data-close-legal>關閉 ✕</button>
+      </div>
+      <div class="qr-pill-badge">🌐 免下載安裝檔・免註冊帳號・純網頁隨開隨練</div>
+      <div class="qr-box-card">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&color=4a3b2c&bgcolor=ffffff&data=https%3A%2F%2Fsmallfishann97.github.io%2Fmath-adventure-island%2F"
+          alt="數學遊戲冒險島專屬 QR Code"
+          class="qr-img"
+          width="220"
+          height="220"
+        />
+        <p class="qr-scan-tip">🔍 打開手機相機或掃碼器對準即可開啟</p>
+      </div>
+      <div class="legal-card" style="text-align:left;margin-bottom:14px;">
+        <ol style="margin:0;padding-left:20px;font-size:0.9rem;line-height:1.7;">
+          <li>拿起手機打開「相機」或掃碼器對準上方 QR 碼即可直接進入數學遊戲冒險島。</li>
+          <li>如需在手機桌面快速開啟，可透過瀏覽器選單點選<strong>「加入主畫面」</strong>。</li>
+          <li>闖關紀錄與星星金幣會自動保存在手機本機瀏覽器中，外出搭車也能隨時練習！</li>
+        </ol>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button type="button" class="btn btn-gold btn-lg" id="btn-copy-site-url" style="width:100%;">
+          📋 複製學習網址 (https://smallfishann97.github.io/math-adventure-island/)
+        </button>
+        <button type="button" class="btn btn-ghost" data-close-legal style="width:100%;">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 星星、金幣與闖關規則說明彈窗 -->
+  <div id="rules-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="rules-modal-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="rules-modal-title">📖 數學遊戲冒險島・星星、金幣與闖關規則</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-rules">關閉 ✕</button>
+      </div>
+      <div class="rules-grid">
+        <div class="rule-card rule-star">
+          <h4>⭐ 如何收集「星星」？</h4>
+          <ul>
+            <li>點選冒險島任一單元進入 <strong>10 道關卡</strong>（每關 5 題），或到「✨ 原創挑戰區」挑戰（每關 20 題）。</li>
+            <li><strong>答對 80%～100%</strong>（5 題對 4～5 題）：獲得 <strong>⭐⭐⭐ 3 顆星</strong>（通關！）。</li>
+            <li><strong>答對 60%～79%</strong>（5 題對 3 題）：獲得 <strong>⭐⭐ 2 顆星</strong>（通關！）。</li>
+            <li><strong>低於 60%</strong>：尚未通關（0 顆星），看完圖解後可再挑戰。</li>
+            <li>每關會保留<strong>最高星等</strong>，單一單元最多 30 顆星，全島 16 單元最多可集滿 <strong>480 顆星</strong>！</li>
+          </ul>
+        </div>
+        <div class="rule-card rule-coin">
+          <h4>🪙 如何賺取「閃亮金幣」？</h4>
+          <ul>
+            <li><strong>📅 每日簽到打卡</strong>：每天到「🛍️ 商店徽章」按一下簽到，立即領取 <strong>+50 金幣</strong>！</li>
+            <li><strong>🎁 過關小禮物小遊戲</strong>：只要過關（正確率 ≥ 60%），結算畫面可從 <strong>6 款迷你小遊戲中任選 1 款玩一次</strong>（每次過關限選 1 款），玩完最高直接賺 <strong>+200 金幣</strong>！</li>
+            <li><strong>⚡ 60 秒心算閃電賽</strong>：到「⚡ 閃電與PK」挑戰限時心算，結束後依得分自動發放金幣！</li>
+          </ul>
+        </div>
+        <div class="rule-card rule-shop">
+          <h4>🏝️ 星星和金幣有什麼用？</h4>
+          <ul>
+            <li><strong>佈置我的冒險群島</strong>：用金幣在「🛍️ 商店徽章」購買 <strong>72 款會動的可愛裝飾與 Q 版小人物</strong>（櫻花樹、摩天輪、城堡、獨角獸與各行各業小人物等），買完可自由擺放到 6 座主題小島任意位置，點擊 Q 版小人物還會開口說話喔！</li>
+            <li><strong>點亮榮譽徽章牆</strong>：累積星星、金幣、簽到與字卡熟記數，解鎖 <strong>8 枚榮譽徽章</strong>！</li>
+            <li><strong>領取專屬獎狀</strong>：到「🧰 教具報告」自動把星星與金幣成績印在個人 <strong>🏅 數學榮譽獎狀</strong> 上下載或列印！</li>
+          </ul>
+        </div>
+        <div class="rule-card rule-study">
+          <h4>🗺️ 闖關與複習小秘訣</h4>
+          <ul>
+            <li><strong>循序解鎖／自由選關</strong>：每單元第 1 關過關自動解鎖第 2 關，也可勾選右上角「自由選關模式」直接跳關練習。</li>
+            <li><strong>答題好幫手</strong>：每題都有 <strong>🔊 念題目</strong> 與 <strong>✏️ 手寫草稿紙</strong>，作答後立刻看「為什麼對／為什麼錯」與圖形說明。</li>
+            <li><strong>自動錯題本</strong>：答錯的題目會依單元收進「🛠️ 錯題特訓」，在特訓中答對就會自動移出錯題本！</li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px;">
+        <button type="button" class="btn btn-gold btn-lg" id="btn-rules-ok">我知道了，出發冒險！🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 過關小禮物：迷你小遊戲彈窗 -->
+  <div id="minigame-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="mg-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-top">
+        <h3 id="mg-modal-title">🎁 過關小禮物・秘境迷你遊戲</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-mg">關閉 ✕</button>
+      </div>
+      <div id="minigame-stage" class="minigame-stage"></div>
+      <div id="minigame-result" class="minigame-result hidden"></div>
+    </div>
+  </div>
+
+  <!-- 歷史紀錄詳細回顧彈窗 -->
+  <div id="history-detail-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="hist-modal-title">📜 歷史答題詳情</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-hist-modal">關閉 ✕</button>
+      </div>
+      <div id="hist-modal-body" class="review-list"></div>
+    </div>
+  </div>
+
+  <!-- 160 關全破隱藏大彩蛋慶祝彈窗 -->
+  <div id="grand-slam-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="grand-slam-title">
+    <div class="modal-dialog" style="text-align:center;background:linear-gradient(180deg,#fffdf7,#fff2ce);border:3px solid var(--gold);">
+      <div id="grand-slam-badge-slot" style="width:96px;height:96px;margin:0 auto 10px;"></div>
+      <div class="footer-notice-badge" style="margin-bottom:8px;">🎆 160 關全破隱藏大彩蛋解鎖 🎆</div>
+      <h3 id="grand-slam-title" style="margin:0 0 10px;font-size:1.5rem;color:var(--ink);">👑 恭喜成為傳說大滿貫島主！</h3>
+      <p style="margin:0 0 16px;font-size:0.95rem;line-height:1.7;color:var(--ink-soft);">
+        你竟然把 16 個單元、全部 <strong>160 道數學關卡</strong> 全部通關了！<br/>
+        冒險島為你施放最盛大的慶祝煙火，並送上終極隱藏大禮：
+      </p>
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+        <span class="ver-tag" style="font-size:0.9rem;padding:6px 14px;">🏅 限定「傳說大滿貫島主」徽章</span>
+        <span class="ver-tag" style="font-size:0.9rem;padding:6px 14px;background:#fff4cc;">🪙 +500 閃亮金幣已入帳！</span>
+      </div>
+      <button type="button" class="btn btn-gold btn-lg" id="btn-close-grand-slam" style="width:100%;">✨ 收下大滿貫獎勵並繼續佈置群島！</button>
+    </div>
+  </div>
+
+  <!-- 腳本載入 -->
+  <script src="data/grade3-math-bank.js"></script>
+  <script src="data/original-challenges.js"></script>
+  <script src="data/math-glossary.js"></script>
+  <script src="avatars.js"></script>
+  <script src="svg-icons.js"></script>
+  <script src="audio-fx.js"></script>
+  <script src="visual-explainer.js"></script>
+  <script src="mini-games.js"></script>
+  <script src="extras.js"></script>
+  <script src="deluxe-features.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

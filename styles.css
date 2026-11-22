@@ -1,0 +1,3986 @@
+/* ==========================================================================
+   小三數學秘境島｜精品典藏美學樣式系統（暖象牙 × 深焙暖棕 × 香檳金 × 森林墨綠）
+   零俗氣藍色・完整支援四段字體縮放・闖關動畫・3D翻轉字卡・2D島嶼地圖
+   ========================================================================== */
+
+:root {
+  --bg-page: #fff8ee;
+  --bg-card: #ffffff;
+  --bg-ivory: #fff4e4;
+  --ink: #5a4031;
+  --ink-soft: #785946;
+  --muted: #9c7d67;
+
+  --gold: #f2a43b;
+  --gold-light: #ffd57e;
+  --gold-dark: #c97b18;
+  --gold-soft: #fff3d6;
+
+  --espresso: #7c563c;
+  --espresso-mid: #9b6e4e;
+
+  --forest: #52b079;
+  --forest-dark: #388d5c;
+  --forest-soft: #e6faee;
+
+  --burgundy: #f07470;
+  --burgundy-dark: #cc524e;
+  --burgundy-soft: #ffeceb;
+
+  --border: #f0dec2;
+  --border-gold: rgba(242, 164, 59, 0.48);
+  --shadow-sm: 0 6px 16px rgba(138, 92, 56, 0.09);
+  --shadow-md: 0 12px 28px rgba(138, 92, 56, 0.12);
+  --shadow-lg: 0 20px 44px rgba(138, 92, 56, 0.16);
+  --radius-lg: 30px;
+  --radius-md: 20px;
+}
+
+/* 四段字體大小設定 */
+html[data-font-size="sm"] { font-size: 14px; }
+html[data-font-size="md"] { font-size: 16px; }
+html[data-font-size="lg"] { font-size: 18.5px; }
+html[data-font-size="xl"] { font-size: 21px; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: "Zen Maru Gothic", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background-color: var(--bg-page);
+  background-image:
+    radial-gradient(rgba(242, 164, 59, 0.22) 2px, transparent 2px),
+    radial-gradient(circle at 12% 10%, rgba(114, 214, 152, 0.22) 0, transparent 38%),
+    radial-gradient(circle at 88% 14%, rgba(255, 179, 171, 0.28) 0, transparent 38%),
+    radial-gradient(circle at 50% 92%, rgba(255, 213, 126, 0.26) 0, transparent 42%);
+  background-size: 28px 28px, 100% 100%, 100% 100%, 100% 100%;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+h1, h2, h3, .serif {
+  font-family: "Zen Maru Gothic", "Noto Sans TC", sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.hidden { display: none !important; }
+
+/* 全螢幕特效與開場動畫 */
+#fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 900;
+}
+
+#floating-fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 950;
+  overflow: hidden;
+}
+
+.floating-text {
+  position: absolute;
+  font-weight: 900;
+  font-size: 1.32rem;
+  background: rgba(255, 253, 247, 0.96);
+  border: 2px solid var(--border-gold);
+  padding: 8px 18px;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(90, 64, 49, 0.18);
+  animation: floatUpFade 2.8s cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+  max-width: 90vw;
+  text-align: center;
+}
+
+@keyframes floatUpFade {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); }
+  14% { opacity: 1; transform: translate(-50%, -14px) scale(1.04); }
+  78% { opacity: 1; transform: translate(-50%, -26px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -68px) scale(0.96); }
+}
+
+/* 闖關開場動畫遮罩 */
+.stage-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 980;
+  background: rgba(34, 27, 22, 0.72);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  animation: introFadeIn 0.25s ease;
+}
+
+.stage-intro-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, var(--espresso), var(--espresso-mid));
+  border: 2px solid var(--gold-light);
+  color: #fff;
+  padding: 36px 52px;
+  border-radius: 26px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  animation: introPop 0.45s cubic-bezier(0.18, 0.9, 0.3, 1.15);
+}
+
+.stage-intro-emblem {
+  color: var(--gold-light);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  margin-bottom: 10px;
+}
+
+.stage-intro-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.9rem;
+  color: #fffdf9;
+}
+
+.stage-intro-card p {
+  margin: 0;
+  color: #e6dac8;
+  font-size: 1rem;
+}
+
+.stage-intro-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 20%, rgba(217, 182, 117, 0.28) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: shimmerSweep 0.95s ease forwards;
+}
+
+@keyframes introFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes introPop { from { opacity: 0; transform: scale(0.84) translateY(14px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes shimmerSweep { to { transform: translateX(120%); } }
+
+/* ==================== 登入頁面（精品沙龍感） ==================== */
+.login-screen {
+  min-height: 100vh;
+  display: none;
+  place-items: center;
+  padding: 28px 16px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(184, 134, 59, 0.16), transparent 42%),
+    radial-gradient(circle at 80% 80%, rgba(45, 90, 76, 0.14), transparent 45%),
+    var(--bg-page);
+}
+
+.login-screen.active { display: grid; }
+
+.login-card {
+  width: 100%;
+  max-width: 660px;
+  background: #fff;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 28px;
+  padding: 38px 36px 28px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  position: relative;
+}
+
+.login-crest {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  color: var(--gold-dark);
+  background: var(--gold-soft);
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-gold);
+  margin-bottom: 14px;
+}
+
+.login-title {
+  margin: 0 0 8px;
+  font-size: 2.2rem;
+  color: var(--espresso);
+}
+
+.login-subtitle {
+  margin: 0 0 26px;
+  color: var(--muted);
+  font-size: 0.96rem;
+}
+
+.profiles-section {
+  background: var(--bg-ivory);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 22px;
+}
+
+.profiles-section h3, .login-form h3 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  color: var(--ink-soft);
+  font-family: "Noto Sans TC", sans-serif;
+}
+
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.16s ease;
+}
+
+.profile-btn:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-avatar { font-size: 1.7rem; }
+.profile-meta strong { display: block; font-size: 0.96rem; color: var(--ink); }
+.profile-meta span { font-size: 0.78rem; color: var(--gold-dark); font-weight: 700; }
+
+.avatar-picker {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.avatar-opt {
+  width: 72px;
+  height: 86px;
+  border-radius: 20px;
+  border: 2.5px solid var(--border);
+  background: var(--bg-ivory);
+  padding: 6px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: all 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.avatar-opt .avatar-opt-name {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  line-height: 1;
+}
+
+.avatar-opt.active {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 6px 14px rgba(242, 164, 59, 0.32);
+}
+
+.avatar-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-frame .avatar-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.avatar-xs { width: 26px; height: 26px; }
+.avatar-sm { width: 34px; height: 34px; }
+.avatar-md { width: 42px; height: 42px; }
+.avatar-lg { width: 54px; height: 54px; }
+
+.login-input-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.login-input-row .luxury-input {
+  flex: 1;
+  min-width: 320px;
+  max-width: 420px;
+}
+
+.luxury-input, .luxury-select {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid var(--border-gold);
+  border-radius: 999px;
+  padding: 12px 20px;
+  outline: none;
+  min-width: 260px;
+}
+
+.luxury-input:focus, .luxury-select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(184, 134, 59, 0.14);
+}
+
+.login-copyright {
+  margin: 26px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+
+/* ==================== 頂部精品導覽列 ==================== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 253, 249, 0.94);
+  backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid var(--border-gold);
+}
+
+.topbar-inner {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 11px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--espresso), var(--espresso-mid));
+  border: 1.5px solid var(--gold-light);
+  color: var(--gold-light);
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+  box-shadow: 0 4px 12px rgba(44, 36, 30, 0.22);
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 1.18rem;
+  font-weight: 900;
+  color: var(--espresso);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.brand-author {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+  letter-spacing: 0.03em;
+}
+
+.brand-text p {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--gold-dark);
+  font-weight: 700;
+}
+
+.topbar-actions, .topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.nav-pill, .icon-toggle, .user-chip {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.nav-pill:hover, .icon-toggle:hover, .user-chip:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.nav-pill.active {
+  background: var(--espresso);
+  color: #fff;
+  border-color: var(--gold-light);
+  box-shadow: 0 4px 12px rgba(44, 36, 30, 0.2);
+}
+
+.badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--burgundy);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+/* 字體大小調節器 */
+.font-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-ivory);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 999px;
+  padding: 3px 6px;
+}
+
+.tool-hint {
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: var(--gold-dark);
+  padding: 0 4px;
+}
+
+.fs-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.fs-btn.active {
+  background: var(--gold);
+  color: #fff;
+}
+
+.user-chip {
+  background: var(--gold-soft);
+  border-color: var(--border-gold);
+}
+
+.user-switch-hint {
+  font-size: 0.72rem;
+  color: var(--gold-dark);
+  border-left: 1px solid var(--border-gold);
+  padding-left: 6px;
+}
+
+/* ==================== 主容器與精品按鈕 ==================== */
+.main-container {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 24px 20px 56px;
+}
+
+.view { display: none; animation: fadeIn 0.28s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.94rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: transform 0.14s cubic-bezier(0.2, 0.9, 0.3, 1.4), box-shadow 0.14s ease, filter 0.15s ease;
+}
+
+.btn:hover { transform: translateY(-2px) scale(1.02); }
+.btn:active { transform: translateY(3px) scale(0.98); }
+.btn-sm { padding: 6px 13px; font-size: 0.84rem; }
+.btn-lg { padding: 12px 24px; font-size: 1rem; }
+.btn-xl { padding: 14px 30px; font-size: 1.08rem; }
+
+.btn-gold {
+  background: linear-gradient(180deg, #ffbe55, #f09a2b);
+  color: #fff;
+  box-shadow: 0 5px 0 #c97714, 0 8px 16px rgba(240, 154, 43, 0.3);
+}
+.btn-gold:active { box-shadow: 0 1px 0 #c97714; }
+
+.btn-forest {
+  background: linear-gradient(180deg, #64c48a, #449e6a);
+  color: #fff;
+  box-shadow: 0 5px 0 #2f7a4e, 0 8px 16px rgba(68, 158, 106, 0.28);
+}
+.btn-forest:active { box-shadow: 0 1px 0 #2f7a4e; }
+
+.btn-burgundy {
+  background: linear-gradient(180deg, #ff8b85, #e8635e);
+  color: #fff;
+  box-shadow: 0 5px 0 #bf433f, 0 8px 16px rgba(232, 99, 94, 0.28);
+}
+.btn-burgundy:active { box-shadow: 0 1px 0 #bf433f; }
+
+.btn-outline-light {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fffdf9;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 4px 0 rgba(124, 86, 60, 0.22);
+}
+.btn-outline-light:hover { background: rgba(255, 255, 255, 0.32); }
+
+.btn-ghost {
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 0 #ebd6b7;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+/* ==================== 超可愛馬卡龍冒險島 Hero 橫幅（零藍色） ==================== */
+.hero-banner {
+  background:
+    radial-gradient(circle at 86% 18%, rgba(255, 241, 184, 0.42), transparent 46%),
+    linear-gradient(135deg, #58b87d 0%, #8bc96e 38%, #f4b255 76%, #f0897c 100%);
+  color: #fffdf9;
+  border: 4px solid #fff7e2;
+  border-radius: 34px;
+  padding: 28px 32px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  align-items: center;
+  box-shadow: 0 14px 34px rgba(178, 124, 68, 0.22);
+  margin-bottom: 24px;
+}
+
+.hero-tag {
+  display: inline-block;
+  background: rgba(217, 182, 117, 0.18);
+  border: 1px solid rgba(217, 182, 117, 0.5);
+  color: #f3ddb0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.hero-content h2 {
+  margin: 0 0 10px;
+  font-size: 1.88rem;
+  line-height: 1.32;
+  color: #fffdf9;
+}
+
+.hero-content p {
+  margin: 0 0 18px;
+  color: #e9dfd1;
+  font-size: 0.96rem;
+}
+
+.hero-cta-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.quick-unit-select {
+  font-family: inherit;
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--ink);
+  background: #fffdf9;
+  border: 1.5px solid var(--gold-light);
+  border-radius: 14px;
+  padding: 12px 15px;
+  min-width: 245px;
+  cursor: pointer;
+}
+
+.hero-stats-card {
+  background: rgba(255, 253, 249, 0.96);
+  color: var(--ink);
+  border: 1.5px solid var(--gold-light);
+  border-radius: 20px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.stat-item:last-child { border-bottom: none; padding-bottom: 0; }
+.stat-label { font-size: 0.88rem; font-weight: 700; color: var(--muted); }
+.stat-value { font-size: 1.18rem; font-weight: 900; color: var(--forest); }
+
+/* ==================== 2D 互動島嶼地圖 ==================== */
+.panel-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  box-shadow: var(--shadow-md);
+}
+
+.island-section {
+  margin-bottom: 26px;
+  border-color: var(--border-gold);
+}
+
+.island-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.section-eyebrow {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--gold-dark);
+}
+
+.island-header h3 {
+  margin: 2px 0 0;
+  font-size: 1.32rem;
+}
+
+.map-legend {
+  display: flex;
+  gap: 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.dot-done { background: var(--gold); }
+.dot-progress { background: var(--forest); }
+.dot-new { background: #b8aa99; }
+
+.island-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.camera-controls {
+  display: inline-flex;
+  gap: 5px;
+  background: var(--bg-ivory);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 999px;
+  padding: 3px 6px;
+}
+
+.cam-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 2px 5px rgba(91, 67, 48, 0.12);
+  transition: transform 0.14s ease, background 0.14s ease;
+}
+
+.cam-btn:hover {
+  background: var(--gold);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* 立體浮空冒險島舞台（薄荷碧玉淺海＋多層厚度崖壁＋立體站立地標） */
+.island-map-container {
+  position: relative;
+  width: 100%;
+  height: 590px;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 2px solid var(--border-gold);
+  background:
+    radial-gradient(circle at 50% 42%, #d8f2e6 0%, #aee0cc 55%, #8bcbb2 100%);
+  perspective: 1200px;
+  cursor: grab;
+  user-select: none;
+}
+
+.island-map-container:active {
+  cursor: grabbing;
+}
+
+/* 飄動立體白雲 */
+.island-cloud {
+  position: absolute;
+  pointer-events: none;
+  font-size: 2.3rem;
+  opacity: 0.72;
+  filter: drop-shadow(0 8px 12px rgba(44, 97, 66, 0.14));
+  animation: cloudDrift 28s linear infinite;
+  z-index: 2;
+}
+.island-cloud.c1 { top: 18px; left: -10%; font-size: 2.3rem; animation-duration: 34s; }
+.island-cloud.c2 { top: 72px; left: -16%; font-size: 1.8rem; animation-duration: 42s; animation-delay: -12s; }
+.island-cloud.c3 { top: 34px; left: -8%; font-size: 2.6rem; animation-duration: 50s; animation-delay: -24s; }
+.island-cloud.c4 { top: 112px; left: -14%; font-size: 2.1rem; animation-duration: 38s; animation-delay: -6s; }
+.island-cloud.c5 { top: 52px; left: -12%; font-size: 1.7rem; animation-duration: 46s; animation-delay: -31s; }
+.island-cloud.c6 { top: 96px; left: -18%; font-size: 2.4rem; animation-duration: 54s; animation-delay: -40s; }
+
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(1250px); }
+}
+
+/* 旋轉舞台主體（含柔和上下浮動效果） */
+.island-stage {
+  position: absolute;
+  left: 50%;
+  top: 57%;
+  width: 920px;
+  height: 500px;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(46deg) rotateZ(var(--rot-z, -3deg)) scale(var(--stage-scale, 0.94));
+  transition: transform 0.25s cubic-bezier(0.22, 0.85, 0.32, 1);
+  animation: islandFloatBob 4.2s ease-in-out infinite;
+  will-change: transform, translate;
+}
+
+.island-stage.dragging {
+  transition: none;
+  animation-play-state: paused;
+}
+
+.island-map-container.decorate-mode .island-stage,
+.island-map-container.decorate-mode .island-layer-shadow {
+  animation-play-state: paused;
+}
+
+@keyframes islandFloatBob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -11px; }
+}
+
+/* 浮空島嶼多層立體厚度 */
+.island-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.island-layer-shadow {
+  transform: translateZ(-48px) translateY(22px);
+  filter: blur(18px);
+  opacity: 0.34;
+  animation: islandShadowBreathe 4.2s ease-in-out infinite;
+}
+
+@keyframes islandShadowBreathe {
+  0%, 100% { transform: translateZ(-48px) translateY(22px) scale(1); opacity: 0.36; }
+  50% { transform: translateZ(-48px) translateY(30px) scale(0.94); opacity: 0.22; }
+}
+
+.island-layer-cliff-deep {
+  transform: translateZ(-34px);
+}
+
+.island-layer-cliff-mid {
+  transform: translateZ(-18px);
+}
+
+.island-layer-beach {
+  transform: translateZ(-6px);
+}
+
+.island-layer-grass {
+  transform: translateZ(2px);
+}
+
+.island-layer-hill {
+  transform: translateZ(16px);
+}
+
+/* 立體站立於島面上的可愛樹與小屋（以底部為軸心站立，絕不插入地面） */
+.island-prop {
+  position: absolute;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) translateZ(10px) rotateZ(calc(var(--rot-z, -3deg) * -1)) rotateX(-46deg);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 6px 6px rgba(44, 67, 48, 0.26));
+}
+
+.prop-emoji {
+  font-size: 2.1rem;
+  line-height: 1;
+}
+
+.prop-house {
+  font-size: 2.5rem;
+}
+
+/* 立體 16 座單元地標柱（外框透明區不攔截點擊，只有真的點到數字圓球或單元名牌才跳關！） */
+.island-pin {
+  position: absolute;
+  border: none;
+  background: none;
+  padding: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) translateZ(14px) rotateZ(calc(var(--rot-z, -3deg) * -1)) rotateX(-46deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20;
+  transition: filter 0.18s ease;
+}
+
+.island-pin:hover {
+  z-index: 60;
+  filter: drop-shadow(0 12px 16px rgba(166, 111, 34, 0.45));
+}
+
+.island-pin:hover .pin-orb {
+  transform: translateY(-7px) scale(1.14);
+}
+
+.pin-avatar-float {
+  pointer-events: none;
+  font-size: 1.55rem;
+  background: #fffdf7;
+  border: 2.5px solid var(--gold);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 4px;
+  box-shadow: 0 6px 14px rgba(91, 67, 48, 0.25);
+  animation: shipBob 2.2s ease-in-out infinite;
+}
+
+.pin-orb {
+  pointer-events: auto;
+  cursor: pointer;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.92rem;
+  border: 3px solid #fffdf7;
+  box-shadow:
+    0 6px 0 rgba(58, 42, 28, 0.34),
+    0 12px 16px rgba(44, 67, 48, 0.32);
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.pin-orb.done {
+  background: linear-gradient(145deg, #f0c975, #b87c24);
+}
+
+.pin-orb.progress {
+  background: linear-gradient(145deg, #57a676, #2c6142);
+}
+
+.pin-orb.new {
+  background: linear-gradient(145deg, #a6917a, #725d49);
+}
+
+.pin-label {
+  pointer-events: auto;
+  cursor: pointer;
+  margin-top: 5px;
+  background: rgba(255, 253, 247, 0.95);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 10px;
+  padding: 2px 8px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(91, 67, 48, 0.16);
+  white-space: nowrap;
+}
+
+.pin-label strong {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.pin-label span {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 900;
+  color: var(--gold-dark);
+  line-height: 1.2;
+}
+
+.island-path-flow {
+  stroke-dasharray: 10 8;
+  animation: dashFlow 22s linear infinite;
+}
+
+@keyframes dashFlow {
+  to { stroke-dashoffset: -320; }
+}
+
+@keyframes shipBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* 單元卡片總覽 */
+.section-divider-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.section-divider-row h3 {
+  margin: 0;
+  font-size: 1.32rem;
+}
+
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.filter-chip {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.filter-chip.active {
+  background: var(--espresso);
+  color: #fff;
+  border-color: var(--gold-light);
+}
+
+.units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+  gap: 16px;
+}
+
+.unit-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.unit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gold);
+}
+
+.unit-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.unit-order {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  font-weight: 900;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-gold);
+}
+
+.unit-stars { font-size: 0.86rem; font-weight: 900; color: var(--gold-dark); }
+.unit-title { margin: 0; font-size: 1.12rem; }
+.unit-summary { margin: 0; font-size: 0.86rem; color: var(--muted); flex: 1; }
+.unit-meta-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.code-chip {
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f3efe8;
+  color: var(--ink-soft);
+}
+
+.domain-chip {
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+.unit-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+.unit-actions .btn { padding: 8px 10px; font-size: 0.86rem; }
+
+/* ==================== 10 關闖關地圖 ==================== */
+.lesson-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.toolbar-right-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.unlock-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.stage-map-header {
+  border-bottom: 1.5px dashed var(--border);
+  padding-bottom: 16px;
+  margin-bottom: 22px;
+}
+
+.stage-map-header h2 { margin: 8px 0 6px; font-size: 1.7rem; }
+
+.stage-progress-summary {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.94rem;
+  color: var(--gold-dark);
+}
+
+.stages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 16px;
+}
+
+.stage-card {
+  position: relative;
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 18px 16px;
+  background: #fff;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-card.unlocked:hover {
+  transform: translateY(-5px);
+  border-color: var(--gold);
+  box-shadow: var(--shadow-md);
+}
+
+.stage-card.current-stage {
+  border: 2px solid var(--gold);
+  background: linear-gradient(180deg, #fffdf8, var(--gold-soft));
+  animation: currentGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes currentGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 134, 59, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(184, 134, 59, 0); }
+}
+
+.stage-card.locked {
+  background: #f5f1ea;
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.stage-num-badge {
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--gold-dark);
+}
+
+.stage-icon { font-size: 2rem; }
+.stage-card-stars { font-size: 1.15rem; letter-spacing: 3px; }
+.stage-diff-pill {
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--forest-soft);
+  color: var(--forest);
+}
+
+/* ==================== 單元教學講義 ==================== */
+.lesson-header { border-bottom: 1.5px dashed var(--border); padding-bottom: 14px; margin-bottom: 20px; }
+.lesson-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.lesson-header h2 { margin: 0 0 6px; font-size: 1.7rem; }
+.lesson-summary { margin: 0; color: var(--muted); }
+
+.lesson-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.lesson-box { border-radius: 16px; padding: 18px 20px; border: 1.5px solid transparent; }
+.lesson-box h3 { margin: 0 0 10px; font-size: 1.1rem; }
+.lesson-box ul, .lesson-box ol { margin: 0; padding-left: 20px; }
+.lesson-box li { margin-bottom: 7px; }
+
+.box-gold { background: var(--gold-soft); border-color: var(--border-gold); }
+.box-forest { background: var(--forest-soft); border-color: rgba(45, 90, 76, 0.25); }
+.box-ivory { background: var(--bg-ivory); border-color: var(--border); }
+.box-burgundy { background: var(--burgundy-soft); border-color: rgba(166, 58, 58, 0.25); }
+
+.formula-list { display: flex; flex-direction: column; gap: 8px; }
+.formula-item {
+  background: #fff;
+  border: 1.5px solid rgba(45, 90, 76, 0.3);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  color: var(--forest-dark);
+}
+
+.example-problem { margin: 0 0 8px; font-weight: 800; color: var(--ink); }
+.example-answer-box {
+  margin-top: 10px;
+  background: #fff;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 9px 14px;
+  color: var(--gold-dark);
+}
+
+.lesson-footer {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1.5px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.lesson-refs { font-size: 0.86rem; color: var(--muted); font-weight: 700; }
+
+/* ==================== 互動答題遊戲 + SVG 圖解 ==================== */
+.quiz-hud {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 18px;
+  padding: 13px 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.hud-title-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; }
+.hud-mode-title { color: var(--espresso); }
+.hud-progress-text { color: var(--muted); }
+.progress-track { height: 11px; background: #ede6da; border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--forest)); border-radius: 999px; transition: width 0.35s ease; }
+
+.hud-metrics { display: flex; gap: 8px; flex-wrap: wrap; }
+.metric-pill { padding: 6px 12px; border-radius: 12px; font-weight: 900; font-size: 0.88rem; border: 1.5px solid var(--border); }
+.score-pill { background: var(--gold-soft); border-color: var(--border-gold); color: var(--gold-dark); }
+.combo-pill { background: var(--burgundy-soft); border-color: rgba(166, 58, 58, 0.3); color: var(--burgundy); transition: transform 0.2s ease; }
+.combo-pill.pop { transform: scale(1.18); }
+.timer-pill { background: var(--forest-soft); border-color: rgba(45, 90, 76, 0.3); color: var(--forest); }
+
+.quiz-card {
+  max-width: 900px;
+  margin: 0 auto;
+  animation: slideCardIn 0.32s ease;
+}
+
+@keyframes slideCardIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
+
+.quiz-card.fx-correct {
+  border-color: var(--forest);
+  box-shadow: 0 0 0 6px rgba(45, 90, 76, 0.16), var(--shadow-md);
+  animation: popBounce 0.42s ease;
+}
+
+.quiz-card.fx-wrong {
+  border-color: var(--burgundy);
+  box-shadow: 0 0 0 6px rgba(166, 58, 58, 0.14), var(--shadow-md);
+  animation: gentleShake 0.4s ease;
+}
+
+@keyframes popBounce { 0% { transform: scale(1); } 35% { transform: scale(1.02); } 100% { transform: scale(1); } }
+@keyframes gentleShake { 0%,100% { transform: translateX(0); } 22% { transform: translateX(-8px); } 48% { transform: translateX(7px); } 74% { transform: translateX(-4px); } }
+
+.question-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.meta-tag { font-size: 0.78rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+.tag-unit { background: var(--gold-soft); color: var(--gold-dark); }
+.tag-diff { background: var(--burgundy-soft); color: var(--burgundy); }
+.tag-code { background: #f3efe8; color: var(--ink-soft); }
+.tag-type { background: var(--forest-soft); color: var(--forest); }
+
+.question-text {
+  margin: 0 0 16px;
+  font-size: 1.32rem;
+  line-height: 1.55;
+  font-family: "Noto Sans TC", sans-serif;
+  font-weight: 900;
+}
+
+/* SVG 視覺圖表容器 */
+.question-visual-slot { margin-bottom: 18px; }
+
+.math-visual-figure {
+  margin: 10px 0;
+  padding: 14px;
+  background: var(--bg-ivory);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.math-visual-svg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.math-visual-caption {
+  margin-top: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.mini-stat-table {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.92rem;
+}
+
+.mini-stat-table th, .mini-stat-table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: center;
+}
+.mini-stat-table thead th { background: var(--espresso); color: #fff; }
+.mini-stat-table .hl-head { background: var(--gold); color: #fff; }
+.mini-stat-table .hl-cell { background: var(--gold-soft); color: var(--gold-dark); font-weight: 900; }
+.mini-stat-table .total-row { background: var(--forest-soft); }
+
+/* 選擇題與填空題 */
+.choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+.choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 15px;
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 1.04rem;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 3px 0 #e4dcd0;
+  transition: all 0.14s ease;
+}
+
+.choice-btn:hover:not(:disabled) { border-color: var(--gold); background: var(--bg-ivory); transform: translateY(-2px); }
+.choice-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.choice-btn.is-correct { background: var(--forest-soft); border-color: var(--forest); color: var(--forest-dark); }
+.choice-btn.is-correct .choice-letter { background: var(--forest); color: #fff; }
+.choice-btn.is-wrong { background: var(--burgundy-soft); border-color: var(--burgundy); color: var(--burgundy-dark); }
+.choice-btn.is-wrong .choice-letter { background: var(--burgundy); color: #fff; }
+
+.input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.answer-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 1.28rem;
+  font-weight: 900;
+  padding: 13px 16px;
+  border: 2px solid var(--border-gold);
+  border-radius: 14px;
+  outline: none;
+}
+.answer-input:focus { border-color: var(--gold); }
+
+.numpad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-width: 400px; }
+.num-key {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  border-radius: 12px;
+  padding: 11px;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 3px 0 #e0d8cb;
+}
+.num-key-action { background: #f3efe8; color: var(--muted); font-size: 0.92rem; }
+.num-key-zero { grid-column: span 2; }
+.num-key-submit { grid-column: span 2; background: var(--gold); border-color: var(--gold-dark); color: #fff; }
+
+/* 對與錯雙欄原因說明 + 圖形化解析區 */
+.feedback-box {
+  margin-top: 20px;
+  border-radius: 18px;
+  padding: 18px 20px;
+  border: 1.5px solid var(--border);
+  animation: fadeIn 0.26s ease;
+}
+.feedback-box.correct { background: var(--forest-soft); border-color: rgba(45, 90, 76, 0.35); }
+.feedback-box.wrong { background: var(--burgundy-soft); border-color: rgba(166, 58, 58, 0.35); }
+
+.feedback-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.feedback-icon { font-size: 2rem; }
+.feedback-header h4 { margin: 0; font-size: 1.18rem; font-weight: 900; }
+.feedback-answer-line { margin: 2px 0 0; font-weight: 800; }
+
+.explain-blocks { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+.explain-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
+  padding: 12px 15px;
+  border: 1px solid var(--border);
+}
+
+.explain-card h5 { margin: 0 0 6px; font-size: 0.96rem; font-weight: 900; }
+.explain-card.ok-card { border-left: 5px solid var(--forest); }
+.explain-card.ok-card h5 { color: var(--forest-dark); }
+.explain-card.bad-card { border-left: 5px solid var(--burgundy); }
+.explain-card.bad-card h5 { color: var(--burgundy-dark); }
+.explain-card.steps-card { border-left: 5px solid var(--gold); }
+.explain-card.steps-card h5 { color: var(--gold-dark); }
+
+.explain-card ol, .explain-card ul { margin: 0; padding-left: 20px; font-size: 0.94rem; }
+.explain-card li { margin-bottom: 4px; }
+.explain-source { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+.feedback-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+/* ==================== 結算成績單與過關小禮物 ==================== */
+.result-summary-card {
+  text-align: center;
+  margin-bottom: 22px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg-ivory) 100%);
+  border-color: var(--border-gold);
+}
+
+.result-stars { font-size: 3rem; letter-spacing: 8px; animation: popBounce 0.65s ease; }
+.result-trophy-row h2 { margin: 4px 0 6px; font-size: 1.8rem; }
+.result-trophy-row p { margin: 0 0 18px; color: var(--muted); }
+
+.result-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.result-stat { background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 12px 8px; }
+.result-stat span { display: block; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.result-stat strong { font-size: 1.28rem; font-weight: 900; color: var(--forest); }
+
+/* 過關小禮物區塊 */
+.reward-gift-banner {
+  background: linear-gradient(135deg, #2c241e, #47382b);
+  border: 2px solid var(--gold-light);
+  color: #fff;
+  border-radius: 20px;
+  padding: 20px 22px;
+  margin: 0 auto 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  text-align: left;
+  box-shadow: var(--shadow-md);
+}
+
+.gift-info { display: flex; align-items: center; gap: 14px; }
+.gift-icon { font-size: 2.5rem; animation: shipBob 2s ease-in-out infinite; }
+.gift-info h3 { margin: 0 0 4px; font-size: 1.15rem; color: var(--gold-light); }
+.gift-info p { margin: 0; font-size: 0.88rem; color: #e9dfd1; }
+.gift-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.result-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px dashed var(--border);
+}
+.review-header h3 { margin: 0 0 4px; font-size: 1.3rem; }
+.review-header p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+.review-filter { display: flex; gap: 8px; }
+
+.review-list { display: flex; flex-direction: column; gap: 16px; }
+.review-item {
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: #fff;
+}
+.review-item.is-correct { border-left: 7px solid var(--forest); }
+.review-item.is-wrong { border-left: 7px solid var(--burgundy); background: #fffcfc; }
+
+.review-item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.review-status { font-weight: 900; font-size: 0.86rem; padding: 3px 10px; border-radius: 999px; }
+.review-status.ok { background: var(--forest-soft); color: var(--forest-dark); }
+.review-status.bad { background: var(--burgundy-soft); color: var(--burgundy-dark); }
+.review-question { margin: 0 0 10px; font-size: 1.06rem; font-weight: 800; }
+.review-answers { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; font-size: 0.94rem; }
+
+/* ==================== 3D 翻轉數學名詞字卡館 ==================== */
+.glossary-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.glossary-progress { font-weight: 800; color: var(--gold-dark); }
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.flashcard-scene {
+  perspective: 1100px;
+  min-height: 360px;
+}
+
+.flashcard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  transition: transform 0.65s cubic-bezier(0.22, 0.8, 0.3, 1);
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.flashcard.flipped { transform: rotateY(180deg); }
+
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1.5px solid var(--border-gold);
+  box-shadow: var(--shadow-sm);
+  overflow-y: auto;
+}
+
+.flashcard-front {
+  background: linear-gradient(160deg, #fffdf9 0%, #f8efe0 100%);
+}
+
+.flashcard-back {
+  background: #fff;
+  transform: rotateY(180deg);
+  border-color: var(--forest);
+}
+
+.fc-unit-tag { font-size: 0.74rem; font-weight: 800; color: var(--gold-dark); }
+.fc-term { margin: 6px 0; font-size: 1.32rem; color: var(--espresso); }
+.fc-short { margin: 0 0 10px; font-size: 0.94rem; font-weight: 700; color: var(--ink-soft); }
+.fc-hint { font-size: 0.78rem; color: var(--muted); text-align: right; font-weight: 700; }
+
+.fc-back-detail { font-size: 0.92rem; margin: 0 0 8px; }
+.fc-back-box {
+  background: var(--bg-ivory);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.86rem;
+  margin-bottom: 7px;
+  border-left: 4px solid var(--gold);
+}
+.fc-master-btn { align-self: flex-end; margin-top: 6px; }
+.fc-master-btn.mastered { background: var(--forest); color: #fff; border-color: var(--forest); }
+
+.fc-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.fc-speak-btn {
+  border: 1.5px solid var(--border-gold);
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.fc-speak-btn:hover {
+  background: var(--gold);
+  color: #fff;
+}
+
+.fc-speak-btn.speaking {
+  background: var(--forest);
+  border-color: var(--forest-dark);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(63, 130, 91, 0.2);
+}
+
+/* ==================== 歷史答題紀錄館 ==================== */
+.history-list { display: flex; flex-direction: column; gap: 12px; }
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 15px 18px;
+  background: var(--bg-ivory);
+}
+.history-row:hover { border-color: var(--gold); }
+.history-meta h4 { margin: 0 0 4px; font-size: 1.04rem; }
+.history-meta p { margin: 0; font-size: 0.84rem; color: var(--muted); }
+.history-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* ==================== 課綱出處 ==================== */
+.panel-header { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.panel-header h2 { margin: 0; font-size: 1.48rem; }
+.panel-desc { margin: 0 0 18px; color: var(--muted); }
+.sources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.source-card { border: 1.5px solid var(--border); border-radius: 16px; padding: 16px; background: var(--bg-ivory); display: flex; flex-direction: column; gap: 6px; }
+.source-card h4 { margin: 0; font-size: 1rem; }
+.source-org { font-size: 0.82rem; font-weight: 800; color: var(--forest); }
+.source-card p { margin: 4px 0 8px; font-size: 0.86rem; color: var(--muted); flex: 1; }
+.source-card a { color: var(--gold-dark); font-weight: 800; text-decoration: none; }
+.source-card a:hover { text-decoration: underline; }
+.section-subtitle { margin: 0 0 12px; font-size: 1.1rem; }
+.codes-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.code-badge-lg { background: var(--gold-soft); color: var(--gold-dark); font-weight: 900; font-size: 0.84rem; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border-gold); }
+
+/* ==================== 彈窗與迷你小遊戲 ==================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 960;
+  background: rgba(44, 34, 26, 0.74);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid var(--gold-light);
+  border-radius: 24px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-dialog.modal-lg { max-width: 860px; }
+
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px dashed var(--border);
+}
+.modal-top h3 { margin: 0; font-size: 1.2rem; }
+
+.mg-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.mg-canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 2px solid var(--gold);
+  display: block;
+  touch-action: none;
+}
+
+.mg-memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.mg-mem-card {
+  height: 92px;
+  border-radius: 14px;
+  border: 2px solid var(--gold);
+  background: linear-gradient(135deg, var(--espresso), var(--espresso-mid));
+  color: var(--gold-light);
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.mg-mem-card .mg-mem-back { display: none; }
+.mg-mem-card.open, .mg-mem-card.matched {
+  background: var(--gold-soft);
+  transform: scale(1.03);
+}
+.mg-mem-card.open .mg-mem-front, .mg-mem-card.matched .mg-mem-front { display: none; }
+.mg-mem-card.open .mg-mem-back, .mg-mem-card.matched .mg-mem-back { display: block; }
+.mg-mem-card.matched { border-color: var(--forest); background: var(--forest-soft); }
+
+.mg-whack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.mg-hole {
+  height: 88px;
+  border-radius: 16px;
+  border: 2px solid var(--border-gold);
+  background: var(--bg-ivory);
+  font-size: 2.2rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.mg-hole.up { background: var(--gold-soft); border-color: var(--gold); transform: scale(1.04); }
+
+.minigame-result {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--forest-soft);
+  border: 1.5px solid var(--forest);
+  text-align: center;
+  font-weight: 900;
+  color: var(--forest-dark);
+}
+
+/* ==================== 頁尾版權 ==================== */
+.site-footer {
+  text-align: center;
+  padding: 24px 20px 36px;
+  border-top: 1.5px solid var(--border-gold);
+  background: rgba(255, 253, 249, 0.75);
+}
+
+.footer-brand { margin: 0 0 6px; font-size: 0.88rem; font-weight: 800; color: var(--gold-dark); }
+.footer-copy { margin: 0; font-size: 0.82rem; color: var(--muted); font-weight: 700; letter-spacing: 0.03em; }
+
+/* 響應式 */
+@media (max-width: 920px) {
+  .hero-banner, .lesson-grid { grid-template-columns: 1fr; }
+  .quiz-hud { grid-template-columns: 1fr; }
+  .result-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .choice-grid { grid-template-columns: 1fr; }
+  .input-row { flex-direction: column; }
+  .glossary-grid { grid-template-columns: 1fr; }
+}
+
+/* ==================== 八大擴充功能樣式（商店/徽章/草稿紙/互動教具/雷達圖/列印/備份） ==================== */
+.quiz-card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.quiz-helper-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 手寫計算草稿紙 */
+.scratchpad-panel {
+  margin-bottom: 18px;
+  background: #fffdf7;
+  border: 2px dashed var(--border-gold);
+  border-radius: 18px;
+  padding: 12px 14px;
+}
+
+.scratchpad-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.scratchpad-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pen-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 0 1.5px var(--border);
+  cursor: pointer;
+}
+
+.pen-dot.active {
+  box-shadow: 0 0 0 3px var(--gold);
+  transform: scale(1.12);
+}
+
+.scratchpad-canvas {
+  width: 100%;
+  height: 220px;
+  display: block;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background-color: #fffdf7;
+  background-image:
+    linear-gradient(to right, rgba(240, 222, 194, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(240, 222, 194, 0.45) 1px, transparent 1px);
+  background-size: 24px 24px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+/* 每日簽到、徽章牆與金幣商店 */
+.daily-checkin-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, #fff5dc, #ffeae6);
+  border: 2px solid var(--gold-light);
+  border-radius: 22px;
+  padding: 18px 22px;
+}
+
+.checkin-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.checkin-icon { font-size: 2.4rem; }
+.checkin-info h3 { margin: 0 0 4px; font-size: 1.15rem; }
+.checkin-info p { margin: 0; font-size: 0.92rem; color: var(--ink-soft); }
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 14px;
+}
+
+.badge-card {
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-card.unlocked {
+  background: linear-gradient(180deg, #fffdf7, var(--gold-soft));
+  border-color: var(--gold);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge-card.locked {
+  background: #f8f3eb;
+  opacity: 0.65;
+}
+
+.badge-emoji { font-size: 2.1rem; }
+.badge-card strong { font-size: 0.96rem; color: var(--ink); }
+.badge-card span { font-size: 0.78rem; color: var(--muted); }
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 16px;
+}
+
+.shop-item-card {
+  border: 2px solid var(--border);
+  border-radius: 22px;
+  padding: 18px 14px;
+  text-align: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.16s ease, border-color 0.16s ease;
+}
+
+.shop-item-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+}
+
+.shop-item-card.owned {
+  background: var(--forest-soft);
+  border-color: var(--forest);
+}
+
+.shop-icon { font-size: 2.6rem; line-height: 1.1; }
+.shop-item-card h4 { margin: 0; font-size: 1.04rem; }
+.shop-item-card p { margin: 0 0 6px; font-size: 0.82rem; color: var(--muted); flex: 1; }
+
+/* 互動小教具與診斷雷達圖 */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.tool-card {
+  background: var(--bg-ivory);
+  border: 2px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tool-card-wide { grid-column: 1 / -1; }
+.tool-card h3 { margin: 0; font-size: 1.12rem; }
+.tool-visual-center { display: flex; justify-content: center; align-items: center; }
+
+.tool-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.tool-sliders-row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.tool-sliders label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.tool-sliders input[type="range"] {
+  flex: 1;
+  accent-color: var(--gold);
+}
+
+.tool-info-box {
+  background: #fff;
+  border: 1.5px solid var(--border-gold);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.tools-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.diag-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.diag-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--bg-ivory);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+}
+.diag-row em { font-style: normal; font-weight: 800; color: var(--forest-dark); }
+
+.worksheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.soft-divider {
+  border: none;
+  border-top: 2px dashed var(--border);
+  margin: 22px 0;
+}
+
+.backup-btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .tools-grid, .tools-bottom-grid { grid-template-columns: 1fr; }
+}
+
+/* 新增三款過關小遊戲樣式（大轉盤 / 糖果消消樂） */
+.mg-wheel-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.mg-wheel-pointer {
+  font-size: 1.7rem;
+  color: var(--burgundy);
+  line-height: 1;
+  margin-bottom: -14px;
+  z-index: 2;
+}
+
+.mg-wheel-canvas {
+  display: block;
+  filter: drop-shadow(0 8px 16px rgba(138, 92, 56, 0.2));
+}
+
+.mg-candy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.mg-candy-btn {
+  height: 76px;
+  border-radius: 22px;
+  border: 3px solid var(--gold-light);
+  background: linear-gradient(180deg, #fff6e0, #ffe0a3);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1.65rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #d9a34c;
+  transition: all 0.16s ease;
+}
+
+.mg-candy-btn.selected {
+  background: linear-gradient(180deg, #74d19a, #4aa872);
+  border-color: var(--forest-dark);
+  color: #fff;
+  transform: scale(1.06);
+  box-shadow: 0 5px 0 #2f7a4e;
+}
+
+.mg-candy-btn.cleared {
+  opacity: 0.18;
+  transform: scale(0.85);
+  pointer-events: none;
+}
+
+.mg-candy-btn.wrong-flash {
+  background: var(--burgundy);
+  color: #fff;
+  border-color: var(--burgundy-dark);
+}
+
+/* 20 款島嶼裝飾專屬生動動畫（擺在島上與商店預覽都會動！） */
+.anim-sway {
+  display: inline-block;
+  transform-origin: 50% 95%;
+  animation: propSway 2.8s ease-in-out infinite;
+}
+
+.anim-float {
+  display: inline-block;
+  animation: propFloat 2.6s ease-in-out infinite;
+}
+
+.anim-flutter {
+  display: inline-block;
+  animation: propFlutter 2.2s ease-in-out infinite;
+}
+
+.anim-spin {
+  display: inline-block;
+  animation: propSpin 9s linear infinite;
+}
+
+.anim-flicker {
+  display: inline-block;
+  animation: propFlicker 2s ease-in-out infinite;
+}
+
+.anim-bounce {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  animation: propBounce 2.2s ease-in-out infinite;
+}
+
+@keyframes propSway {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+
+@keyframes propFloat {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-9px) rotate(3deg); }
+}
+
+@keyframes propFlutter {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(4px, -7px) scale(1.08); }
+  50% { transform: translate(-3px, -11px) scale(0.96); }
+  75% { transform: translate(-5px, -4px) scale(1.06); }
+}
+
+@keyframes propSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes propFlicker {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(255, 200, 80, 0.35)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(255, 195, 60, 0.85)); }
+}
+
+@keyframes propBounce {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  45% { transform: translateY(-7px) scale(0.96, 1.05); }
+  55% { transform: translateY(-7px) scale(0.96, 1.05); }
+}
+
+/* ==================== 五大進階功能樣式（夕陽/星空夜景、獎狀、閃電賽、雙人PK） ==================== */
+.cam-btn.active {
+  background: var(--gold);
+  color: #fff;
+}
+
+.island-map-container.theme-sunset {
+  background: radial-gradient(circle at 50% 30%, #ffd59e 0%, #f59f76 55%, #c76b6b 100%);
+}
+
+.island-map-container.theme-night {
+  background:
+    radial-gradient(rgba(255, 245, 200, 0.75) 1.5px, transparent 1.5px),
+    radial-gradient(rgba(255, 245, 200, 0.5) 1px, transparent 1px),
+    radial-gradient(circle at 50% 42%, #294c4a 0%, #1c3538 58%, #15252b 100%);
+  background-size: 90px 90px, 55px 55px, 100% 100%;
+  background-position: 0 0, 26px 32px, 0 0;
+}
+
+.island-map-container.theme-night .custom-prop {
+  filter: drop-shadow(0 0 12px rgba(255, 224, 130, 0.85));
+}
+
+/* 個人獎狀生成器 */
+.cert-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.cert-preview-wrap {
+  display: flex;
+  justify-content: center;
+  background: var(--bg-ivory);
+  border: 2px dashed var(--border-gold);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.cert-canvas {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+/* 60秒閃電賽 & 雙人PK搶答 */
+.arcade-arena {
+  background: var(--bg-ivory);
+  border: 2px solid var(--border-gold);
+  border-radius: 22px;
+  padding: 20px;
+  text-align: center;
+}
+
+.blitz-hud {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.blitz-q {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--espresso);
+  margin: 10px 0 18px;
+}
+
+.blitz-opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.blitz-opt-btn {
+  font-size: 1.35rem;
+  padding: 16px;
+}
+
+.blitz-finish h3 {
+  margin: 0 0 8px;
+  font-size: 1.45rem;
+  color: var(--forest-dark);
+}
+
+.pk-scoreboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pk-side-score {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 1.08rem;
+}
+.pk-side-score.p1 { background: var(--forest-soft); color: var(--forest-dark); border: 2px solid var(--forest); }
+.pk-side-score.p2 { background: var(--burgundy-soft); color: var(--burgundy-dark); border: 2px solid var(--burgundy); }
+.pk-round-badge { font-weight: 900; color: var(--gold-dark); }
+
+.pk-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pk-pad {
+  background: #fff;
+  border-radius: 18px;
+  padding: 14px;
+  border: 2px solid var(--border);
+}
+.pk-pad.p1-pad { border-color: var(--forest); }
+.pk-pad.p2-pad { border-color: var(--burgundy); }
+.pk-pad-title { font-size: 0.9rem; font-weight: 900; margin-bottom: 10px; }
+
+.pk-opts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pk-msg {
+  margin-top: 12px;
+  font-size: 1.02rem;
+  font-weight: 900;
+  color: var(--gold-dark);
+}
+
+@media (max-width: 720px) {
+  .pk-split { grid-template-columns: 1fr; }
+}
+
+/* 星星、金幣與闖關規則說明彈窗卡片 */
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.rule-card {
+  border-radius: 18px;
+  padding: 15px 17px;
+  border: 2px solid var(--border);
+  background: var(--bg-ivory);
+}
+
+.rule-card h4 {
+  margin: 0 0 8px;
+  font-size: 1.04rem;
+  color: var(--espresso);
+}
+
+.rule-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.rule-card li {
+  margin-bottom: 5px;
+}
+
+.rule-star { background: #fff8e1; border-color: var(--gold-light); }
+.rule-coin { background: #ffeceb; border-color: #f8b4ae; }
+.rule-shop { background: #e6faee; border-color: #9ed9b6; }
+.rule-study { background: #fff5e6; border-color: #ebd6b7; }
+
+@media (max-width: 720px) {
+  .rules-grid { grid-template-columns: 1fr; }
+}
+
+/* 超可愛原創天色切換膠囊（白天／夕陽／星空） */
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffdf7;
+  border: 2px solid var(--border-gold);
+  border-radius: 999px;
+  padding: 4px 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 2px solid transparent;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 4px 11px 4px 7px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.theme-pill:hover {
+  background: var(--gold-soft);
+  transform: translateY(-1px);
+}
+
+.theme-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.theme-pill.active[data-island-theme="day"] {
+  background: linear-gradient(180deg, #fff5cc, #ffe184);
+  border-color: #e69d24;
+  color: #7c4d0c;
+  box-shadow: 0 3px 0 #d48b1a;
+}
+
+.theme-pill.active[data-island-theme="sunset"] {
+  background: linear-gradient(180deg, #ffd6c2, #ff9f87);
+  border-color: #d95d48;
+  color: #6e231a;
+  box-shadow: 0 3px 0 #c44a38;
+}
+
+.theme-pill.active[data-island-theme="night"] {
+  background: linear-gradient(180deg, #2d5552, #1b3639);
+  border-color: #ffd57e;
+  color: #fff6d6;
+  box-shadow: 0 3px 0 #132529;
+}
+
+/* 陰天天色氛圍與按鈕樣式 */
+.island-map-container.theme-cloudy {
+  background: radial-gradient(circle at 50% 32%, #e3ebe7 0%, #c1cfc9 56%, #9cb0a8 100%);
+}
+
+.island-map-container.theme-cloudy .island-cloud {
+  opacity: 0.94;
+  filter: brightness(0.62) contrast(1.12) saturate(0.25) drop-shadow(0 8px 14px rgba(45, 62, 58, 0.38));
+}
+
+.island-map-container.theme-sunset .island-cloud {
+  opacity: 0.85;
+  filter: sepia(0.38) hue-rotate(-20deg) saturate(1.45) brightness(0.96);
+}
+
+.island-map-container.theme-night .island-cloud {
+  opacity: 0.36;
+  filter: brightness(0.52);
+}
+
+.theme-pill.active[data-island-theme="cloudy"] {
+  background: linear-gradient(180deg, #eef3f0, #cddad4);
+  border-color: #7d948a;
+  color: #3c5249;
+  box-shadow: 0 3px 0 #70877d;
+}
+
+/* 頂部即時日期、星期與時間膠囊 */
+.live-clock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #fffdf7, #fff3dc);
+  border: 2px solid var(--gold-light);
+  color: var(--ink);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 #ebd1a0;
+}
+
+.clock-cute-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.clock-time-txt {
+  color: var(--forest-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 陰天下雨動畫層（僅在 theme-cloudy 時顯示，不影響點擊與拖曳） */
+.island-rain-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 45;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.island-map-container.theme-cloudy .island-rain-layer {
+  opacity: 1;
+}
+
+.rain-drop {
+  position: absolute;
+  top: -32px;
+  width: 2px;
+  height: 24px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.78));
+  transform: rotate(12deg);
+  animation: rainFall 0.9s linear infinite;
+}
+
+@keyframes rainFall {
+  0% {
+    transform: translate(0, -30px) rotate(12deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-42px, 630px) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+/* 白天與夕陽時可愛小鳥展翅飛過動畫（陰天與星空自動隱藏） */
+.island-birds-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.island-map-container.theme-day .island-birds-layer,
+.island-map-container.theme-sunset .island-birds-layer {
+  opacity: 1;
+}
+
+.flying-bird {
+  position: absolute;
+  left: 115px;
+  color: #fffdf7;
+  filter: drop-shadow(0 4px 6px rgba(91, 67, 48, 0.2));
+  animation: birdFlyAcross 16s linear infinite;
+}
+
+.island-map-container.theme-sunset .flying-bird {
+  color: #5a382c;
+  opacity: 0.78;
+}
+
+.flying-bird.b1 { top: 10px; width: 48px; animation-duration: 15s; animation-delay: -2s; }
+.flying-bird.b2 { top: 38px; width: 40px; animation-duration: 19s; animation-delay: -8s; }
+.flying-bird.b3 { top: 22px; width: 34px; animation-duration: 17s; animation-delay: -13s; }
+
+.bird-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.bird-wing-front {
+  transform-box: fill-box;
+  transform-origin: 40% 95%;
+  animation: wingFlapFront 0.65s ease-in-out infinite;
+}
+
+.bird-wing-back {
+  transform-box: fill-box;
+  transform-origin: 85% 95%;
+  animation: wingFlapBack 0.65s ease-in-out infinite;
+}
+
+.island-map-container.theme-sunset .flying-bird {
+  filter: sepia(0.28) saturate(1.25) drop-shadow(0 4px 8px rgba(168, 72, 48, 0.35));
+}
+
+@keyframes birdFlyAcross {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  8%   { opacity: 1; }
+  30%  { transform: translate(280px, -6px); }
+  60%  { transform: translate(620px, 5px); }
+  90%  { opacity: 1; }
+  100% { transform: translate(1060px, -4px); opacity: 0; }
+}
+
+@keyframes wingFlapFront {
+  0%, 100% { transform: rotate(-18deg) scaleY(1); }
+  50%      { transform: rotate(22deg) scaleY(0.55); }
+}
+
+@keyframes wingFlapBack {
+  0%, 100% { transform: rotate(14deg) scaleY(1); }
+  50%      { transform: rotate(-20deg) scaleY(0.6); }
+}
+
+/* 白天微笑大太陽、夕陽落日、星空微笑彎月 */
+.island-sky-sun,
+.island-sky-moon {
+  position: absolute;
+  top: 16px;
+  left: 22px;
+  width: 78px;
+  height: 78px;
+  pointer-events: none;
+  z-index: 42;
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity 0.45s ease, transform 0.55s ease, top 0.55s ease, filter 0.45s ease;
+}
+
+.island-map-container.theme-day .island-sky-sun {
+  opacity: 1;
+  transform: scale(1);
+  filter: drop-shadow(0 0 18px rgba(255, 210, 80, 0.78));
+}
+
+.island-map-container.theme-sunset .island-sky-sun {
+  opacity: 0.95;
+  top: 46px;
+  transform: scale(0.92);
+  filter: hue-rotate(-18deg) saturate(1.35) drop-shadow(0 0 22px rgba(255, 130, 80, 0.85));
+}
+
+.island-map-container.theme-night .island-sky-moon {
+  opacity: 1;
+  transform: scale(1);
+  filter: drop-shadow(0 0 16px rgba(255, 232, 130, 0.8));
+}
+
+.sun-rays-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sunSlowSpin 18s linear infinite;
+}
+
+@keyframes sunSlowSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 陰天閃電動畫層（僅在 theme-cloudy 時偶爾閃現，柔和不刺眼） */
+.island-lightning-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 46;
+  display: none;
+}
+
+.island-map-container.theme-cloudy .island-lightning-layer {
+  display: block;
+}
+
+.lightning-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 252, 232, 0.32);
+  opacity: 0;
+  animation: skyLightningFlash 6s ease-in-out infinite;
+}
+
+.lightning-bolt {
+  position: absolute;
+  top: 42px;
+  width: 44px;
+  opacity: 0;
+  filter: drop-shadow(0 0 12px rgba(255, 230, 109, 0.95));
+}
+
+.lightning-bolt.lb1 {
+  left: 18%;
+  animation: boltStrike 6s linear infinite;
+}
+
+.lightning-bolt.lb2 {
+  right: 20%;
+  width: 36px;
+  top: 52px;
+  animation: boltStrike 6s linear infinite;
+  animation-delay: -3s;
+}
+
+.bolt-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@keyframes skyLightningFlash {
+  0%, 72%, 77%, 81%, 100% { opacity: 0; }
+  74% { opacity: 0.9; }
+  78% { opacity: 0.55; }
+}
+
+@keyframes boltStrike {
+  0%, 71%, 79%, 100% { opacity: 0; transform: scaleY(0.7); }
+  73% { opacity: 1; transform: scaleY(1.05); }
+  75% { opacity: 0.25; transform: scaleY(1); }
+  77% { opacity: 0.95; transform: scaleY(1.02); }
+}
+
+/* 自由佈置我的小島模式（自選裝飾擺放位置） */
+.decorate-bar {
+  background: var(--gold-soft);
+  border: 2px solid var(--gold);
+  border-radius: 18px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.decorate-bar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.decorate-tray {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deco-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 2px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.deco-chip:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.deco-chip.active {
+  background: var(--gold);
+  border-color: var(--gold-dark);
+  color: #fff;
+  box-shadow: 0 3px 0 var(--gold-dark);
+}
+
+/* 佈置模式時開啟島面點擊感應層 & 裝飾可點選發光 */
+.island-drop-plane {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.island-map-container.decorate-mode {
+  cursor: crosshair;
+  box-shadow: 0 0 0 4px rgba(242, 164, 59, 0.35);
+}
+
+.island-map-container.decorate-mode .island-drop-plane {
+  pointer-events: auto;
+}
+
+.island-map-container.decorate-mode .island-pin {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.island-map-container.decorate-mode .custom-prop {
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 35;
+}
+
+.island-prop.custom-prop.is-picked {
+  z-index: 50;
+  filter: drop-shadow(0 0 14px rgba(242, 164, 59, 1));
+  outline: 3px dashed #fffdf7;
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* ==================== 頁尾非官方學習工具宣告與四大彈窗樣式 ==================== */
+.footer-disclaimer-wrap {
+  max-width: 920px;
+  margin: 0 auto 16px;
+  padding-bottom: 16px;
+  border-bottom: 1.5px dashed var(--border);
+}
+
+.footer-notice-badge {
+  display: inline-block;
+  background: var(--gold-soft);
+  border: 1.5px solid var(--border-gold);
+  color: var(--gold-dark);
+  font-size: 0.82rem;
+  font-weight: 900;
+  padding: 5px 16px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.footer-disclaimer-text {
+  margin: 0 auto 14px;
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.footer-disclaimer-text strong {
+  color: var(--ink);
+}
+
+.footer-links-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.footer-link-btn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.14s ease, background 0.14s ease;
+}
+
+.footer-link-btn:hover {
+  color: var(--gold-dark);
+  background: var(--gold-soft);
+}
+
+.footer-sep {
+  color: var(--border);
+  font-weight: 700;
+}
+
+.legal-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.legal-card {
+  background: var(--bg-ivory);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 15px 18px;
+}
+
+.legal-card h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  color: var(--forest-dark);
+}
+
+.legal-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+.legal-card ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+.legal-card li {
+  margin-bottom: 5px;
+}
+
+.legal-card strong {
+  color: var(--gold-dark);
+}
+
+.changelog-latest {
+  background: linear-gradient(180deg, #fffdf7, var(--gold-soft));
+  border-color: var(--gold);
+}
+
+.changelog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.ver-badge {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  background: #e5d8bf;
+  color: var(--ink);
+}
+
+.ver-badge.latest {
+  background: var(--forest);
+  color: #fff;
+}
+
+.ver-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+  background: #fff;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-gold);
+}
+
+.legal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.changelog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.qr-pill-badge {
+  display: inline-block;
+  background: var(--forest-soft);
+  border: 1.5px solid rgba(82, 176, 121, 0.45);
+  color: var(--forest-dark);
+  font-size: 0.84rem;
+  font-weight: 900;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.qr-box-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border: 2px solid var(--border-gold);
+  border-radius: 22px;
+  padding: 16px 20px 12px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.qr-img {
+  display: block;
+  border-radius: 10px;
+}
+
+.qr-scan-tip {
+  margin: 8px 0 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.footer-email-link {
+  color: var(--gold-dark);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-all;
+}
+
+.footer-email-link:hover {
+  color: var(--forest-dark);
+}
+
+/* ==================== 行動裝置（手機／平板）完整響應式優化 ==================== */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#app-shell,
+.main-container,
+.view,
+.panel-card,
+.hero-banner,
+.hero-banner > *,
+.hero-content,
+.hero-stats-card,
+.island-section,
+.island-header,
+.island-header > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#app-shell {
+  overflow-x: clip;
+}
+
+.visual-box svg,
+.question-visual-box svg,
+.glossary-visual svg,
+.radar-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  /* 頂部導覽列：手機不擋住捲動，品牌與按鈕自動置中換行 */
+  .topbar {
+    position: relative;
+  }
+
+  .topbar-inner {
+    padding: 10px 10px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .brand {
+    justify-content: center;
+    text-align: left;
+    gap: 8px;
+    max-width: 100%;
+  }
+
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .brand-text {
+    min-width: 0;
+  }
+
+  .brand-text h1 {
+    font-size: 1rem;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .brand-author {
+    display: inline-block;
+    font-size: 0.72rem;
+  }
+
+  .brand-text p {
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  .topbar-actions,
+  .topbar-tools {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .nav-pill {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .live-clock-pill {
+    font-size: 0.74rem;
+    padding: 5px 10px;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .font-size-control {
+    padding: 3px 6px;
+    gap: 3px;
+  }
+
+  .fs-btn {
+    padding: 3px 7px;
+    font-size: 0.74rem;
+  }
+
+  .user-chip {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+
+  /* 登島畫面：解除桌機 min-width 防止橫向撐爆 */
+  .login-screen {
+    padding: 14px 10px;
+  }
+
+  .login-card {
+    padding: 22px 16px;
+    border-radius: 22px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .login-title {
+    font-size: 1.45rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.86rem;
+  }
+
+  .login-input-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .login-input-row .luxury-input,
+  .luxury-input {
+    min-width: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.95rem;
+    padding: 12px 14px;
+  }
+
+  .avatar-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* 主內容區與 Hero 橫幅（徹底消除右側撐爆問題） */
+  .main-container {
+    padding: 12px 10px 44px;
+    width: 100%;
+  }
+
+  .hero-banner {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 18px 14px;
+    gap: 14px;
+    border-radius: 22px;
+    border-width: 3px;
+    margin-bottom: 16px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    max-width: 100%;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.45;
+    font-size: 0.74rem;
+    padding: 5px 12px;
+    border-radius: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-content h2 {
+    font-size: 1.32rem;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .hero-content p {
+    font-size: 0.86rem;
+    line-height: 1.6;
+    margin-bottom: 14px;
+    word-break: break-word;
+  }
+
+  .hero-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .quick-unit-select {
+    min-width: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    font-size: 0.88rem;
+    padding: 10px 12px;
+    text-overflow: ellipsis;
+  }
+
+  .hero-cta-row .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 14px;
+    font-size: 0.92rem;
+  }
+
+  .hero-stats-card {
+    padding: 14px 14px;
+    border-radius: 16px;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .stat-label {
+    font-size: 0.84rem;
+  }
+
+  .stat-value {
+    font-size: 1.05rem;
+  }
+
+  /* 通用卡片與標題列 */
+  .panel-card {
+    padding: 16px 12px;
+    border-radius: 20px;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .panel-header h2 {
+    font-size: 1.14rem;
+  }
+
+  /* 互動浮空島舞台：依手機寬度縮放高度與工具列 */
+  .island-section {
+    padding: 14px 10px;
+    border-radius: 20px;
+  }
+
+  .island-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .island-header h3 {
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .island-controls-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .island-controls-row .btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .map-legend {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.78rem;
+  }
+
+  .weather-switcher {
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .weather-btn {
+    padding: 5px 8px;
+    font-size: 0.76rem;
+  }
+
+  .island-map-container {
+    height: 300px;
+    border-radius: 16px;
+  }
+
+  .island-stage {
+    top: 56%;
+  }
+
+  .island-decorate-bar {
+    padding: 10px 12px;
+  }
+
+  .decorate-bar-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* 單元卡片與 10 關地圖 */
+  .units-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .unit-card {
+    min-width: 0 !important;
+    padding: 16px 14px;
+  }
+
+  .stages-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stage-node {
+    padding: 12px 10px;
+  }
+
+  /* 答題卡片與選項 */
+  .quiz-card {
+    padding: 16px 12px;
+    border-radius: 20px;
+  }
+
+  .quiz-card-top-row {
+    gap: 6px;
+  }
+
+  .question-text {
+    font-size: 1.06rem;
+    line-height: 1.6;
+  }
+
+  .choice-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .choice-btn {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
+  .input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input-row .luxury-input {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .feedback-box {
+    padding: 14px 12px;
+  }
+
+  /* 小遊戲、商店、徽章、教具、PK 雙人與彈窗 */
+  .modal-backdrop {
+    padding: 8px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .modal-dialog,
+  .modal-dialog.modal-lg {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    padding: 16px 14px;
+    border-radius: 20px;
+    margin: auto 0;
+  }
+
+  .modal-top h3 {
+    font-size: 1.04rem;
+  }
+
+  .game-canvas {
+    width: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+  }
+
+  .mini-game-btns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mini-game-btns .btn {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 0.84rem;
+    justify-content: center;
+  }
+
+  .shop-grid,
+  .badges-grid,
+  .tools-grid,
+  .sources-grid,
+  .orig-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .stage-intro-card {
+    width: 92vw;
+    padding: 24px 16px;
+  }
+
+  .result-card {
+    padding: 20px 14px;
+  }
+
+  .result-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .result-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* 頁尾與手機掃碼卡片 */
+  .site-footer {
+    padding: 20px 12px 32px;
+  }
+
+  .footer-disclaimer-text {
+    font-size: 0.78rem;
+    line-height: 1.65;
+    text-align: left;
+  }
+
+  .footer-links-row {
+    gap: 4px;
+  }
+
+  .footer-link-btn {
+    font-size: 0.78rem;
+    padding: 4px 6px;
+  }
+
+  .footer-sep {
+    display: none;
+  }
+
+  .qr-img {
+    width: 176px;
+    height: 176px;
+  }
+}
+
+@media (max-width: 420px) {
+  .island-map-container {
+    height: 260px;
+  }
+
+  .hero-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .brand-text h1 {
+    font-size: 0.94rem;
+  }
+}
+
+/* ==================== 跨平台統一原創 SVG 向量圖尺寸與質感 ==================== */
+.brand-logo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 12px;
+}
+
+.svg-icon-art {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.svg-prop-icon {
+  width: 44px;
+  height: 44px;
+  display: block;
+  filter: drop-shadow(0 4px 4px rgba(56, 40, 22, 0.25));
+}
+
+.prop-house .svg-prop-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.svg-cloud-icon {
+  width: 68px;
+  height: 68px;
+  display: block;
+}
+
+.svg-shop-icon {
+  width: 54px;
+  height: 54px;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 4px 5px rgba(90, 64, 49, 0.16));
+}
+
+.svg-badge-icon {
+  width: 52px;
+  height: 52px;
+  display: block;
+  margin: 0 auto;
+}
+
+.svg-checkin-icon {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+
+.svg-chip-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+
+/* ==================== 群島切換船票（1~4 號主題島） ==================== */
+.archipelago-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #fffdf7, #fff4dc);
+  border: 2px dashed var(--border-gold);
+  border-radius: 18px;
+}
+
+.archipelago-label {
+  font-size: 0.86rem;
+  font-weight: 900;
+  color: var(--gold-dark);
+  white-space: nowrap;
+}
+
+.island-ticket-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #ead7b7;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+
+.island-ticket-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+  background: #fffaf0;
+}
+
+.island-ticket-btn.active {
+  background: linear-gradient(135deg, #52b079, #3c9462);
+  border-color: #2f7a50;
+  color: #fffdf9;
+  box-shadow: 0 3px 0 #266541;
+}
+
+.ticket-num {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.island-ticket-btn.active .ticket-num {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.sub-island-badge {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  transform: translateX(-50%) rotateX(-46deg) translateZ(24px);
+  background: rgba(255, 253, 247, 0.94);
+  border: 2px solid var(--border-gold);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 900;
+  padding: 7px 16px;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(90, 64, 49, 0.16);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.deco-isl-tag {
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 900;
+  margin-left: 5px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(90, 64, 49, 0.1);
+  color: var(--ink-soft);
+}
+
+.deco-chip.active .deco-isl-tag {
+  background: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.island-ticket-btn.is-locked {
+  background: #f5efe3;
+  border-color: #dfd3be;
+  color: var(--muted);
+  box-shadow: 0 2px 0 #e0d4be;
+  opacity: 0.88;
+}
+
+.ticket-lock-tag {
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #ffe8c2;
+  color: var(--gold-dark);
+}
+
+.island-ticket-btn:not(.is-locked) .ticket-lock-tag {
+  display: none;
+}
+
+.island-unlock-toast {
+  margin: -6px 0 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff5dc, #ffe8c4);
+  border: 1.5px solid var(--border-gold);
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ==================== Q 版小人物點擊對話泡泡 ==================== */
+.island-prop.custom-prop[data-custom-prop^="char_"] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.island-prop.custom-prop[data-custom-prop^="char_"]:hover {
+  z-index: 45;
+  filter: drop-shadow(0 0 10px rgba(242, 164, 59, 0.75));
+}
+
+.char-speech-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: 108%;
+  transform: translateX(-50%);
+  background: #fffdf7;
+  border: 2px solid var(--gold);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.4;
+  padding: 7px 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(90, 64, 49, 0.22);
+  white-space: nowrap;
+  z-index: 90;
+  pointer-events: none;
+  animation: charBubblePop 3.8s ease forwards;
+}
+
+.char-speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: var(--gold);
+}
+
+@keyframes charBubblePop {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.85); }
+  10% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  85% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -10px) scale(0.95); }
+}
+
+/* ==================== 每題解題提示（不爆雷）與上一題／下一題切換列 ==================== */
+.hint-toggle-btn {
+  background: linear-gradient(135deg, #fff6d6, #ffe8a8);
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+
+.quiz-hint-box {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fffdf4, #fff4d2);
+  border: 2px dashed var(--gold);
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.quiz-hint-box strong {
+  display: block;
+  color: var(--gold-dark);
+  margin-bottom: 4px;
+}
+
+.quiz-hint-box p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.quiz-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1.5px dashed var(--border);
+}
+
+.quiz-nav-status {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.pad-size-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.pad-size-ctrl input[type="range"] {
+  width: 62px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.pad-size-ctrl em {
+  font-style: normal;
+  min-width: 18px;
+  text-align: center;
+  color: var(--gold-dark);
+  font-weight: 900;
+}
+
+.pad-pen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: var(--ink);
+  background: var(--gold-soft);
+  border: 1.5px solid var(--border-gold);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.pad-pen-svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.size-end {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.scratchpad-panel.is-expanded .scratchpad-canvas {
+  height: 460px;
+}
+
+/* ==================== 登入頁冒險者刪除按鈕 & 商店語音預覽 ==================== */
+.profile-card-wrap {
+  position: relative;
+  display: flex;
+}
+
+.profile-card-wrap .profile-btn {
+  width: 100%;
+  padding-right: 36px;
+}
+
+.profile-del-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: #fffdf8;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+
+.profile-del-btn:hover {
+  background: #fde8e6;
+  border-color: #e8635e;
+  color: #c43b36;
+}
+
+.shop-char-voice {
+  cursor: pointer;
+}
+
+.voice-mini-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+  .archipelago-bar {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .archipelago-label {
+    width: 100%;
+    font-size: 0.8rem;
+  }
+
+  .island-ticket-btn {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    padding: 7px 8px;
+    font-size: 0.78rem;
+  }
+
+  .sub-island-badge {
+    font-size: 0.72rem;
+    padding: 5px 10px;
+    white-space: normal;
+    text-align: center;
+    max-width: 82%;
+  }
+}
