@@ -1127,7 +1127,7 @@
     } else {
       card.classList.add("fx-wrong");
       window.SoundFX.playWrong();
-      window.VisualFX.spawnFloatingText("沒關係，看下面的圖解就懂了 💡", "#a63a3a", fxX, Math.max(110, fxY - 18));
+      window.VisualFX.spawnFloatingText("沒關係，看下面的圖解就懂了 💡", "#a63a3a", window.innerWidth / 2, Math.max(110, fxY - 18));
     }
 
     const feedbackBox = document.getElementById("feedback-box");

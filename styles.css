@@ -88,14 +88,14 @@ h1, h2, h3, .serif {
 .floating-text {
   position: absolute;
   font-weight: 900;
-  font-size: 1.32rem;
+  font-size: 1.02rem;
   background: rgba(255, 253, 247, 0.96);
   border: 2px solid var(--border-gold);
-  padding: 8px 18px;
+  padding: 7px 16px;
   border-radius: 999px;
   box-shadow: 0 8px 22px rgba(90, 64, 49, 0.18);
   animation: floatUpFade 2.8s cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
-  max-width: 90vw;
+  max-width: 88vw;
   text-align: center;
 }
 
