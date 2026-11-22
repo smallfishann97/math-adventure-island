@@ -11,6 +11,11 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
+  <div id="inapp-browser-banner" class="inapp-browser-banner hidden" role="status">
+    <span>💡 偵測到您正使用 App 內建瀏覽器，建議點選單改用 <strong>Chrome / Safari</strong> 開啟，語音朗讀與音效最順暢喔！</span>
+    <button type="button" id="btn-close-inapp-banner" class="inapp-close-btn" aria-label="關閉提示">我知道了 ✕</button>
+  </div>
   <!-- 全螢幕粒子特效畫布 & 浮動加分提示層 -->
   <canvas id="fx-canvas" aria-hidden="true"></canvas>
   <div id="floating-fx-layer" aria-hidden="true"></div>
@@ -904,7 +909,7 @@
       <div class="qr-pill-badge">🌐 免下載安裝檔・免註冊帳號・純網頁隨開隨練</div>
       <div class="qr-box-card">
         <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&color=4a3b2c&bgcolor=ffffff&data=https%3A%2F%2Fsmallfishann97.github.io%2Fmath-adventure-island%2F"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&color=4a3b2c&bgcolor=ffffff&data=https%3A%2F%2Fsmallfishann97.github.io%2Fmath-adventure-island%2F%3FopenExternalBrowser%3D1"
           alt="數學遊戲冒險島專屬 QR Code"
           class="qr-img"
           width="220"
@@ -921,7 +926,7 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button type="button" class="btn btn-gold btn-lg" id="btn-copy-site-url" style="width:100%;">
-          📋 複製學習網址 (https://smallfishann97.github.io/math-adventure-island/)
+          📋 複製分享網址（LINE 自動開 Chrome / Safari）
         </button>
         <button type="button" class="btn btn-ghost" data-close-legal style="width:100%;">關閉</button>
       </div>

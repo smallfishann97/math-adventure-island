@@ -595,7 +595,7 @@
 
     const copyBtn = document.getElementById("btn-copy-site-url");
     if (copyBtn) {
-      const siteUrl = "https://smallfishann97.github.io/math-adventure-island/";
+      const siteUrl = "https://smallfishann97.github.io/math-adventure-island/?openExternalBrowser=1";
       copyBtn.addEventListener("click", () => {
         window.SoundFX.playClick();
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -611,6 +611,17 @@
           prompt("請複製以下學習網址：", siteUrl);
         }
       });
+    }
+    // 偵測 LINE / FB / IG 等 App 內建瀏覽器，顯示改用 Chrome / Safari 開啟提示
+    const ua = navigator.userAgent || "";
+    const isInApp = /Line\/|FBAN|FBAV|Instagram|MicroMessenger/i.test(ua);
+    const inappBanner = document.getElementById("inapp-browser-banner");
+    const closeInapp = document.getElementById("btn-close-inapp-banner");
+    if (isInApp && inappBanner) {
+      inappBanner.classList.remove("hidden");
+    }
+    if (closeInapp && inappBanner) {
+      closeInapp.addEventListener("click", () => inappBanner.classList.add("hidden"));
     }
   }
 
