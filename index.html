@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261123p" />
+  <link rel="stylesheet" href="styles.css?v=20261123q" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -36,9 +36,8 @@
       <div class="login-crest">🍃 MATH ADVENTURE ISLAND 🍃</div>
       <h1 class="login-title">數學遊戲冒險島</h1>
       <p class="login-subtitle">108 課綱不分版本・6 座冒險群島・16 個主題單元・960 題精編互動闖關題庫</p>
-      <div class="site-counter-bar" aria-label="網站人氣與冒險者統計">
-        <span class="site-counter-pill">👣 累計拜訪：<strong data-site-visits>1</strong> 人次</span>
-        <span class="site-counter-pill">🧑‍🎓 已建立冒險者：<strong data-site-members>1</strong> 人</span>
+      <div class="site-counter-bar" aria-label="目前線上人數">
+        <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上冒險中：<strong data-site-online>1</strong> 人</span>
       </div>
 
       <div id="existing-profiles-wrap" class="profiles-section hidden">
@@ -175,9 +174,8 @@
               <strong class="stat-value" id="stat-mistake-count">0 題</strong>
             </div>
             <button type="button" class="btn btn-gold btn-sm" id="btn-open-rules" style="margin-top:4px;width:100%;">📖 星星、金幣與闖關規則說明</button>
-            <div class="site-counter-bar hero-counter-bar" aria-label="網站人氣與冒險者統計">
-              <span class="site-counter-pill">👣 累計訪客：<strong data-site-visits>1</strong> 人次</span>
-              <span class="site-counter-pill">🧑‍🎓 已建立冒險者：<strong data-site-members>1</strong> 人</span>
+            <div class="site-counter-bar hero-counter-bar" aria-label="目前線上人數">
+              <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上冒險中：<strong data-site-online>1</strong> 人</span>
             </div>
           </div>
         </div>
@@ -898,16 +896,16 @@
           <span class="footer-sep">｜</span>
           <button type="button" class="footer-link-btn" data-open-legal="qrcode">📱 手機掃碼開啟</button>
           <span class="footer-sep">｜</span>
-          <a href="mailto:smallfishann97@gmail.com" class="footer-link-btn">✉️ 聯絡我們</a>
+          <button type="button" class="footer-link-btn" id="btn-open-contact">✉️ 聯絡我們</button>
+          <span class="footer-sep">｜</span>
+          <button type="button" class="footer-link-btn" id="btn-open-admin">👑 站長專屬</button>
         </div>
       </div>
-      <div class="site-counter-bar footer-counter-bar" aria-label="網站人氣與冒險者統計">
-        <span class="site-counter-pill">👣 累計拜訪：<strong data-site-visits>1</strong> 人次</span>
-        <span class="site-counter-pill">🧑‍🎓 已建立冒險者：<strong data-site-members>1</strong> 人</span>
+      <div class="site-counter-bar footer-counter-bar" aria-label="目前線上人數">
+        <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上冒險中：<strong data-site-online>1</strong> 人</span>
       </div>
       <p class="footer-brand">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
-      <p class="footer-copy" style="margin-bottom:4px;">聯絡信箱：<a href="mailto:smallfishann97@gmail.com" class="footer-email-link">smallfishann97@gmail.com</a></p>
-      <p class="footer-copy">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
+      <p class="footer-copy" id="footer-secret-trigger" title="Copyright © 2026 Ann Lu">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
     </footer>
   </div>
 
@@ -955,7 +953,7 @@
         </div>
         <div class="legal-card">
           <h4>2. 原創題庫與智慧財產權聲明</h4>
-          <p>本站收錄之全部題庫（共 960 題，含 16 單元主線與 8 大原創素養挑戰關卡）、數學名詞字卡、原創動物角色與向量圖解，均係<strong>參考教育部公開之 108 課綱學習目標編寫與製作</strong>，未轉載任何出版社或外部平台受著作權保護之原文題目。若任何單位對內容有指正建議，歡迎來信 <a href="mailto:smallfishann97@gmail.com" class="footer-email-link">smallfishann97@gmail.com</a> 聯繫我們協助處理。</p>
+          <p>本站收錄之全部題庫（共 960 題，含 16 單元主線與 8 大原創素養挑戰關卡）、數學名詞字卡、原創動物角色與向量圖解，均係<strong>參考教育部公開之 108 課綱學習目標編寫與製作</strong>，未轉載任何出版社或外部平台受著作權保護之原文題目。若任何單位對內容有指正建議，歡迎透過頁尾「✉️ 聯絡我們」表單與我們聯繫協助處理。</p>
         </div>
         <div class="legal-card">
           <h4>3. 自修輔助參考與原創影音聲明</h4>
@@ -1196,6 +1194,94 @@
     </div>
   </div>
 
+  <!-- 站內聯絡我們（不外露私人信箱）意見回饋彈窗 -->
+  <div id="modal-contact-form" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-top">
+        <h3 id="contact-modal-title">✉️ 聯絡我們・意見回饋箱</h3>
+      </div>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
+        對題目內容有指正建議、功能許願或任何想對設計者 Ann Lu 說的話，歡迎直接留言給我們（免公開信箱，保護雙方隱私）：
+      </p>
+      <form id="site-contact-form" class="print-form">
+        <label class="form-row">
+          <span>回饋類別：</span>
+          <select id="contact-category" class="luxury-select">
+            <option value="題目指正建議">📘 題目或詳解指正建議</option>
+            <option value="功能許願與體驗">✨ 功能許願與使用體驗</option>
+            <option value="鼓勵與心得分享">💛 給設計者的鼓勵與分享</option>
+            <option value="其他合作或聯繫">📩 其他聯繫事項</option>
+          </select>
+        </label>
+        <label class="form-row">
+          <span>您的稱呼：</span>
+          <input type="text" id="contact-sender" class="luxury-input" placeholder="例：王老師 ／ 小安媽媽 ／ 三年級小宇" maxlength="30" required />
+        </label>
+        <label class="form-row">
+          <span>回覆聯絡方式（選填，若需我們回信可填）：</span>
+          <input type="text" id="contact-reply-to" class="luxury-input" placeholder="可選填您的信箱或留空" maxlength="60" />
+        </label>
+        <label class="form-row" style="flex-direction:column;align-items:stretch;gap:6px;">
+          <span>留言內容：</span>
+          <textarea id="contact-message" class="luxury-input" rows="4" placeholder="請輸入您的寶貴建議或指正內容…" maxlength="600" required style="resize:vertical;min-height:90px;padding:10px;"></textarea>
+        </label>
+        <div id="contact-submit-toast" class="island-unlock-toast hidden" style="margin:6px 0;background:#e8f9ee;border-color:#5bb876;color:#276b3d;">
+          ✅ 感謝您的寶貴回饋！您的留言已成功送達系統囉！
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+          <button type="button" class="btn btn-ghost" id="btn-close-contact">取消關閉</button>
+          <button type="submit" class="btn btn-gold btn-lg" id="btn-submit-contact">📨 送出回饋留言</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 👑 站長專屬隱藏後台數據彈窗 -->
+  <div id="admin-stats-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="admin-modal-title">👑 站長專屬數據後台</h3>
+      </div>
+
+      <!-- 密碼驗證門檻（未解鎖前顯示，一般訪客看不到數據） -->
+      <form id="admin-auth-gate" class="print-form" style="text-align:center;padding:12px 0;">
+        <p style="font-weight:800;color:var(--ink-soft);margin:0 0 12px;">
+          🔒 此區域為站長 Ann Lu 專屬管理後台，請輸入站長密碼解鎖查看：
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;max-width:380px;margin:0 auto;">
+          <input type="password" id="admin-pwd-input" class="luxury-input" placeholder="請輸入站長專屬密碼…" autocomplete="off" />
+          <button type="submit" class="btn btn-gold">🔑 解鎖</button>
+        </div>
+        <p id="admin-pwd-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.86rem;margin:10px 0 0;">
+          ❌ 密碼不正確，僅限站長本人進入喔！
+        </p>
+      </form>
+
+      <!-- 解鎖後才顯示的站長數據與留言箱 -->
+      <div id="admin-dashboard-content" class="hidden">
+        <p style="font-size:0.84rem;color:var(--muted);margin:0 0 12px;">
+          ✅ 已通過站長身分驗證（一般訪客於前台僅能看到「目前線上人數」，以下完整統計僅您可見）：
+        </p>
+        <div class="weekly-kpi-grid" style="margin-bottom:14px;">
+          <div class="wk-kpi"><span>👣 累計拜訪人次</span><strong data-site-visits>1</strong></div>
+          <div class="wk-kpi"><span>🧑‍🎓 已建立冒險者人數</span><strong data-site-members>1</strong></div>
+          <div class="wk-kpi"><span>🟢 目前線上人數</span><strong data-site-online>1</strong></div>
+          <div class="wk-kpi"><span>⏱️ 本次停留時間</span><strong data-stay-current>00:00</strong></div>
+        </div>
+        <div class="weekly-kpi-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:16px;">
+          <div class="wk-kpi"><span>⏳ 累計總停留學習時間</span><strong data-stay-total>0 分鐘</strong></div>
+          <div class="wk-kpi"><span>📊 平均每次拜訪停留時間</span><strong data-stay-avg>0 分鐘</strong></div>
+        </div>
+        <h4 style="margin:0 0 8px;color:var(--ink);">📬 站內「聯絡我們」收到的意見回饋留言</h4>
+        <div id="admin-feedback-list" class="exam-review-scroll" style="max-height:220px;"></div>
+      </div>
+
+      <div class="legal-footer-actions" style="margin-top:14px;">
+        <button type="button" class="btn btn-ghost" id="btn-close-admin">關閉視窗</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
@@ -1207,7 +1293,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261123p"></script>
+  <script src="super-features.js?v=20261123r"></script>
   <script src="app.js?v=20261123h"></script>
 </body>
 </html>

@@ -5075,3 +5075,27 @@ html, body {
 .footer-counter-bar {
   margin: 0 auto 10px;
 }
+
+.online-pill {
+  background: linear-gradient(180deg, #f3fcf6, #ddf5e5);
+  border-color: #63b87b;
+}
+
+.online-pill strong {
+  color: #257a42;
+}
+
+.online-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #39a85b;
+  box-shadow: 0 0 0 3px rgba(57, 168, 91, 0.28);
+  animation: onlinePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes onlinePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.72; }
+}
