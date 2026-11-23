@@ -897,7 +897,7 @@
           <span class="footer-sep">｜</span>
           <button type="button" class="footer-link-btn" id="btn-open-contact">✉️ 聯絡我們</button>
           <span class="footer-sep">｜</span>
-          <button type="button" class="footer-link-btn" id="btn-open-admin">👑 站長專屬</button>
+          <button type="button" class="footer-link-btn" id="btn-open-admin">👑 版主專屬</button>
         </div>
       </div>
       <div class="site-counter-bar footer-counter-bar" aria-label="網站人氣統計">
@@ -971,22 +971,22 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-top">
         <div>
-          <h3 id="title-legal-changelog">🚀 數學遊戲冒險島・最新版本公告（站長專屬）</h3>
+          <h3 id="title-legal-changelog">🚀 數學遊戲冒險島・最新版本公告（版主專屬）</h3>
           <p id="changelog-auto-sub" style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">系統進版自動同步日誌 (v1.1.0 ~ <span data-auto-ver>v2.2.0</span>)</p>
         </div>
       </div>
 
-      <!-- 更版日誌站長密碼驗證門檻 -->
+      <!-- 更版日誌版主密碼驗證門檻 -->
       <form id="changelog-auth-gate" class="print-form" style="text-align:center;padding:12px 0;">
         <p style="font-weight:800;color:var(--ink-soft);margin:0 0 12px;">
-          🔒 此版本日誌為站長 Ann Lu 專屬查閱，請輸入站長密碼解鎖查看：
+          🔒 此版本日誌為版主 Ann Lu 專屬查閱，請輸入版主密碼解鎖查看：
         </p>
         <div style="display:flex;gap:10px;justify-content:center;max-width:380px;margin:0 auto;">
-          <input type="password" id="changelog-pwd-input" class="luxury-input" placeholder="請輸入站長專屬密碼…" autocomplete="off" />
+          <input type="password" id="changelog-pwd-input" class="luxury-input" placeholder="請輸入版主專屬密碼…" autocomplete="off" />
           <button type="submit" class="btn btn-gold">🔑 解鎖</button>
         </div>
         <p id="changelog-pwd-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.86rem;margin:10px 0 0;">
-          ❌ 密碼不正確，僅限站長本人查閱喔！
+          ❌ 密碼不正確，僅限版主本人查閱喔！
         </p>
       </form>
 
@@ -998,13 +998,13 @@
         <div class="legal-card changelog-latest">
           <div class="changelog-head">
             <span class="ver-badge latest"><span data-auto-ver>v2.2.0</span> (最新)</span>
-            <span class="ver-tag">🐾 8種Q版寵物 & 👑 站長專屬後台</span>
+            <span class="ver-tag">🐾 8種Q版寵物 & 👑 版主專屬後台</span>
           </div>
           <h4>🐾 10種登島頭像、8種Q版電子寵物（含5種玩具互動與睡眠模式）與站內回饋系統上線</h4>
           <ul>
             <li><strong>🦊 登島角色擴充至 10 種原創動物</strong>：新增焦糖狐狸、呆萌無尾熊、抹茶小恐龍、葵花小倉鼠共 10 種頭像（單機最多可建立 10 位冒險者）。</li>
             <li><strong>🐶 8 種 Q 版電子寵物與 5 種玩具互動</strong>：擴充為 8 種大頭 Q 版寵物（成長上限 100/100 MAX），新增「😴 哄牠睡覺」睡眠泡泡模式，以及「🎾 陪牠玩耍」頂皮球、接飛盤、追蝴蝶、吹泡泡、摸摸頭 5 種動態特效。</li>
-            <li><strong>✉️ 隱私保護意見回饋箱 & 👑 站長數據後台</strong>：新增免外露信箱之「✉️ 聯絡我們」站內回饋表單、前台即時人氣統計，以及密碼保護之「👑 站長專屬」數據分析與 CSV 報表匯出功能。</li>
+            <li><strong>✉️ 隱私保護意見回饋箱 & 👑 版主數據後台</strong>：新增免外露信箱之「✉️ 聯絡我們」站內回饋表單、前台即時人氣統計，以及密碼保護之「👑 版主專屬」數據分析與 CSV 報表匯出功能。</li>
           </ul>
         </div>
         <div class="legal-card">
@@ -1264,31 +1264,31 @@
     </div>
   </div>
 
-  <!-- 👑 站長專屬隱藏後台數據彈窗 -->
+  <!-- 👑 版主專屬隱藏後台數據彈窗 -->
   <div id="admin-stats-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
     <div class="modal-dialog modal-lg">
       <div class="modal-top">
-        <h3 id="admin-modal-title">👑 站長專屬數據後台</h3>
+        <h3 id="admin-modal-title">👑 版主專屬數據後台</h3>
       </div>
 
       <!-- 密碼驗證門檻（未解鎖前顯示，一般訪客看不到數據） -->
       <form id="admin-auth-gate" class="print-form" style="text-align:center;padding:12px 0;">
         <p style="font-weight:800;color:var(--ink-soft);margin:0 0 12px;">
-          🔒 此區域為站長 Ann Lu 專屬管理後台，請輸入站長密碼解鎖查看：
+          🔒 此區域為版主 Ann Lu 專屬管理後台，請輸入版主密碼解鎖查看：
         </p>
         <div style="display:flex;gap:10px;justify-content:center;max-width:380px;margin:0 auto;">
-          <input type="password" id="admin-pwd-input" class="luxury-input" placeholder="請輸入站長專屬密碼…" autocomplete="off" />
+          <input type="password" id="admin-pwd-input" class="luxury-input" placeholder="請輸入版主專屬密碼…" autocomplete="off" />
           <button type="submit" class="btn btn-gold">🔑 解鎖</button>
         </div>
         <p id="admin-pwd-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.86rem;margin:10px 0 0;">
-          ❌ 密碼不正確，僅限站長本人進入喔！
+          ❌ 密碼不正確，僅限版主本人進入喔！
         </p>
       </form>
 
-      <!-- 解鎖後才顯示的站長數據與留言箱 -->
+      <!-- 解鎖後才顯示的版主數據與留言箱 -->
       <div id="admin-dashboard-content" class="hidden">
         <p style="font-size:0.84rem;color:var(--muted);margin:0 0 12px;">
-          ✅ 已通過站長身分驗證（一般訪客於前台僅能看到「累計拜訪人次」與「目前線上人數」，以下已建立冒險者人數、停留時間與回饋留言僅您可見）：
+          ✅ 已通過版主身分驗證（一般訪客於前台僅能看到「累計拜訪人次」與「目前線上人數」，以下已建立冒險者人數、停留時間與回饋留言僅您可見）：
         </p>
         <div class="weekly-kpi-grid" style="margin-bottom:14px;">
           <div class="wk-kpi"><span>👣 累計拜訪人次</span><strong data-site-visits>1</strong></div>
@@ -1301,7 +1301,7 @@
           <div class="wk-kpi"><span>📊 平均每次拜訪停留時間</span><strong data-stay-avg>0 分鐘</strong></div>
         </div>
 
-        <h4 style="margin:0 0 8px;color:var(--ink);">🎁 站長一鍵測試／教學展示工具（對目前登入角色生效）</h4>
+        <h4 style="margin:0 0 8px;color:var(--ink);">🎁 版主一鍵測試／教學展示工具（對目前登入角色生效）</h4>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
           <button type="button" class="btn btn-gold btn-sm" id="admin-btn-add-coins">🪙 +1,000 金幣</button>
           <button type="button" class="btn btn-forest btn-sm" id="admin-btn-add-cookies">🍪 +50 塊寵物餅乾</button>

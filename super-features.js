@@ -1346,7 +1346,7 @@
     initSiteCounters();
   }
 
-  // ==================== 6. 公開線上人數 & 站長專屬隱藏後台（訪客／會員／停留時間） & 站內聯絡我們 ====================
+  // ==================== 6. 公開線上人數 & 版主專屬隱藏後台（訪客／會員／停留時間） & 站內聯絡我們 ====================
   const COUNTER_NS = "smallfishann97-math-adventure-island";
   let cachedVisits = Number(localStorage.getItem("mai_cached_visits") || 0);
   let cachedMembers = Number(localStorage.getItem("mai_cached_members") || 0);
@@ -1580,7 +1580,7 @@
       renderCounterDOM();
     }, 1000);
 
-    // 1. 累計拜訪人次（站長後台查看）
+    // 1. 累計拜訪人次（版主後台查看）
     if (!sessionStorage.getItem("mai_visit_bumped")) {
       sessionStorage.setItem("mai_visit_bumped", "1");
       cachedVisits = Math.max(1, cachedVisits + 1);
@@ -1608,7 +1608,7 @@
       } catch (_) {}
     }
 
-    // 2. 已建立冒險者人數（站長後台查看）
+    // 2. 已建立冒險者人數（版主後台查看）
     const localIds = getLocalMemberIds();
     let syncedIds = [];
     try {
@@ -1726,7 +1726,7 @@
       });
     }
 
-    // 5. 👑 站長專屬數據後台（點頁尾「👑 站長專屬」並輸入站長高強度密碼解鎖）
+    // 5. 👑 版主專屬數據後台（點頁尾「👑 版主專屬」並輸入版主高強度密碼解鎖）
     const ADMIN_KEY_B64 = "YW5uOTcwOThwb2lsa2ptbmIxMjNxd2Vhc2R6eGM=";
     function checkAdminPwd(str) {
       try {
@@ -1819,7 +1819,7 @@
       btnCloseAdmin.addEventListener("click", () => adminModal.classList.add("hidden"));
     }
 
-    // 站長一鍵測試／教學展示工具按鈕
+    // 版主一鍵測試／教學展示工具按鈕
     function showAdminToolToast(msg) {
       const t = document.getElementById("admin-tool-toast");
       if (!t) return;
