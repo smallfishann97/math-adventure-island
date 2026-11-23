@@ -113,16 +113,16 @@
           ]
         },
 
-        // 4. 甜點遊樂園（蹦蹦跳跳活潑嘉年華風格）
+        // 4. 甜點遊樂園（輕鬆悠閒旋轉木馬嘉年華風格）
         carnival: {
           name: "🎡 甜點遊樂園",
-          tempoMs: 205,
+          tempoMs: 285,
           leadWave: "triangle",
-          bassWave: "triangle",
-          leadGain: 0.062,
-          bassGain: 0.048,
-          leadDecay: 0.19,
-          bassDecay: 0.20,
+          bassWave: "sine",
+          leadGain: 0.056,
+          bassGain: 0.042,
+          leadDecay: 0.28,
+          bassDecay: 0.30,
           chime: true,
           melody: [
             783.99, 659.25, 783.99, 1046.5, 880.00, 783.99, 659.25, 0,
