@@ -178,28 +178,49 @@
     }).join("");
   }
 
-  // ==================== 2. 島嶼電子寵物養成 ====================
+  // ==================== 2. 島嶼電子寵物養成（6 種高顏值 Q 版小夥伴） ====================
   const PET_SPECIES = {
     shiba: {
       name: "柴犬麻糬",
-      body: "#F4B974",
-      belly: "#FFF5DF",
-      ear: "#C87D3A",
+      body: "#F5B86E",
+      belly: "#FFF7E6",
+      ear: "#C87B36",
       quotes: ["汪汪！你算得越來越快了喔！", "再答對幾題就有香噴噴餅乾吃囉！", "今天也在冒險島一起加油吧！"],
     },
     fox: {
       name: "焦糖小狐狸",
-      body: "#F08C5B",
-      belly: "#FFF3E0",
-      ear: "#8C4A27",
-      quotes: ["呼呼～小狐狸最佩服會算數學的你！", "這題難不倒我們兩個聰明搭檔！", "陪我玩一下再繼續闖關吧！"],
+      body: "#F28B59",
+      belly: "#FFF4E4",
+      ear: "#7D3F20",
+      quotes: ["呼呼～小狐狸最佩服會算數學的你！", "這題難不倒我們兩個聰明搭檔！", "答對題目拿餅乾餵我，我會變超帥喔！"],
     },
     dino: {
       name: "抹茶小恐龍",
-      body: "#8ED194",
-      belly: "#F2FCEB",
-      ear: "#4C9A5E",
+      body: "#88D18E",
+      belly: "#F3FCEB",
+      ear: "#F4B956",
       quotes: ["吼嗚～小恐龍幫你把錯題都吃光光！", "餅乾好好吃，我的力量滿格了！", "你是最棒的冒險島小博士！"],
+    },
+    bunny: {
+      name: "草莓垂耳兔",
+      body: "#FAD2DC",
+      belly: "#FFF9FB",
+      ear: "#F299B1",
+      quotes: ["蹦蹦跳跳！你今天算數學超認真耶！", "最喜歡吃甜甜的數學餅乾了～", "我們一起把星星全部收集起來吧！"],
+    },
+    panda: {
+      name: "奶茶小熊貓",
+      body: "#FFF9EE",
+      belly: "#EAD8BE",
+      ear: "#6A4E3B",
+      quotes: ["嚼嚼～算完這關再餵我吃塊小餅乾吧！", "一步一步慢慢算，一定能全對喔！", "你今天表現超級棒，給你拍拍手！"],
+    },
+    unicorn: {
+      name: "夢幻獨角獸",
+      body: "#EFE2FA",
+      belly: "#FFF7FC",
+      ear: "#E5A4CB",
+      quotes: ["閃亮亮魔法加持！每題都能看懂算對！", "吃到好吃的餅乾，頭上的金色角更亮了！", "帶著勇氣往下一關出發吧！"],
     },
   };
 
@@ -210,48 +231,164 @@
     return { lv: 1, title: "🥚 暖暖神秘蛋", nextXp: 10 };
   }
 
-  function renderPetSvg(speciesId, lv) {
+  function renderPetSvg(speciesId, lv, isSleeping = false) {
     const sp = PET_SPECIES[speciesId] || PET_SPECIES.shiba;
+    const zzzOverlay = isSleeping
+      ? `<text x="98" y="34" font-size="14" font-weight="900" fill="#B5753C">Z</text>
+         <text x="110" y="22" font-size="17" font-weight="900" fill="#B5753C">z</text>
+         <text x="122" y="12" font-size="12" font-weight="900" fill="#B5753C">z</text>
+         <circle cx="80" cy="65" r="7" fill="#FFE6F2" stroke="#D484B0" stroke-width="1.6" opacity="0.88"/>
+         <circle cx="78" cy="63" r="2" fill="#FFFFFF"/>`
+      : "";
+    // Lv.1：綁著蝴蝶結的 Q 版斑點神秘蛋
     if (lv === 1) {
       return `
-        <svg viewBox="0 0 120 120" class="pet-stage-svg" aria-hidden="true">
-          <ellipse cx="60" cy="102" rx="34" ry="9" fill="#EBD8BA"/>
-          <path d="M60 18 C84 18 94 52 92 78 C90 96 76 104 60 104 C44 104 30 96 28 78 C26 52 36 18 60 18 Z" fill="#FFF8E8" stroke="#5A4031" stroke-width="3.2"/>
-          <circle cx="46" cy="54" r="7" fill="${sp.body}" opacity="0.75"/>
-          <circle cx="74" cy="68" r="9" fill="${sp.body}" opacity="0.65"/>
-          <circle cx="52" cy="82" r="5" fill="${sp.ear}" opacity="0.5"/>
-          <path d="M44 42 L53 49 L62 41 L71 48" fill="none" stroke="#5A4031" stroke-width="2" stroke-linecap="round"/>
+        <svg viewBox="0 0 140 140" class="pet-stage-svg" aria-hidden="true">
+          <ellipse cx="70" cy="118" rx="38" ry="9" fill="#EBD8BA"/>
+          <path d="M70 22 C98 22 108 60 105 90 C102 110 88 120 70 120 C52 120 38 110 35 90 C32 60 42 22 70 22 Z" fill="#FFFDF7" stroke="#5A4031" stroke-width="3.2"/>
+          <circle cx="53" cy="64" r="8" fill="${sp.body}" opacity="0.85"/>
+          <circle cx="86" cy="78" r="10" fill="${sp.body}" opacity="0.75"/>
+          <circle cx="62" cy="96" r="6" fill="${sp.ear}" opacity="0.65"/>
+          <!-- 可愛紅粉蝴蝶結 -->
+          <path d="M70 35 C58 25 50 35 60 42 C50 47 58 55 70 43 C82 55 90 47 80 42 C90 35 82 25 70 35 Z" fill="#FF857A" stroke="#5A4031" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="70" cy="39" r="4" fill="#FFD966" stroke="#5A4031" stroke-width="1.8"/>
+          <!-- 害羞小腮紅與微笑 -->
+          <ellipse cx="52" cy="78" rx="5" ry="2.8" fill="#FF9E94" opacity="0.75"/>
+          <ellipse cx="88" cy="78" rx="5" ry="2.8" fill="#FF9E94" opacity="0.75"/>
+          ${zzzOverlay}
         </svg>`;
     }
+
+    // 各物種專屬 Q 版耳朵／角／尾巴／花紋
+    let backParts = "";
+    let headExtras = "";
+    let faceMarkings = "";
+
+    if (speciesId === "shiba") {
+      // 柴犬捲尾巴＋尖立耳＋白眉豆豆
+      backParts = `<path d="M95 92 C116 88 118 66 102 66 C94 66 95 78 102 78" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linecap="round"/>`;
+      headExtras = `
+        <path d="M40 44 L26 16 L56 30 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M38 39 L31 23 L50 31 Z" fill="#FFF5DF"/>
+        <path d="M100 44 L114 16 L84 30 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M102 39 L109 23 L90 31 Z" fill="#FFF5DF"/>`;
+      faceMarkings = `
+        <path d="M36 68 Q52 54 70 68 Q88 54 104 68 C102 86 88 94 70 94 C52 94 38 86 36 68 Z" fill="#FFFDF8"/>
+        <ellipse cx="56" cy="48" rx="4.2" ry="2.6" fill="#FFFDF8"/>
+        <ellipse cx="84" cy="48" rx="4.2" ry="2.6" fill="#FFFDF8"/>`;
+    } else if (speciesId === "fox") {
+      // 小狐狸蓬鬆白尾尖大尾巴＋大尖耳＋臉頰絨毛
+      backParts = `
+        <path d="M94 96 C124 94 130 62 110 56 C98 53 92 70 94 84 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M110 56 C122 59 124 72 112 75 C106 68 106 61 110 56 Z" fill="#FFFDF7"/>`;
+      headExtras = `
+        <path d="M38 44 L20 12 L56 28 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M34 36 L26 19 L48 29 Z" fill="#7D3F20"/>
+        <path d="M102 44 L120 12 L84 28 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M106 36 L114 19 L92 29 Z" fill="#7D3F20"/>`;
+      faceMarkings = `
+        <path d="M33 66 L24 72 L36 78 Q54 60 70 72 Q86 60 104 78 L116 72 L107 66 C103 86 88 94 70 94 C52 94 37 86 33 66 Z" fill="#FFF8EE"/>`;
+    } else if (speciesId === "dino") {
+      // 小恐龍金色背棘＋粗萌小尾巴＋肚皮橫紋
+      backParts = `
+        <path d="M94 96 C118 98 124 82 116 74 C108 78 102 82 94 84 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M104 42 L116 46 L105 54 Z M107 58 L120 62 L107 70 Z" fill="#FFD35C" stroke="#5A4031" stroke-width="2" stroke-linejoin="round"/>`;
+      headExtras = `
+        <path d="M62 24 L70 11 L78 24 Z" fill="#FFD35C" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M46 28 L50 17 L58 25 Z" fill="#FFA45B" stroke="#5A4031" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M82 25 L90 17 L94 28 Z" fill="#FFA45B" stroke="#5A4031" stroke-width="2.2" stroke-linejoin="round"/>`;
+      faceMarkings = `
+        <ellipse cx="48" cy="48" rx="4" ry="3" fill="#5CB868" opacity="0.6"/>
+        <ellipse cx="92" cy="50" rx="5" ry="3.5" fill="#5CB868" opacity="0.6"/>`;
+    } else if (speciesId === "bunny") {
+      // 草莓垂耳兔長長軟垂耳＋圓球白尾巴＋頭頂小草莓
+      backParts = `<circle cx="102" cy="96" r="10" fill="#FFFDF9" stroke="#5A4031" stroke-width="2.6"/>`;
+      headExtras = `
+        <path d="M42 36 C20 34 14 68 24 84 C32 92 42 76 40 54 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M36 46 C24 48 20 68 27 78 C32 82 36 70 36 54 Z" fill="#F49CB5"/>
+        <path d="M98 36 C120 34 126 68 116 84 C108 92 98 76 100 54 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M104 46 C116 48 120 68 113 78 C108 82 104 70 104 54 Z" fill="#F49CB5"/>`;
+    } else if (speciesId === "panda") {
+      // 奶茶小熊貓圓圓深棕耳＋可愛八字黑眼圈＋小竹葉
+      headExtras = `
+        <circle cx="38" cy="30" r="13" fill="#6A4E3B" stroke="#5A4031" stroke-width="3"/>
+        <circle cx="38" cy="30" r="6" fill="#D9A88F"/>
+        <circle cx="102" cy="30" r="13" fill="#6A4E3B" stroke="#5A4031" stroke-width="3"/>
+        <circle cx="102" cy="30" r="6" fill="#D9A88F"/>`;
+      faceMarkings = `
+        <ellipse cx="52" cy="58" rx="11" ry="9" transform="rotate(-18 52 58)" fill="#6A4E3B"/>
+        <ellipse cx="88" cy="58" rx="11" ry="9" transform="rotate(18 88 58)" fill="#6A4E3B"/>`;
+    } else if (speciesId === "unicorn") {
+      // 夢幻獨角獸金色螺旋角＋粉彩鬃毛＋小翅膀
+      backParts = `
+        <path d="M32 82 C12 72 12 96 34 98 Z" fill="#FFFDF9" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M108 82 C128 72 128 96 106 98 Z" fill="#FFFDF9" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round"/>`;
+      headExtras = `
+        <path d="M38 40 L26 20 L50 30 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="2.8" stroke-linejoin="round"/>
+        <path d="M102 40 L114 20 L90 30 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="2.8" stroke-linejoin="round"/>
+        <circle cx="56" cy="27" r="8" fill="#FFB5D0" stroke="#5A4031" stroke-width="2"/>
+        <circle cx="84" cy="27" r="8" fill="#FFE07D" stroke="#5A4031" stroke-width="2"/>
+        <path d="M63 28 L70 5 L77 28 Z" fill="#FFD859" stroke="#5A4031" stroke-width="2.6" stroke-linejoin="round"/>
+        <line x1="65" y1="21" x2="75" y2="18" stroke="#C98219" stroke-width="2"/>`;
+    }
+
+    // 進化配件：Lv.2 破殼蛋殼、Lv.3 冒險領巾與星星、Lv.4 皇家大皇冠與披風
+    const cape = lv >= 4
+      ? `<path d="M34 80 C20 96 22 114 38 114 L102 114 C118 114 120 96 106 80 Z" fill="#E86452" stroke="#5A4031" stroke-width="2.6"/>`
+      : "";
     const crown = lv >= 4
-      ? `<path d="M44 26 L48 12 L56 20 L60 10 L64 20 L72 12 L76 26 Z" fill="#FFD447" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round"/>`
+      ? `<path d="M52 24 L55 8 L64 17 L70 6 L76 17 L85 8 L88 24 Z" fill="#FFD447" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round"/>
+         <circle cx="70" cy="17" r="2.4" fill="#E85D4A"/>`
       : lv >= 3
-      ? `<path d="M88 22 L91 28 L97 29 L92 33 L94 39 L88 36 L82 39 L84 33 L79 29 L85 28 Z" fill="#FFD447" stroke="#B6721A" stroke-width="1.4"/>`
+      ? `<path d="M108 18 L111 25 L118 26 L113 31 L114 38 L108 34 L102 38 L103 31 L98 26 L105 25 Z" fill="#FFD447" stroke="#B6721A" stroke-width="1.5"/>`
       : "";
     const shell = lv === 2
-      ? `<path d="M30 82 L40 90 L50 82 L60 90 L70 82 L80 90 L90 82 C88 100 76 106 60 106 C44 106 32 100 30 82 Z" fill="#FFF8E8" stroke="#5A4031" stroke-width="2.6" stroke-linejoin="round"/>`
+      ? `<path d="M34 92 L44 100 L54 91 L65 100 L75 91 L86 100 L96 91 L106 92 C104 112 90 120 70 120 C50 120 36 112 34 92 Z" fill="#FFFDF6" stroke="#5A4031" stroke-width="2.8" stroke-linejoin="round"/>`
       : "";
     const scarf = lv >= 3
-      ? `<path d="M38 78 Q60 88 82 78 L80 86 Q60 94 40 86 Z" fill="#F27966" stroke="#5A4031" stroke-width="2"/>`
+      ? `<path d="M42 84 Q70 95 98 84 L95 93 Q70 102 45 93 Z" fill="#F26D5B" stroke="#5A4031" stroke-width="2.2"/>
+         <circle cx="70" cy="94" r="5.5" fill="#FFD447" stroke="#5A4031" stroke-width="2"/>`
       : "";
+
     return `
-      <svg viewBox="0 0 120 120" class="pet-stage-svg" aria-hidden="true">
-        <ellipse cx="60" cy="106" rx="36" ry="8" fill="#EBD8BA"/>
-        ${crown}
-        <path d="M34 46 L26 22 L48 34 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M86 46 L94 22 L72 34 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
-        <ellipse cx="60" cy="70" rx="32" ry="30" fill="${sp.body}" stroke="#5A4031" stroke-width="3.2"/>
-        <ellipse cx="60" cy="78" rx="21" ry="18" fill="${sp.belly}"/>
-        <circle cx="48" cy="60" r="4.2" fill="#5A4031"/>
-        <circle cx="72" cy="60" r="4.2" fill="#5A4031"/>
-        <circle cx="46.5" cy="58.5" r="1.4" fill="#FFF"/>
-        <circle cx="70.5" cy="58.5" r="1.4" fill="#FFF"/>
-        <ellipse cx="40" cy="67" rx="4.5" ry="2.6" fill="#FF9E94" opacity="0.7"/>
-        <ellipse cx="80" cy="67" rx="4.5" ry="2.6" fill="#FF9E94" opacity="0.7"/>
-        <ellipse cx="60" cy="67" rx="3.4" ry="2.4" fill="#5A4031"/>
-        <path d="M54 72 Q60 77 66 72" fill="none" stroke="#5A4031" stroke-width="2.4" stroke-linecap="round"/>
+      <svg viewBox="0 0 140 140" class="pet-stage-svg" aria-hidden="true">
+        <ellipse cx="70" cy="122" rx="42" ry="8" fill="#EBD8BA"/>
+        ${cape}
+        ${backParts}
+        <!-- 圓滾滾 Q 版小身體與小肚肚 -->
+        <ellipse cx="70" cy="96" rx="30" ry="24" fill="${sp.body}" stroke="#5A4031" stroke-width="3"/>
+        <ellipse cx="70" cy="99" rx="19" ry="15" fill="${sp.belly}"/>
+        ${headExtras}
+        <!-- 大頭 Q 版臉龐 -->
+        <ellipse cx="70" cy="58" rx="36" ry="31" fill="${sp.body}" stroke="#5A4031" stroke-width="3.2"/>
+        ${faceMarkings}
+        <!-- 水汪汪雙高光大眼睛 或 安心閉眼睡覺 -->
+        ${
+          isSleeping
+            ? `<path d="M46 58 Q53 64 60 58" fill="none" stroke="#432D20" stroke-width="3" stroke-linecap="round"/>
+               <path d="M80 58 Q87 64 94 58" fill="none" stroke="#432D20" stroke-width="3" stroke-linecap="round"/>`
+            : `<circle cx="53" cy="58" r="6" fill="#432D20"/>
+               <circle cx="87" cy="58" r="6" fill="#432D20"/>
+               <circle cx="51" cy="55.8" r="2.3" fill="#FFFFFF"/>
+               <circle cx="85" cy="55.8" r="2.3" fill="#FFFFFF"/>
+               <circle cx="55" cy="60.2" r="1.1" fill="#FFFFFF"/>
+               <circle cx="89" cy="60.2" r="1.1" fill="#FFFFFF"/>`
+        }
+        <!-- 粉嫩蘋果肌腮紅 -->
+        <ellipse cx="42" cy="66" rx="6" ry="3.4" fill="#FF928B" opacity="0.78"/>
+        <ellipse cx="98" cy="66" rx="6" ry="3.4" fill="#FF928B" opacity="0.78"/>
+        <!-- Q 版小鼻頭與立體 W 貓咪微笑嘴 -->
+        <ellipse cx="70" cy="64" rx="3.5" ry="2.4" fill="#5A4031"/>
+        <path d="M63 69 Q66.5 73.5 70 69 Q73.5 73.5 77 69" fill="none" stroke="#5A4031" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- 圓圓小手手與小腳丫 -->
+        <ellipse cx="45" cy="93" rx="6.5" ry="5" fill="${sp.body}" stroke="#5A4031" stroke-width="2.5"/>
+        <ellipse cx="95" cy="93" rx="6.5" ry="5" fill="${sp.body}" stroke="#5A4031" stroke-width="2.5"/>
+        <ellipse cx="54" cy="116" rx="8" ry="5.5" fill="${sp.belly}" stroke="#5A4031" stroke-width="2.5"/>
+        <ellipse cx="86" cy="116" rx="8" ry="5.5" fill="${sp.belly}" stroke="#5A4031" stroke-width="2.5"/>
         ${scarf}
         ${shell}
+        ${crown}
+        ${zzzOverlay}
       </svg>`;
   }
 
@@ -265,17 +402,22 @@
     const xpBar = document.getElementById("pet-xp-fill");
     const cookieEl = document.getElementById("pet-cookie-count");
     const speechEl = document.getElementById("pet-speech-bubble");
+    const sleepBtn = document.getElementById("btn-pet-sleep");
     if (!stageEl) return;
 
     const sp = PET_SPECIES[user.pet.species] || PET_SPECIES.shiba;
     const st = getPetStage(user.pet.xp || 0);
-    stageEl.innerHTML = renderPetSvg(user.pet.species, st.lv);
-    if (nameEl) nameEl.textContent = sp.name;
+    const sleeping = Boolean(user.pet.sleeping);
+    stageEl.innerHTML = renderPetSvg(user.pet.species, st.lv, sleeping);
+    if (nameEl) nameEl.textContent = `${sp.name}${sleeping ? "（💤 熟睡中）" : ""}`;
     if (levelEl) levelEl.textContent = `Lv.${st.lv} ${st.title}（成長值 ${user.pet.xp} / ${st.nextXp}）`;
     if (xpBar) xpBar.style.width = `${Math.min(100, Math.round(((user.pet.xp || 0) / st.nextXp) * 100))}%`;
     if (cookieEl) cookieEl.textContent = String(user.pet.cookies || 0);
+    if (sleepBtn) sleepBtn.textContent = sleeping ? "☀️ 叫醒小夥伴" : "😴 哄牠睡覺";
     if (speechEl && !speechEl.dataset.custom) {
-      speechEl.textContent = sp.quotes[0];
+      speechEl.textContent = sleeping
+        ? `呼嚕呼嚕…Zzz…${sp.name}正在做甜甜的夢呢🌙`
+        : sp.quotes[0];
     }
 
     document.querySelectorAll("button[data-pet-species]").forEach((b) => {
@@ -959,6 +1101,7 @@
           return;
         }
         const prevLv = getPetStage(user.pet.xp || 0).lv;
+        user.pet.sleeping = false;
         user.pet.cookies -= 1;
         user.pet.xp = (user.pet.xp || 0) + 6;
         const nextLv = getPetStage(user.pet.xp).lv;
@@ -998,6 +1141,31 @@
         if (window.SpeechFX && window.SoundFX && window.SoundFX.enabled) {
           window.SpeechFX.speak(line);
         }
+        if (user.pet.sleeping) {
+          user.pet.sleeping = false;
+          api.saveStore();
+          renderPetPanel();
+        }
+      });
+    }
+
+    const btnSleep = document.getElementById("btn-pet-sleep");
+    if (btnSleep) {
+      btnSleep.addEventListener("click", () => {
+        const user = ensureSuperState(api.getUser());
+        if (!user) return;
+        user.pet.sleeping = !user.pet.sleeping;
+        api.saveStore();
+        window.SoundFX && window.SoundFX.playClick();
+        const sp = PET_SPECIES[user.pet.species] || PET_SPECIES.shiba;
+        const speech = document.getElementById("pet-speech-bubble");
+        if (speech) {
+          speech.dataset.custom = "1";
+          speech.textContent = user.pet.sleeping
+            ? `💤 呼嚕呼嚕…${sp.name}蓋好小被子睡著囉！晚安～🌙`
+            : `☀️ 伸個大懶腰！${sp.name}睡飽飽精神百倍，繼續去算數學吧！`;
+        }
+        renderPetPanel();
       });
     }
 
