@@ -1117,195 +1117,360 @@
     };
   }
 
-  // ==================== 遊戲 12：🃏 猜大小撲克 ====================
-  function startHigherGame(container, onFinish) {
+  // ==================== 遊戲 12：🏎️ 冒險島賽車（3 車道躲障礙搶金幣） ====================
+  function startRacingGame(container, onFinish) {
     stopCurrentGame();
-    const SUITS = ["♥", "♦", "♣", "♠"];
-    const LABELS = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-    let round = 1;
-    const totalRounds = 5;
+    let timeLeft = 18;
     let coins = 0;
-    let locked = false;
-    let curVal = 1 + Math.floor(Math.random() * 13);
-    let curSuit = SUITS[Math.floor(Math.random() * 4)];
-    let nextTimer = null;
+    let lane = 1; // 0, 1, 2
+    let carX = 180;
+    let roadOffset = 0;
+    let finished = false;
+    let rafId = null;
+    let countTimer = null;
+    let spawnAcc = 0;
+    const laneXs = [78, 180, 282];
+    const objs = [];
 
     container.innerHTML = `
       <div class="mg-header-bar">
-        <span>🃏 猜大小撲克（共 5 回合・A最小 K最大）</span>
-        <span id="mg-hi-round">第 1 / 5 回合</span>
-        <span id="mg-hi-coins">金幣：0</span>
+        <span>🏎️ 冒險島賽車（左右切車道搶金幣、閃路障！）</span>
+        <span id="mg-race-time">剩餘 18 秒</span>
+        <span id="mg-race-coins">金幣：0</span>
       </div>
-      <div class="mg-card-arena">
-        <div class="mg-poker-card" id="mg-hi-card">
-          <span class="mg-poker-suit">${curSuit}</span>
-          <strong class="mg-poker-num">${LABELS[curVal]}</strong>
-          <span class="mg-poker-sub">點數 ${curVal}</span>
-        </div>
-        <div class="mg-hi-controls">
-          <div id="mg-hi-msg" class="mg-status-line">猜猜看：下一張牌比 ${curVal} 大還是小？</div>
-          <div class="mg-hi-btns">
-            <button type="button" class="btn btn-gold btn-lg" id="mg-btn-higher">⬆️ 比較大</button>
-            <button type="button" class="btn btn-forest btn-lg" id="mg-btn-lower">⬇️ 比較小</button>
-          </div>
-        </div>
+      <div style="text-align:center;">
+        <canvas id="mg-race-canvas" width="360" height="280" style="width:100%;max-width:360px;border-radius:16px;border:3px solid #d99b32;background:#5c534c;touch-action:none;"></canvas>
+      </div>
+      <div class="mg-hi-btns" style="margin-top:10px;">
+        <button type="button" class="btn btn-gold btn-lg" id="mg-race-left" style="min-width:130px;">⬅️ 左轉</button>
+        <button type="button" class="btn btn-gold btn-lg" id="mg-race-right" style="min-width:130px;">➡️ 右轉</button>
       </div>
     `;
 
-    const cardEl = container.querySelector("#mg-hi-card");
-    const msgEl = container.querySelector("#mg-hi-msg");
-    const roundEl = container.querySelector("#mg-hi-round");
-    const coinsEl = container.querySelector("#mg-hi-coins");
-    const btnHi = container.querySelector("#mg-btn-higher");
-    const btnLo = container.querySelector("#mg-btn-lower");
+    const canvas = container.querySelector("#mg-race-canvas");
+    const ctx = canvas.getContext("2d");
+    const timeEl = container.querySelector("#mg-race-time");
+    const coinsEl = container.querySelector("#mg-race-coins");
+    const btnL = container.querySelector("#mg-race-left");
+    const btnR = container.querySelector("#mg-race-right");
 
-    function guess(dir) {
-      if (locked || round > totalRounds) return;
-      locked = true;
-      btnHi.disabled = true;
-      btnLo.disabled = true;
-      const nextVal = 1 + Math.floor(Math.random() * 13);
-      const nextSuit = SUITS[Math.floor(Math.random() * 4)];
-
-      let won = false;
-      if (nextVal === curVal) {
-        coins += 25;
-        msgEl.textContent = `🤝 竟然同點數 ${LABELS[nextVal]}！幸運加贈 +25 金幣！`;
-        window.SoundFX.playCorrect(1);
-      } else if ((dir === "hi" && nextVal > curVal) || (dir === "lo" && nextVal < curVal)) {
-        won = true;
-        coins += 30;
-        msgEl.textContent = `🎉 猜中了！下一張是 ${nextSuit}${LABELS[nextVal]}（${nextVal}點），+30 金幣！`;
-        window.SoundFX.playCorrect(round);
-      } else {
-        coins += 10;
-        msgEl.textContent = `😅 下一張是 ${nextSuit}${LABELS[nextVal]}（${nextVal}點），送你鼓勵獎 +10 金幣！`;
-        window.SoundFX.playWrong();
-      }
-
-      curVal = nextVal;
-      curSuit = nextSuit;
-      cardEl.innerHTML = `<span class="mg-poker-suit">${curSuit}</span><strong class="mg-poker-num">${LABELS[curVal]}</strong><span class="mg-poker-sub">點數 ${curVal}</span>`;
-      cardEl.classList.toggle("is-red", curSuit === "♥" || curSuit === "♦");
-      coinsEl.textContent = `金幣：${coins}`;
-
-      round += 1;
-      if (round > totalRounds) {
-        nextTimer = setTimeout(() => {
-          window.SoundFX.playFanfare(3);
-          window.VisualFX.burstConfetti();
-          if (onFinish) onFinish(coins, "猜大小撲克");
-        }, 900);
-      } else {
-        nextTimer = setTimeout(() => {
-          roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
-          msgEl.textContent = `下一張牌會比 ${curVal} 大還是小呢？`;
-          locked = false;
-          btnHi.disabled = false;
-          btnLo.disabled = false;
-        }, 850);
-      }
+    function moveLeft() {
+      if (finished) return;
+      lane = Math.max(0, lane - 1);
+      window.SoundFX.playClick();
+    }
+    function moveRight() {
+      if (finished) return;
+      lane = Math.min(2, lane + 1);
+      window.SoundFX.playClick();
     }
 
-    cardEl.classList.toggle("is-red", curSuit === "♥" || curSuit === "♦");
-    btnHi.addEventListener("click", () => guess("hi"));
-    btnLo.addEventListener("click", () => guess("lo"));
+    btnL.addEventListener("pointerdown", (e) => { e.preventDefault(); moveLeft(); });
+    btnR.addEventListener("pointerdown", (e) => { e.preventDefault(); moveRight(); });
+    canvas.addEventListener("pointerdown", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      if (relX < rect.width / 2) moveLeft();
+      else moveRight();
+    });
+
+    function onKey(e) {
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") { e.preventDefault(); moveLeft(); }
+      if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") { e.preventDefault(); moveRight(); }
+    }
+    window.addEventListener("keydown", onKey);
+
+    let lastTs = performance.now();
+    function loop(ts) {
+      if (finished) return;
+      const dt = Math.min(0.05, (ts - lastTs) / 1000);
+      lastTs = ts;
+      roadOffset = (roadOffset + dt * 240) % 44;
+      carX += (laneXs[lane] - carX) * Math.min(1, dt * 16);
+
+      spawnAcc += dt;
+      if (spawnAcc > 0.52) {
+        spawnAcc = 0;
+        const l = Math.floor(Math.random() * 3);
+        const r = Math.random();
+        const type = r < 0.52 ? "coin" : r < 0.72 ? "star" : "cone";
+        objs.push({ lane: l, x: laneXs[l], y: -24, type, speed: 215 + Math.random() * 55 });
+      }
+
+      // 繪製草地與三車道公路
+      ctx.fillStyle = "#8bc87d";
+      ctx.fillRect(0, 0, 360, 280);
+      ctx.fillStyle = "#5c534c";
+      ctx.fillRect(30, 0, 300, 280);
+      ctx.fillStyle = "#f2c26b";
+      ctx.fillRect(30, 0, 6, 280);
+      ctx.fillRect(324, 0, 6, 280);
+
+      // 車道虛線
+      ctx.strokeStyle = "#fff5d6";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([22, 22]);
+      ctx.lineDashOffset = -roadOffset;
+      ctx.beginPath();
+      ctx.moveTo(130, 0); ctx.lineTo(130, 280);
+      ctx.moveTo(230, 0); ctx.lineTo(230, 280);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 更新並繪製金幣／星星／路障
+      for (let i = objs.length - 1; i >= 0; i--) {
+        const o = objs[i];
+        o.y += o.speed * dt;
+        ctx.font = "26px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(o.type === "coin" ? "🪙" : o.type === "star" ? "⭐" : "🚧", o.x, o.y);
+
+        if (Math.abs(o.x - carX) < 30 && Math.abs(o.y - 224) < 30) {
+          if (o.type === "cone") {
+            coins = Math.max(0, coins - 15);
+            window.SoundFX.playWrong();
+          } else {
+            coins += o.type === "star" ? 30 : 15;
+            window.SoundFX.playCorrect(1);
+          }
+          coinsEl.textContent = `金幣：${coins}`;
+          objs.splice(i, 1);
+          continue;
+        }
+        if (o.y > 310) objs.splice(i, 1);
+      }
+
+      // 繪製可愛 Q 版小賽車
+      ctx.save();
+      ctx.translate(carX, 224);
+      ctx.fillStyle = "#3e3129";
+      ctx.fillRect(-20, -18, 8, 14);
+      ctx.fillRect(12, -18, 8, 14);
+      ctx.fillRect(-20, 6, 8, 14);
+      ctx.fillRect(12, 6, 8, 14);
+      ctx.fillStyle = "#ef6c57";
+      ctx.beginPath();
+      ctx.roundRect(-16, -24, 32, 48, 10);
+      ctx.fill();
+      ctx.strokeStyle = "#5a4031";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.fillStyle = "#ffe596";
+      ctx.beginPath();
+      ctx.roundRect(-10, -10, 20, 14, 5);
+      ctx.fill();
+      ctx.fillStyle = "#fffdf7";
+      ctx.fillRect(-3, -24, 6, 48);
+      ctx.restore();
+
+      rafId = requestAnimationFrame(loop);
+    }
+    rafId = requestAnimationFrame(loop);
+
+    countTimer = setInterval(() => {
+      timeLeft -= 1;
+      timeEl.textContent = `剩餘 ${timeLeft} 秒`;
+      if (timeLeft <= 0) {
+        finished = true;
+        cancelAnimationFrame(rafId);
+        clearInterval(countTimer);
+        window.removeEventListener("keydown", onKey);
+        window.SoundFX.playFanfare(3);
+        window.VisualFX.burstConfetti();
+        if (onFinish) onFinish(Math.max(30, coins), "冒險島賽車");
+      }
+    }, 1000);
 
     activeCleanup = () => {
-      if (nextTimer) clearTimeout(nextTimer);
+      finished = true;
+      cancelAnimationFrame(rafId);
+      clearInterval(countTimer);
+      window.removeEventListener("keydown", onKey);
     };
   }
 
-  // ==================== 遊戲 13：✊ 猜拳大挑戰 ====================
-  function startRpsGame(container, onFinish) {
+  // ==================== 遊戲 13：✈️ 雲端開飛機（上下飛行吃星星避烏雲） ====================
+  function startPlaneGame(container, onFinish) {
     stopCurrentGame();
-    const MOVES = [
-      { id: "rock", label: "✊ 石頭", icon: "✊", beats: "scissors" },
-      { id: "scissors", label: "✌️ 剪刀", icon: "✌️", beats: "paper" },
-      { id: "paper", label: "🖐️ 布", icon: "🖐️", beats: "rock" },
-    ];
-    let round = 1;
-    const totalRounds = 3;
+    let timeLeft = 18;
     let coins = 0;
-    let locked = false;
-    let nextTimer = null;
+    let planeY = 135;
+    let targetY = 135;
+    let finished = false;
+    let rafId = null;
+    let countTimer = null;
+    let spawnAcc = 0;
+    const objs = [];
+    const clouds = [
+      { x: 60, y: 42, s: 26 },
+      { x: 210, y: 85, s: 32 },
+      { x: 340, y: 190, s: 28 },
+    ];
 
     container.innerHTML = `
       <div class="mg-header-bar">
-        <span>✊ 猜拳大挑戰（共 3 回合）</span>
-        <span id="mg-rps-round">第 1 / 3 回合</span>
-        <span id="mg-rps-coins">金幣：0</span>
+        <span>✈️ 雲端開飛機（上下飛吃星星金幣、閃開閃電烏雲！）</span>
+        <span id="mg-pln-time">剩餘 18 秒</span>
+        <span id="mg-pln-coins">金幣：0</span>
       </div>
-      <div class="mg-dice-arena">
-        <div class="mg-dice-side">
-          <div class="mg-dice-who">🧑 你出拳</div>
-          <div class="mg-rps-big" id="mg-rps-you">❔</div>
-        </div>
-        <div class="mg-dice-vs">VS</div>
-        <div class="mg-dice-side">
-          <div class="mg-dice-who">🐶 柴柴島主</div>
-          <div class="mg-rps-big" id="mg-rps-cpu">❔</div>
-        </div>
+      <div style="text-align:center;">
+        <canvas id="mg-plane-canvas" width="380" height="260" style="width:100%;max-width:380px;border-radius:16px;border:3px solid #d99b32;background:#fff4df;touch-action:none;"></canvas>
       </div>
-      <div id="mg-rps-msg" class="mg-status-line">選一個出拳！贏了 +40、平手 +25、輸了也有 +15 鼓勵金幣！</div>
-      <div class="mg-hi-btns" id="mg-rps-btns">
-        <button type="button" class="btn btn-gold btn-lg" data-rps="rock">✊ 石頭</button>
-        <button type="button" class="btn btn-forest btn-lg" data-rps="scissors">✌️ 剪刀</button>
-        <button type="button" class="btn btn-burgundy btn-lg" data-rps="paper">🖐️ 布</button>
+      <div class="mg-hi-btns" style="margin-top:10px;">
+        <button type="button" class="btn btn-forest btn-lg" id="mg-pln-up" style="min-width:130px;">⬆️ 向上爬升</button>
+        <button type="button" class="btn btn-gold btn-lg" id="mg-pln-down" style="min-width:130px;">⬇️ 向下俯衝</button>
       </div>
     `;
 
-    const youEl = container.querySelector("#mg-rps-you");
-    const cpuEl = container.querySelector("#mg-rps-cpu");
-    const msgEl = container.querySelector("#mg-rps-msg");
-    const roundEl = container.querySelector("#mg-rps-round");
-    const coinsEl = container.querySelector("#mg-rps-coins");
-    const btns = Array.from(container.querySelectorAll("button[data-rps]"));
+    const canvas = container.querySelector("#mg-plane-canvas");
+    const ctx = canvas.getContext("2d");
+    const timeEl = container.querySelector("#mg-pln-time");
+    const coinsEl = container.querySelector("#mg-pln-coins");
+    const btnUp = container.querySelector("#mg-pln-up");
+    const btnDown = container.querySelector("#mg-pln-down");
 
-    btns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (locked || round > totalRounds) return;
-        locked = true;
-        const myMove = MOVES.find((m) => m.id === btn.dataset.rps);
-        const cpuMove = MOVES[Math.floor(Math.random() * 3)];
-        youEl.textContent = myMove.icon;
-        cpuEl.textContent = cpuMove.icon;
+    function goUp() { if (!finished) targetY = Math.max(30, targetY - 46); }
+    function goDown() { if (!finished) targetY = Math.min(230, targetY + 46); }
 
-        if (myMove.id === cpuMove.id) {
-          coins += 25;
-          msgEl.textContent = "🤝 平手！默契十足 +25 金幣！";
-          window.SoundFX.playCorrect(1);
-        } else if (myMove.beats === cpuMove.id) {
-          coins += 40;
-          msgEl.textContent = "🎉 你贏了柴柴島主！+40 金幣！";
-          window.SoundFX.playCorrect(round);
-        } else {
-          coins += 15;
-          msgEl.textContent = "🐶 柴柴贏了一點點，送你勇氣鼓勵 +15 金幣！";
-          window.SoundFX.playClick();
-        }
-        coinsEl.textContent = `金幣：${coins}`;
-        round += 1;
-        if (round > totalRounds) {
-          nextTimer = setTimeout(() => {
-            window.SoundFX.playFanfare(3);
-            window.VisualFX.burstConfetti();
-            if (onFinish) onFinish(coins, "猜拳大挑戰");
-          }, 850);
-        } else {
-          nextTimer = setTimeout(() => {
-            roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
-            youEl.textContent = "❔";
-            cpuEl.textContent = "❔";
-            msgEl.textContent = `第 ${round} 回合！準備好就出拳吧！`;
-            locked = false;
-          }, 850);
-        }
-      });
+    btnUp.addEventListener("pointerdown", (e) => { e.preventDefault(); goUp(); });
+    btnDown.addEventListener("pointerdown", (e) => { e.preventDefault(); goDown(); });
+    canvas.addEventListener("pointermove", (e) => {
+      if (e.buttons === 0 && e.pointerType === "mouse") return;
+      const rect = canvas.getBoundingClientRect();
+      targetY = Math.max(28, Math.min(232, ((e.clientY - rect.top) / rect.height) * 260));
+    });
+    canvas.addEventListener("pointerdown", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      targetY = Math.max(28, Math.min(232, ((e.clientY - rect.top) / rect.height) * 260));
     });
 
+    function onKey(e) {
+      if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") { e.preventDefault(); goUp(); }
+      if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") { e.preventDefault(); goDown(); }
+    }
+    window.addEventListener("keydown", onKey);
+
+    let lastTs = performance.now();
+    function loop(ts) {
+      if (finished) return;
+      const dt = Math.min(0.05, (ts - lastTs) / 1000);
+      lastTs = ts;
+      planeY += (targetY - planeY) * Math.min(1, dt * 11);
+
+      spawnAcc += dt;
+      if (spawnAcc > 0.54) {
+        spawnAcc = 0;
+        const r = Math.random();
+        const type = r < 0.48 ? "coin" : r < 0.74 ? "star" : "storm";
+        objs.push({ x: 405, y: 28 + Math.random() * 204, type, speed: 185 + Math.random() * 60 });
+      }
+
+      // 暖色夕陽薄荷天空漸層（零亮藍）
+      const grad = ctx.createLinearGradient(0, 0, 0, 260);
+      grad.addColorStop(0, "#ffeec7");
+      grad.addColorStop(0.55, "#fff8e8");
+      grad.addColorStop(1, "#d5f3e4");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 380, 260);
+
+      // 漂浮白雲背景
+      clouds.forEach((c) => {
+        c.x -= dt * 42;
+        if (c.x < -50) c.x = 420;
+        ctx.fillStyle = "rgba(255,255,255,0.82)";
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.s * 0.55, 0, Math.PI * 2);
+        ctx.arc(c.x + c.s * 0.5, c.y - 6, c.s * 0.65, 0, Math.PI * 2);
+        ctx.arc(c.x + c.s, c.y, c.s * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 更新星星／金幣／雷雨雲
+      for (let i = objs.length - 1; i >= 0; i--) {
+        const o = objs[i];
+        o.x -= o.speed * dt;
+        ctx.font = "26px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(o.type === "coin" ? "🪙" : o.type === "star" ? "⭐" : "⛈️", o.x, o.y);
+
+        if (Math.abs(o.x - 76) < 30 && Math.abs(o.y - planeY) < 28) {
+          if (o.type === "storm") {
+            coins = Math.max(0, coins - 15);
+            window.SoundFX.playWrong();
+          } else {
+            coins += o.type === "star" ? 25 : 15;
+            window.SoundFX.playCorrect(1);
+          }
+          coinsEl.textContent = `金幣：${coins}`;
+          objs.splice(i, 1);
+          continue;
+        }
+        if (o.x < -30) objs.splice(i, 1);
+      }
+
+      // 繪製可愛 Q 版螺旋槳小飛機
+      ctx.save();
+      ctx.translate(76, planeY);
+      // 尾翼
+      ctx.fillStyle = "#f2a43b";
+      ctx.beginPath();
+      ctx.moveTo(-24, 0); ctx.lineTo(-32, -12); ctx.lineTo(-16, -2); ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#5a4031";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // 機身
+      ctx.fillStyle = "#ff8570";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 24, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // 機翼與駕駛艙
+      ctx.fillStyle = "#ffd966";
+      ctx.beginPath();
+      ctx.roundRect(-8, -19, 14, 38, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#fffdf7";
+      ctx.beginPath();
+      ctx.arc(8, -2, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // 螺旋槳
+      ctx.strokeStyle = "#5a4031";
+      ctx.lineWidth = 3;
+      const propH = (Math.floor(ts / 50) % 2 === 0) ? 13 : 6;
+      ctx.beginPath();
+      ctx.moveTo(25, -propH);
+      ctx.lineTo(25, propH);
+      ctx.stroke();
+      ctx.restore();
+
+      rafId = requestAnimationFrame(loop);
+    }
+    rafId = requestAnimationFrame(loop);
+
+    countTimer = setInterval(() => {
+      timeLeft -= 1;
+      timeEl.textContent = `剩餘 ${timeLeft} 秒`;
+      if (timeLeft <= 0) {
+        finished = true;
+        cancelAnimationFrame(rafId);
+        clearInterval(countTimer);
+        window.removeEventListener("keydown", onKey);
+        window.SoundFX.playFanfare(3);
+        window.VisualFX.burstConfetti();
+        if (onFinish) onFinish(Math.max(30, coins), "雲端開飛機");
+      }
+    }, 1000);
+
     activeCleanup = () => {
-      if (nextTimer) clearTimeout(nextTimer);
+      finished = true;
+      cancelAnimationFrame(rafId);
+      clearInterval(countTimer);
+      window.removeEventListener("keydown", onKey);
     };
   }
 
@@ -1874,8 +2039,8 @@
       if (type === "fishing") return startFishingGame(container, onFinish);
       if (type === "color") return startColorGame(container, onFinish);
       if (type === "simon") return startSimonGame(container, onFinish);
-      if (type === "higher") return startHigherGame(container, onFinish);
-      if (type === "rps") return startRpsGame(container, onFinish);
+      if (type === "racing") return startRacingGame(container, onFinish);
+      if (type === "plane") return startPlaneGame(container, onFinish);
       if (type === "scratch") return startScratchGame(container, onFinish);
       if (type === "slot") return startSlotGame(container, onFinish);
       if (type === "order") return startOrderGame(container, onFinish);
