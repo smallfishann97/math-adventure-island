@@ -222,6 +222,20 @@
       ear: "#E5A4CB",
       quotes: ["閃亮亮魔法加持！每題都能看懂算對！", "吃到好吃的餅乾，頭上的金色角更亮了！", "帶著勇氣往下一關出發吧！"],
     },
+    cat: {
+      name: "奶油小橘貓",
+      body: "#FAD089",
+      belly: "#FFFBF0",
+      ear: "#E89B48",
+      quotes: ["喵嗚～你算數學的樣子超帥氣喵！", "餅乾香香脆脆，喵喵最喜歡你了！", "呼嚕呼嚕～我們再去多拿幾顆星星吧！"],
+    },
+    penguin: {
+      name: "企鵝小圓滾",
+      body: "#6E655F",
+      belly: "#FFFDF9",
+      ear: "#F5B841",
+      quotes: ["噗通噗通！小企鵝陪你一起開心闖關！", "搖搖擺擺跳個舞，恭喜你越來越厲害！", "吃到美味餅乾，全身都暖呼呼的喔！"],
+    },
   };
 
   function getPetStage(xp) {
@@ -330,6 +344,26 @@
         <circle cx="84" cy="27" r="8" fill="#FFE07D" stroke="#5A4031" stroke-width="2"/>
         <path d="M63 28 L70 5 L77 28 Z" fill="#FFD859" stroke="#5A4031" stroke-width="2.6" stroke-linejoin="round"/>
         <line x1="65" y1="21" x2="75" y2="18" stroke="#C98219" stroke-width="2"/>`;
+    } else if (speciesId === "cat") {
+      // 奶油小橘貓：俏皮彎貓尾＋虎斑額頭三條紋＋可愛貓鬍鬚
+      backParts = `<path d="M96 98 C122 96 126 62 112 58 C105 56 105 68 112 72" fill="none" stroke="${sp.ear}" stroke-width="8" stroke-linecap="round"/>`;
+      headExtras = `
+        <path d="M36 44 L24 14 L56 28 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M35 38 L29 21 L49 30 Z" fill="#F7A399"/>
+        <path d="M104 44 L116 14 L84 28 Z" fill="${sp.body}" stroke="#5A4031" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M105 38 L111 21 L91 30 Z" fill="#F7A399"/>`;
+      faceMarkings = `
+        <path d="M70 30 V40 M63 32 L65 40 M77 32 L75 40" stroke="#D9822B" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M28 62 L38 64 M27 68 L38 68 M112 62 L102 64 M113 68 L102 68" stroke="#5A4031" stroke-width="2" stroke-linecap="round"/>`;
+    } else if (speciesId === "penguin") {
+      // 企鵝小圓滾：暖黃耳罩＋雪白愛心臉龐＋橘黃小扁嘴
+      headExtras = `
+        <path d="M34 52 C34 24 106 24 106 52" fill="none" stroke="#E86A58" stroke-width="4"/>
+        <circle cx="33" cy="54" r="9" fill="#FFD35C" stroke="#5A4031" stroke-width="2.4"/>
+        <circle cx="107" cy="54" r="9" fill="#FFD35C" stroke="#5A4031" stroke-width="2.4"/>`;
+      faceMarkings = `
+        <path d="M40 58 C40 42 58 40 70 50 C82 40 100 42 100 58 C100 76 88 86 70 86 C52 86 40 76 40 58 Z" fill="#FFFDF9"/>
+        <ellipse cx="70" cy="65" rx="7" ry="4.2" fill="#FFA43B" stroke="#5A4031" stroke-width="1.8"/>`;
     }
 
     // 進化配件：Lv.2 破殼蛋殼、Lv.3 冒險領巾與星星、Lv.4 皇家大皇冠與披風
@@ -1125,26 +1159,52 @@
       });
     }
 
+    const PLAY_ACTIVITIES = [
+      { anim: "play-ball", icons: ["⚽", "✨", "🎵"], actionText: "⚽ 丟出彩色小皮球！跳起來用頭頂球囉！" },
+      { anim: "play-frisbee", icons: ["🥏", "💨", "🌟"], actionText: "🥏 咻～飛盤飛出去，一個華麗翻身接住！" },
+      { anim: "play-butterfly", icons: ["🦋", "🌸", "✨"], actionText: "🦋 追著花園小蝴蝶開心地轉圈圈跳舞！" },
+      { anim: "play-bubbles", icons: ["🫧", "🫧", "✨"], actionText: "🫧 噗嚕噗嚕吹出好多七彩泡泡！" },
+      { anim: "play-pat", icons: ["🤚", "💕", "💖"], actionText: "💕 摸摸頭撒嬌中，開心到尾巴搖個不停！" },
+    ];
+    let playActIdx = 0;
+
     const btnPlay = document.getElementById("btn-pet-play");
     if (btnPlay) {
       btnPlay.addEventListener("click", () => {
         const user = ensureSuperState(api.getUser());
         if (!user) return;
-        const sp = PET_SPECIES[user.pet.species] || PET_SPECIES.shiba;
-        const line = sp.quotes[Math.floor(Math.random() * sp.quotes.length)];
-        window.SoundFX && window.SoundFX.playCorrect(1);
-        const speech = document.getElementById("pet-speech-bubble");
-        if (speech) {
-          speech.dataset.custom = "1";
-          speech.textContent = `${line}（餵我吃🍪餅乾才會長大進化喔！）`;
-        }
-        if (window.SpeechFX && window.SoundFX && window.SoundFX.enabled) {
-          window.SpeechFX.speak(line);
-        }
         if (user.pet.sleeping) {
           user.pet.sleeping = false;
           api.saveStore();
           renderPetPanel();
+        }
+        const sp = PET_SPECIES[user.pet.species] || PET_SPECIES.shiba;
+        const act = PLAY_ACTIVITIES[playActIdx % PLAY_ACTIVITIES.length];
+        playActIdx += 1;
+        const line = sp.quotes[Math.floor(Math.random() * sp.quotes.length)];
+        window.SoundFX && window.SoundFX.playCorrect(2);
+        const speech = document.getElementById("pet-speech-bubble");
+        if (speech) {
+          speech.dataset.custom = "1";
+          speech.textContent = `${act.actionText}「${line}」`;
+        }
+        const stageEl = document.getElementById("pet-avatar-stage");
+        if (stageEl) {
+          stageEl.classList.remove("play-ball", "play-frisbee", "play-butterfly", "play-bubbles", "play-pat");
+          void stageEl.offsetWidth;
+          stageEl.classList.add(act.anim);
+          stageEl.querySelectorAll(".pet-play-prop").forEach((n) => n.remove());
+          act.icons.forEach((ic, idx) => {
+            const prop = document.createElement("span");
+            prop.className = `pet-play-prop p-${idx}`;
+            prop.textContent = ic;
+            stageEl.appendChild(prop);
+            setTimeout(() => prop.remove(), 1200);
+          });
+          setTimeout(() => stageEl.classList.remove(act.anim), 1200);
+        }
+        if (window.SpeechFX && window.SoundFX && window.SoundFX.enabled) {
+          window.SpeechFX.speak(line);
         }
       });
     }
