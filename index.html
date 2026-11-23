@@ -176,10 +176,6 @@
               <strong class="stat-value" id="stat-mistake-count">0 題</strong>
             </div>
             <button type="button" class="btn btn-gold btn-sm" id="btn-open-rules" style="margin-top:4px;width:100%;">📖 星星、金幣與闖關規則說明</button>
-            <div class="site-counter-bar hero-counter-bar" aria-label="網站人氣統計">
-              <span class="site-counter-pill">👣 累計拜訪人次：<strong data-site-visits>1</strong></span>
-              <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上：<strong data-site-online>1</strong> 人</span>
-            </div>
           </div>
         </div>
 
@@ -888,7 +884,7 @@
       <div class="footer-disclaimer-wrap">
         <div class="footer-notice-badge">🍃 網站宣告</div>
         <p class="footer-disclaimer-text">
-          本站「數學遊戲冒險島」由 Ann Lu 規劃製作，非教育部、政府機構或各出版社之官方網站。站內 960 題題庫、圖解與名詞字卡皆參考教育部 108 課綱編寫，不索取機敏個資，課綱標準以教育部最新公告為準；若有指正建議歡迎來信聯繫。
+          本站「數學遊戲冒險島」由 Ann Lu 規劃製作，非教育部、政府機構或各出版社之官方網站。站內 960 題題庫、圖解與名詞字卡皆參考教育部 108 課綱編寫，不索取機敏個資，課綱標準以教育部最新公告為準。為持續提升教學品質與互動學習體驗，本平台將不定期進行系統進版、功能優化與題庫維護更新；若有指正建議歡迎透過「聯絡我們」回饋。
         </p>
         <div class="footer-links-row">
           <button type="button" class="footer-link-btn" data-open-legal="privacy">🔒 隱私權保護宣告</button>
@@ -976,13 +972,28 @@
       <div class="modal-top">
         <div>
           <h3 id="title-legal-changelog">🚀 數學遊戲冒險島・最新版本公告</h3>
-          <p style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">最新版本重點功能與使用者體驗優化 (v1.1.0 ~ v2.1.0)</p>
+          <p id="changelog-auto-sub" style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">系統進版自動同步日誌 (v1.1.0 ~ <span data-auto-ver>v2.2.0</span>)</p>
         </div>
+      </div>
+      <div id="changelog-auto-banner" class="weekly-comment" style="margin-bottom:12px;">
+        🔄 系統進版自動偵測：目前線上運行版本 <strong data-auto-ver>v2.2.0</strong>（最新同步日期：<span data-auto-date>2026-11-23</span>）
       </div>
       <div class="legal-cards">
         <div class="legal-card changelog-latest">
           <div class="changelog-head">
-            <span class="ver-badge latest">v2.1.0 (最新)</span>
+            <span class="ver-badge latest"><span data-auto-ver>v2.2.0</span> (最新)</span>
+            <span class="ver-tag">🐾 8種Q版寵物 & 👑 站長專屬後台</span>
+          </div>
+          <h4>🐾 10種登島頭像、8種Q版電子寵物（含5種玩具互動與睡眠模式）與站內回饋系統上線</h4>
+          <ul>
+            <li><strong>🦊 登島角色擴充至 10 種原創動物</strong>：新增焦糖狐狸、呆萌無尾熊、抹茶小恐龍、葵花小倉鼠共 10 種頭像（單機最多可建立 10 位冒險者）。</li>
+            <li><strong>🐶 8 種 Q 版電子寵物與 5 種玩具互動</strong>：擴充為 8 種大頭 Q 版寵物（成長上限 100/100 MAX），新增「😴 哄牠睡覺」睡眠泡泡模式，以及「🎾 陪牠玩耍」頂皮球、接飛盤、追蝴蝶、吹泡泡、摸摸頭 5 種動態特效。</li>
+            <li><strong>✉️ 隱私保護意見回饋箱 & 👑 站長數據後台</strong>：新增免外露信箱之「✉️ 聯絡我們」站內回饋表單、前台即時人氣統計，以及密碼保護之「👑 站長專屬」數據分析與 CSV 報表匯出功能。</li>
+          </ul>
+        </div>
+        <div class="legal-card">
+          <div class="changelog-head">
+            <span class="ver-badge">v2.1.0</span>
             <span class="ver-tag">🐾 電子寵物任務 & 📝 期中期末模擬考</span>
           </div>
           <h4>🐾 島嶼電子寵物養成、7天簽到寶箱、期中期末模擬考、小島明信片與學習週報上線</h4>
@@ -1320,7 +1331,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261123x"></script>
+  <script src="super-features.js?v=20261123y"></script>
   <script src="app.js?v=20261123t"></script>
 </body>
 </html>

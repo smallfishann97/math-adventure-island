@@ -1908,6 +1908,35 @@
       });
     }
 
+    // 6. 📢 更版日誌「進版自動偵測與版本號自動更新」機制（連線 GitHub Repo 自動抓取最新進版次數與日期）
+    async function syncAutoChangelogVersion() {
+      const today = todayStr();
+      document.querySelectorAll("[data-auto-date]").forEach((el) => {
+        el.textContent = today;
+      });
+      try {
+        const res = await fetch("https://api.github.com/repos/smallfishann97/math-adventure-island/commits?per_page=1");
+        if (!res.ok) return;
+        const link = res.headers.get("Link") || "";
+        const m = link.match(/[&?]page=(\d+)>;\s*rel="last"/);
+        const totalCommits = m ? Number(m[1]) : 45;
+        const data = await res.json();
+        const latestCommit = Array.isArray(data) && data[0] ? data[0] : null;
+        const commitDate = latestCommit && latestCommit.commit && latestCommit.commit.committer
+          ? latestCommit.commit.committer.date.slice(0, 10)
+          : today;
+        const patchNum = Math.max(0, totalCommits - 44);
+        const autoVer = `v2.2.${patchNum}`;
+        document.querySelectorAll("[data-auto-ver]").forEach((el) => {
+          el.textContent = autoVer;
+        });
+        document.querySelectorAll("[data-auto-date]").forEach((el) => {
+          el.textContent = `${commitDate}・Build #${totalCommits}`;
+        });
+      } catch (_) {}
+    }
+    syncAutoChangelogVersion();
+
     try {
       const params = new URLSearchParams(window.location.search);
       if (checkAdminPwd(params.get("admin"))) {
