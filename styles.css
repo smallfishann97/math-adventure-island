@@ -5031,3 +5031,47 @@ html, body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================== 全站公開訪客人數 & 已建立冒險者人數徽章 ==================== */
+.site-counter-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+}
+
+.site-counter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(180deg, #fffdf7, #fff1cf);
+  border: 2px solid #e4af4d;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #5a4031;
+  box-shadow: 0 2px 0 rgba(217, 155, 50, 0.35);
+}
+
+.site-counter-pill strong {
+  color: #c86218;
+  font-size: 0.96rem;
+  font-weight: 900;
+}
+
+.hero-counter-bar {
+  grid-column: 1 / -1;
+  margin: 6px 0 0;
+}
+
+.hero-counter-bar .site-counter-pill {
+  font-size: 0.78rem;
+  padding: 4px 11px;
+}
+
+.footer-counter-bar {
+  margin: 0 auto 10px;
+}

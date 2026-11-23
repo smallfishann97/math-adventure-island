@@ -1306,6 +1306,131 @@
         a.click();
       });
     }
+
+    initSiteCounters();
+  }
+
+  // ==================== 6. 全站公開訪客人數 & 已建立冒險者人數統計 ====================
+  const COUNTER_NS = "smallfishann97-math-adventure-island";
+  let cachedVisits = Number(localStorage.getItem("mai_cached_visits") || 0);
+  let cachedMembers = Number(localStorage.getItem("mai_cached_members") || 0);
+
+  function getLocalMemberIds() {
+    try {
+      const raw = localStorage.getItem("grade3_math_luxury_store_v1");
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Object.keys((parsed && parsed.users) || {});
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function renderCounterDOM() {
+    const localIds = getLocalMemberIds();
+    const v = Math.max(1, cachedVisits, localIds.length);
+    const m = Math.max(localIds.length, cachedMembers, 1);
+    document.querySelectorAll("[data-site-visits]").forEach((el) => {
+      el.textContent = v.toLocaleString("zh-TW");
+    });
+    document.querySelectorAll("[data-site-members]").forEach((el) => {
+      el.textContent = m.toLocaleString("zh-TW");
+    });
+  }
+
+  async function bumpGlobalMemberCount(times = 1) {
+    for (let i = 0; i < times; i++) {
+      try {
+        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/up`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === "number") {
+            cachedMembers = Math.max(cachedMembers, data.count);
+            localStorage.setItem("mai_cached_members", String(cachedMembers));
+          }
+        }
+      } catch (_) {}
+    }
+    renderCounterDOM();
+  }
+
+  async function initSiteCounters() {
+    // 1. 本機先加總一次並立即顯示，確保離線或校園網路阻擋時也有精準數字
+    if (!sessionStorage.getItem("mai_visit_bumped")) {
+      sessionStorage.setItem("mai_visit_bumped", "1");
+      cachedVisits = Math.max(1, cachedVisits + 1);
+      localStorage.setItem("mai_cached_visits", String(cachedVisits));
+      try {
+        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/up`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === "number") {
+            cachedVisits = Math.max(cachedVisits, data.count);
+            localStorage.setItem("mai_cached_visits", String(cachedVisits));
+          }
+        }
+      } catch (_) {}
+    } else {
+      try {
+        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === "number") {
+            cachedVisits = Math.max(cachedVisits, data.count);
+            localStorage.setItem("mai_cached_visits", String(cachedVisits));
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 2. 同步本機已建立的冒險者帳號至雲端計數器（每個帳號 ID 只同步 1 次）
+    const localIds = getLocalMemberIds();
+    let syncedIds = [];
+    try {
+      syncedIds = JSON.parse(localStorage.getItem("mai_synced_member_ids") || "[]");
+    } catch (_) {}
+    const unsynced = localIds.filter((id) => !syncedIds.includes(id));
+    if (unsynced.length > 0) {
+      localStorage.setItem("mai_synced_member_ids", JSON.stringify([...syncedIds, ...unsynced]));
+      await bumpGlobalMemberCount(unsynced.length);
+    } else {
+      try {
+        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === "number") {
+            cachedMembers = Math.max(cachedMembers, data.count);
+            localStorage.setItem("mai_cached_members", String(cachedMembers));
+          }
+        }
+      } catch (_) {}
+    }
+
+    renderCounterDOM();
+
+    // 3. 監聽建立新冒險者表單送出與刪除帳號後重繪
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
+      loginForm.addEventListener("submit", () => {
+        setTimeout(async () => {
+          const nowIds = getLocalMemberIds();
+          let curSynced = [];
+          try {
+            curSynced = JSON.parse(localStorage.getItem("mai_synced_member_ids") || "[]");
+          } catch (_) {}
+          const newOnes = nowIds.filter((id) => !curSynced.includes(id));
+          if (newOnes.length > 0) {
+            localStorage.setItem("mai_synced_member_ids", JSON.stringify([...curSynced, ...newOnes]));
+            cachedMembers = Math.max(cachedMembers + newOnes.length, nowIds.length);
+            localStorage.setItem("mai_cached_members", String(cachedMembers));
+            renderCounterDOM();
+            await bumpGlobalMemberCount(newOnes.length);
+          } else {
+            renderCounterDOM();
+          }
+        }, 120);
+      });
+    }
   }
 
   window.MathSuper = {
@@ -1320,6 +1445,7 @@
       renderWeeklyReport();
       renderPetQuizCheer();
       updateNavBadge();
+      renderCounterDOM();
     },
     recordEvent,
     renderWeeklyReport,
