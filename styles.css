@@ -727,15 +727,17 @@ h1, h2, h3, .serif {
 
 .dot {
   display: inline-block;
-  width: 11px;
-  height: 11px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   margin-right: 5px;
   vertical-align: middle;
+  border: 1.5px solid #fffdf7;
+  box-shadow: 0 2px 4px rgba(58, 42, 28, 0.22);
 }
-.dot-done { background: var(--gold); }
-.dot-progress { background: var(--forest); }
-.dot-new { background: #b8aa99; }
+.dot-done { background: linear-gradient(145deg, #ffcf4d, #e88918); }
+.dot-progress { background: linear-gradient(145deg, #4fd180, #238c4e); }
+.dot-new { background: linear-gradient(145deg, #d8cec2, #9e8e7c); }
 
 .island-controls-row {
   display: flex;
@@ -966,15 +968,19 @@ h1, h2, h3, .serif {
 }
 
 .pin-orb.done {
-  background: linear-gradient(145deg, #f0c975, #b87c24);
+  background: linear-gradient(145deg, #ffcf4d, #e88918);
+  color: #4a2c00;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .pin-orb.progress {
-  background: linear-gradient(145deg, #57a676, #2c6142);
+  background: linear-gradient(145deg, #4fd180, #238c4e);
+  color: #ffffff;
 }
 
 .pin-orb.new {
-  background: linear-gradient(145deg, #a6917a, #725d49);
+  background: linear-gradient(145deg, #d8cec2, #9e8e7c);
+  color: #ffffff;
 }
 
 .pin-label {
