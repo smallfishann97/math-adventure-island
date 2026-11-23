@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>數學遊戲冒險島｜108課綱互動闖關與教學題庫</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261123b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261123" />
+  <link rel="stylesheet" href="styles.css?v=20261123b" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -62,7 +62,7 @@
     <header class="topbar">
       <div class="topbar-inner">
         <button class="brand" id="btn-go-home" type="button" title="回到冒險島地圖">
-          <span class="brand-icon" aria-hidden="true"><img src="favicon.svg" alt="" class="brand-logo-svg" /></span>
+          <span class="brand-icon" aria-hidden="true"><img src="favicon.svg?v=20261123b" alt="" class="brand-logo-svg" /></span>
           <div class="brand-text">
             <h1>數學遊戲冒險島 <span class="brand-author">Designed by Ann Lu</span></h1>
             <p>16 單元・800 題・108 課綱國小三年級</p>
@@ -100,7 +100,7 @@
           </div>
 
           <div class="bgm-btn-wrap">
-            <button class="bgm-pill-btn" id="btn-bgm-toggle" type="button" aria-pressed="false" title="開啟／關閉八音盒背景音樂">
+            <button class="bgm-pill-btn" id="btn-bgm-toggle" type="button" aria-pressed="false" title="開啟／關閉背景音樂">
               <span id="bgm-icon" class="bgm-note-icon" aria-hidden="true">
                 <svg viewBox="0 0 32 32" class="bgm-q-svg">
                   <circle cx="16" cy="16" r="14" fill="#FFFDF7" stroke="#E0942A" stroke-width="2"/>
@@ -112,7 +112,13 @@
               </span>
               <span id="bgm-label">開啟音樂</span>
             </button>
-            <div id="bgm-hint-bubble" class="bgm-hint-bubble hidden" role="status">👆 點這裡有可愛背景音樂喔！</div>
+            <select id="bgm-track-select" class="bgm-track-select" aria-label="選擇背景音樂曲風" title="切換背景音樂曲風">
+              <option value="musicbox">🎵 島嶼八音盒</option>
+              <option value="adventure">⚔️ 勇敢冒險曲</option>
+              <option value="lullaby">🌙 星空晚安曲</option>
+              <option value="carnival">🎡 甜點遊樂園</option>
+            </select>
+            <div id="bgm-hint-bubble" class="bgm-hint-bubble hidden" role="status">👆 點這裡有 4 種可愛音樂可切換喔！</div>
           </div>
 
           <button class="icon-toggle" id="btn-sound-toggle" type="button" aria-pressed="true" title="切換答題音效">
@@ -254,7 +260,7 @@
             <button type="button" class="island-ticket-btn is-locked" data-island-tab="kingdom" role="tab" aria-selected="false">
               <span class="ticket-num">6號島</span>
               <strong>👑 皇冠天空島</strong>
-              <em class="ticket-lock-tag">🔒 ★80解鎖</em>
+              <em class="ticket-lock-tag">🔒 ★60解鎖</em>
             </button>
           </div>
           <div id="island-unlock-toast" class="island-unlock-toast hidden" role="status" aria-live="polite"></div>
@@ -273,7 +279,7 @@
 
         <!-- 領域篩選與精品單元卡片總覽 -->
         <div class="section-divider-row">
-          <h3>🏛️ 全部 16 座主題單元一覽</h3>
+          <h3>🏛️ 全部 16 個主題單元一覽</h3>
           <div class="filter-bar" role="tablist" aria-label="數學領域篩選">
             <button class="filter-chip active" data-domain="ALL" type="button">全部 (16)</button>
             <button class="filter-chip" data-domain="數與量" type="button">數與量</button>
@@ -503,7 +509,7 @@
               <span class="gift-icon">🎁</span>
               <div>
                 <h3 id="gift-banner-title">恭喜過關！獲得「過關小禮物」1 次！</h3>
-                <p id="gift-banner-desc">【規則】每次過關只能從以下 6 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！</p>
+                <p id="gift-banner-desc">【規則】每次過關只能從以下 12 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！</p>
               </div>
             </div>
             <div class="gift-buttons">
@@ -513,6 +519,12 @@
               <button type="button" class="btn btn-gold" data-play-mg="wheel">🎡 幸運大轉盤</button>
               <button type="button" class="btn btn-forest" data-play-mg="bubble">🫧 數字戳泡泡</button>
               <button type="button" class="btn btn-burgundy" data-play-mg="make10">🍬 湊10消消樂</button>
+              <button type="button" class="btn btn-gold" data-play-mg="dice">🎲 骰子比大小</button>
+              <button type="button" class="btn btn-forest" data-play-mg="chest">🗝️ 寶箱三選一</button>
+              <button type="button" class="btn btn-burgundy" data-play-mg="fishing">🎣 海岸釣金魚</button>
+              <button type="button" class="btn btn-gold" data-play-mg="color">🎨 找不同色塊</button>
+              <button type="button" class="btn btn-forest" data-play-mg="simon">🎹 記憶小鋼琴</button>
+              <button type="button" class="btn btn-burgundy" data-play-mg="higher">🃏 猜大小撲克</button>
             </div>
           </div>
 
@@ -777,7 +789,7 @@
     <!-- 頁尾非官方學習工具宣告與版權 -->
     <footer class="site-footer">
       <div class="footer-disclaimer-wrap">
-        <div class="footer-notice-badge">🍃 學習輔助網站宣告</div>
+        <div class="footer-notice-badge">🍃 網站宣告</div>
         <p class="footer-disclaimer-text">
           本平台「數學遊戲冒險島」係由設計者 Ann Lu 規劃製作之國小數學互動學習網站，非中華民國教育部或任何政府官方機構，亦非各教科書出版社之官方網站。本站全部題庫（共 960 題）、圖形化解析、數學名詞字卡，參考教育部公開之《十二年國民基本教育課程綱要（108 課綱）》學習目標編寫與製作，不索取任何機敏個資，公開課綱條目與課程標準均以中華民國教育部最新公告為準；若任何單位對內容有指正建議，歡迎來信聯繫我們處理。
         </p>
@@ -1046,9 +1058,9 @@
   <script src="svg-icons.js"></script>
   <script src="audio-fx.js"></script>
   <script src="visual-explainer.js"></script>
-  <script src="mini-games.js"></script>
+  <script src="mini-games.js?v=20261123b"></script>
   <script src="extras.js"></script>
-  <script src="deluxe-features.js"></script>
-  <script src="app.js"></script>
+  <script src="deluxe-features.js?v=20261123b"></script>
+  <script src="app.js?v=20261123b"></script>
 </body>
 </html>

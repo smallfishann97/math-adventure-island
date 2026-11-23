@@ -634,6 +634,588 @@
     activeCleanup = () => {};
   }
 
+  // ==================== 遊戲 7：🎲 骰子比大小 ====================
+  function startDiceGame(container, onFinish) {
+    stopCurrentGame();
+    const FACES = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+    let round = 1;
+    const totalRounds = 3;
+    let coins = 0;
+    let rolling = false;
+    let rollTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎲 骰子比大小（共 3 回合）</span>
+        <span id="mg-dice-round">第 1 / 3 回合</span>
+        <span id="mg-dice-coins">金幣：0</span>
+      </div>
+      <div class="mg-dice-arena">
+        <div class="mg-dice-side">
+          <div class="mg-dice-who">🧑 你的骰子</div>
+          <div class="mg-dice-pair" id="mg-dice-you"><span>🎲</span><span>🎲</span></div>
+          <div class="mg-dice-sum" id="mg-dice-you-sum">等待擲骰</div>
+        </div>
+        <div class="mg-dice-vs">VS</div>
+        <div class="mg-dice-side">
+          <div class="mg-dice-who">🐶 柴柴島主</div>
+          <div class="mg-dice-pair" id="mg-dice-cpu"><span>🎲</span><span>🎲</span></div>
+          <div class="mg-dice-sum" id="mg-dice-cpu-sum">準備好了</div>
+        </div>
+      </div>
+      <div id="mg-dice-msg" class="mg-status-line">按下「擲骰子」，點數總和比柴柴大就贏得 +40 金幣！</div>
+      <div style="text-align:center;margin-top:12px;">
+        <button type="button" class="btn btn-gold btn-lg" id="mg-dice-roll-btn">🎲 擲骰子！</button>
+      </div>
+    `;
+
+    const youEl = container.querySelector("#mg-dice-you");
+    const cpuEl = container.querySelector("#mg-dice-cpu");
+    const youSumEl = container.querySelector("#mg-dice-you-sum");
+    const cpuSumEl = container.querySelector("#mg-dice-cpu-sum");
+    const msgEl = container.querySelector("#mg-dice-msg");
+    const roundEl = container.querySelector("#mg-dice-round");
+    const coinsEl = container.querySelector("#mg-dice-coins");
+    const rollBtn = container.querySelector("#mg-dice-roll-btn");
+
+    rollBtn.addEventListener("click", () => {
+      if (rolling || round > totalRounds) return;
+      rolling = true;
+      rollBtn.disabled = true;
+      window.SoundFX.playClick();
+      let ticks = 0;
+      rollTimer = setInterval(() => {
+        ticks += 1;
+        const a = 1 + Math.floor(Math.random() * 6);
+        const b = 1 + Math.floor(Math.random() * 6);
+        const c = 1 + Math.floor(Math.random() * 6);
+        const d = 1 + Math.floor(Math.random() * 6);
+        youEl.innerHTML = `<span class="mg-die-face">${FACES[a]}</span><span class="mg-die-face">${FACES[b]}</span>`;
+        cpuEl.innerHTML = `<span class="mg-die-face">${FACES[c]}</span><span class="mg-die-face">${FACES[d]}</span>`;
+        if (ticks >= 9) {
+          clearInterval(rollTimer);
+          rollTimer = null;
+          const mySum = a + b;
+          const cpuSum = c + d;
+          youSumEl.textContent = `總和 ${mySum} 點`;
+          cpuSumEl.textContent = `總和 ${cpuSum} 點`;
+          if (mySum > cpuSum) {
+            coins += 40;
+            msgEl.textContent = `🎉 太棒了！${mySum} 點贏過 ${cpuSum} 點，獲得 +40 金幣！`;
+            window.SoundFX.playCorrect(round);
+          } else if (mySum === cpuSum) {
+            coins += 25;
+            msgEl.textContent = `🤝 平手默契獎！雙方都是 ${mySum} 點，獲得 +25 金幣！`;
+            window.SoundFX.playCorrect(1);
+          } else {
+            coins += 15;
+            msgEl.textContent = `🐶 柴柴險勝一點點，送你參加鼓勵獎 +15 金幣！`;
+            window.SoundFX.playClick();
+          }
+          coinsEl.textContent = `金幣：${coins}`;
+          round += 1;
+          if (round > totalRounds) {
+            rollBtn.textContent = "結算金幣中…";
+            setTimeout(() => {
+              window.SoundFX.playFanfare(3);
+              window.VisualFX.burstConfetti();
+              if (onFinish) onFinish(coins, "骰子比大小");
+            }, 900);
+          } else {
+            roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
+            rolling = false;
+            rollBtn.disabled = false;
+          }
+        }
+      }, 70);
+    });
+
+    activeCleanup = () => {
+      if (rollTimer) clearInterval(rollTimer);
+    };
+  }
+
+  // ==================== 遊戲 8：🗝️ 寶箱三選一 ====================
+  function startChestGame(container, onFinish) {
+    stopCurrentGame();
+    let round = 1;
+    const totalRounds = 2;
+    let totalCoins = 0;
+    let picked = false;
+    let nextTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🗝️ 寶箱三選一（共 2 回合）</span>
+        <span id="mg-chest-round">第 1 / 2 回合</span>
+        <span id="mg-chest-coins">金幣：0</span>
+      </div>
+      <div id="mg-chest-msg" class="mg-status-line">三個神祕寶箱裡藏著 25、45、80 金幣，憑直覺點開一個吧！</div>
+      <div class="mg-chest-grid" id="mg-chest-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-chest-grid");
+    const msgEl = container.querySelector("#mg-chest-msg");
+    const roundEl = container.querySelector("#mg-chest-round");
+    const coinsEl = container.querySelector("#mg-chest-coins");
+
+    function renderRound() {
+      picked = false;
+      roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
+      const prizes = [80, 45, 25].sort(() => Math.random() - 0.5);
+      const labels = ["左邊寶箱", "中間寶箱", "右邊寶箱"];
+      grid.innerHTML = "";
+      prizes.forEach((val, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mg-chest-card";
+        btn.innerHTML = `<span class="mg-chest-emoji">🧰</span><strong>${labels[idx]}</strong><span class="mg-chest-prize">點我開啟</span>`;
+        btn.addEventListener("click", () => {
+          if (picked) return;
+          picked = true;
+          totalCoins += val;
+          coinsEl.textContent = `金幣：${totalCoins}`;
+          if (val === 80) window.SoundFX.playFanfare(3);
+          else window.SoundFX.playCorrect(2);
+          msgEl.textContent = val === 80
+            ? `✨ 超級好運！開出最大獎 +80 金幣！`
+            : `🎉 打開「${labels[idx]}」，獲得 +${val} 金幣！`;
+
+          Array.from(grid.children).forEach((card, i) => {
+            card.disabled = true;
+            const p = prizes[i];
+            card.classList.add(i === idx ? "picked" : "revealed");
+            card.querySelector(".mg-chest-emoji").textContent = p === 80 ? "👑" : p === 45 ? "💰" : "🪙";
+            card.querySelector(".mg-chest-prize").textContent = `+${p} 金幣`;
+          });
+
+          nextTimer = setTimeout(() => {
+            round += 1;
+            if (round > totalRounds) {
+              window.VisualFX.burstConfetti();
+              if (onFinish) onFinish(totalCoins, "寶箱三選一");
+            } else {
+              msgEl.textContent = "第 2 回合！三個寶箱重新洗牌完畢，再挑一個吧！";
+              renderRound();
+            }
+          }, 1150);
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    renderRound();
+    activeCleanup = () => {
+      if (nextTimer) clearTimeout(nextTimer);
+    };
+  }
+
+  // ==================== 遊戲 9：🎣 海岸釣金魚 ====================
+  function startFishingGame(container, onFinish) {
+    stopCurrentGame();
+    let timeLeft = 16;
+    let coins = 0;
+    let finished = false;
+    let spawnTimer = null;
+    let countTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎣 海岸釣金魚（點金魚、海星、珍珠，避開舊靴子！）</span>
+        <span id="mg-fish-time">剩餘 16 秒</span>
+        <span id="mg-fish-coins">金幣：0</span>
+      </div>
+      <div id="mg-pond" class="mg-pond"></div>
+    `;
+
+    const pond = container.querySelector("#mg-pond");
+    const timeEl = container.querySelector("#mg-fish-time");
+    const coinsEl = container.querySelector("#mg-fish-coins");
+
+    const ITEMS = [
+      { icon: "🐠", val: 15, label: "+15" },
+      { icon: "🐡", val: 20, label: "+20" },
+      { icon: "🌟", val: 25, label: "+25" },
+      { icon: "🦪", val: 40, label: "+40" },
+      { icon: "🥾", val: -10, label: "-10" },
+    ];
+
+    function spawnFish() {
+      if (finished) return;
+      const pick = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "mg-fish-item";
+      el.textContent = pick.icon;
+      const topPct = 10 + Math.random() * 72;
+      const fromLeft = Math.random() > 0.5;
+      el.style.top = `${topPct}%`;
+      el.style.left = fromLeft ? "-12%" : "104%";
+      el.style.transition = `left ${2.2 + Math.random() * 1.4}s linear`;
+      pond.appendChild(el);
+
+      requestAnimationFrame(() => {
+        el.style.left = fromLeft ? "106%" : "-14%";
+      });
+
+      el.addEventListener("pointerdown", (ev) => {
+        ev.preventDefault();
+        if (finished || el.dataset.caught) return;
+        el.dataset.caught = "1";
+        coins = Math.max(0, coins + pick.val);
+        coinsEl.textContent = `金幣：${coins}`;
+        if (pick.val > 0) window.SoundFX.playCorrect(1);
+        else window.SoundFX.playWrong();
+
+        const pop = document.createElement("span");
+        pop.className = `mg-fish-pop ${pick.val > 0 ? "good" : "bad"}`;
+        pop.textContent = pick.label;
+        pop.style.left = el.offsetLeft + "px";
+        pop.style.top = el.offsetTop + "px";
+        pond.appendChild(pop);
+        el.remove();
+        setTimeout(() => pop.remove(), 650);
+      });
+
+      setTimeout(() => {
+        if (el.parentNode) el.remove();
+      }, 3900);
+    }
+
+    spawnFish();
+    spawnFish();
+    spawnTimer = setInterval(spawnFish, 650);
+
+    countTimer = setInterval(() => {
+      timeLeft -= 1;
+      timeEl.textContent = `剩餘 ${timeLeft} 秒`;
+      if (timeLeft <= 0) {
+        finished = true;
+        clearInterval(spawnTimer);
+        clearInterval(countTimer);
+        window.SoundFX.playFanfare(3);
+        window.VisualFX.burstConfetti();
+        if (onFinish) onFinish(Math.max(20, coins), "海岸釣金魚");
+      }
+    }, 1000);
+
+    activeCleanup = () => {
+      finished = true;
+      clearInterval(spawnTimer);
+      clearInterval(countTimer);
+    };
+  }
+
+  // ==================== 遊戲 10：🎨 找不同色塊 ====================
+  function startColorGame(container, onFinish) {
+    stopCurrentGame();
+    let timeLeft = 18;
+    let found = 0;
+    let coins = 0;
+    let finished = false;
+    let countTimer = null;
+
+    // 暖色系馬卡龍配色（完全避開亮藍色）
+    const PALETTES = [
+      { base: "#F6B89E", odd: "#E88B68" },
+      { base: "#F5D782", odd: "#E5B43C" },
+      { base: "#A9D9B4", odd: "#6FBF82" },
+      { base: "#E7B7D2", odd: "#D484B0" },
+      { base: "#E8C5A0", odd: "#D29B63" },
+      { base: "#B8DEC9", odd: "#7DC49D" },
+      { base: "#F2C0B3", odd: "#E28E7A" },
+    ];
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎨 找不同色塊（點出顏色不一樣的那一格！）</span>
+        <span id="mg-col-time">剩餘 18 秒</span>
+        <span id="mg-col-coins">找到 0 題・0 金幣</span>
+      </div>
+      <div id="mg-color-grid" class="mg-color-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-color-grid");
+    const timeEl = container.querySelector("#mg-col-time");
+    const coinsEl = container.querySelector("#mg-col-coins");
+
+    function renderBoard() {
+      const size = found >= 3 ? 4 : 3;
+      const total = size * size;
+      const oddIdx = Math.floor(Math.random() * total);
+      const pal = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+      grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+      grid.innerHTML = "";
+      for (let i = 0; i < total; i++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "mg-color-cell";
+        cell.style.background = i === oddIdx ? pal.odd : pal.base;
+        cell.setAttribute("aria-label", `色塊 ${i + 1}`);
+        cell.addEventListener("click", () => {
+          if (finished) return;
+          if (i === oddIdx) {
+            found += 1;
+            coins += 20;
+            coinsEl.textContent = `找到 ${found} 題・${coins} 金幣`;
+            window.SoundFX.playCorrect(found);
+            renderBoard();
+          } else {
+            window.SoundFX.playWrong();
+            cell.classList.add("wrong-flash");
+            setTimeout(() => cell.classList.remove("wrong-flash"), 300);
+          }
+        });
+        grid.appendChild(cell);
+      }
+    }
+
+    renderBoard();
+    countTimer = setInterval(() => {
+      timeLeft -= 1;
+      timeEl.textContent = `剩餘 ${timeLeft} 秒`;
+      if (timeLeft <= 0) {
+        finished = true;
+        clearInterval(countTimer);
+        window.SoundFX.playFanfare(3);
+        window.VisualFX.burstConfetti();
+        if (onFinish) onFinish(Math.max(20, coins), "找不同色塊");
+      }
+    }, 1000);
+
+    activeCleanup = () => {
+      finished = true;
+      clearInterval(countTimer);
+    };
+  }
+
+  // ==================== 遊戲 11：🎹 記憶小鋼琴 ====================
+  function startSimonGame(container, onFinish) {
+    stopCurrentGame();
+    const KEYS = [
+      { id: 0, name: "Do", freq: 261.63, color: "#FF9F87" },
+      { id: 1, name: "Re", freq: 293.66, color: "#FFD66B" },
+      { id: 2, name: "Mi", freq: 329.63, color: "#8ED1A2" },
+      { id: 3, name: "Sol", freq: 392.00, color: "#D9A7E0" },
+    ];
+    let round = 1;
+    const maxRounds = 4;
+    let seq = [];
+    let inputIdx = 0;
+    let coins = 0;
+    let accepting = false;
+    let timers = [];
+    let audioCtx = null;
+
+    function playNote(freq) {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(0.16, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.36);
+      } catch (_) {}
+    }
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎹 記憶小鋼琴（聽旋律照順序彈出來！）</span>
+        <span id="mg-simon-round">第 1 / 4 關</span>
+        <span id="mg-simon-coins">金幣：0</span>
+      </div>
+      <div id="mg-simon-msg" class="mg-status-line">仔細聽，小鋼琴要開始示範囉…</div>
+      <div class="mg-piano-grid" id="mg-piano-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-piano-grid");
+    const msgEl = container.querySelector("#mg-simon-msg");
+    const roundEl = container.querySelector("#mg-simon-round");
+    const coinsEl = container.querySelector("#mg-simon-coins");
+
+    const keyBtns = KEYS.map((k) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "mg-piano-key";
+      btn.style.background = k.color;
+      btn.innerHTML = `<strong>${k.name}</strong><span>🎵</span>`;
+      btn.addEventListener("click", () => {
+        if (!accepting) return;
+        flashKey(k.id);
+        if (k.id === seq[inputIdx]) {
+          inputIdx += 1;
+          if (inputIdx >= seq.length) {
+            accepting = false;
+            coins += 35;
+            coinsEl.textContent = `金幣：${coins}`;
+            msgEl.textContent = `✨ 第 ${round} 關彈對了！+35 金幣！`;
+            window.SoundFX.playCorrect(round);
+            if (round >= maxRounds) {
+              timers.push(setTimeout(() => {
+                window.SoundFX.playFanfare(3);
+                window.VisualFX.burstConfetti();
+                if (onFinish) onFinish(coins, "記憶小鋼琴");
+              }, 700));
+            } else {
+              round += 1;
+              timers.push(setTimeout(startRound, 900));
+            }
+          }
+        } else {
+          accepting = false;
+          window.SoundFX.playWrong();
+          msgEl.textContent = "哎呀差一點點！幫你把剛剛賺到的金幣都收進口袋囉！";
+          timers.push(setTimeout(() => {
+            if (onFinish) onFinish(Math.max(20, coins), "記憶小鋼琴");
+          }, 950));
+        }
+      });
+      grid.appendChild(btn);
+      return btn;
+    });
+
+    function flashKey(idx) {
+      const btn = keyBtns[idx];
+      if (!btn) return;
+      playNote(KEYS[idx].freq);
+      btn.classList.add("lit");
+      timers.push(setTimeout(() => btn.classList.remove("lit"), 320));
+    }
+
+    function startRound() {
+      accepting = false;
+      inputIdx = 0;
+      roundEl.textContent = `第 ${round} / ${maxRounds} 關`;
+      msgEl.textContent = "👀 請專心看發光的琴鍵順序…";
+      const len = round + 1;
+      seq = Array.from({ length: len }, () => Math.floor(Math.random() * 4));
+      seq.forEach((keyId, i) => {
+        timers.push(setTimeout(() => flashKey(keyId), 450 + i * 520));
+      });
+      timers.push(setTimeout(() => {
+        accepting = true;
+        msgEl.textContent = "🎹 換你了！照剛剛的順序按出來吧！";
+      }, 450 + seq.length * 520 + 120));
+    }
+
+    timers.push(setTimeout(startRound, 350));
+
+    activeCleanup = () => {
+      accepting = false;
+      timers.forEach((t) => clearTimeout(t));
+      timers = [];
+    };
+  }
+
+  // ==================== 遊戲 12：🃏 猜大小撲克 ====================
+  function startHigherGame(container, onFinish) {
+    stopCurrentGame();
+    const SUITS = ["♥", "♦", "♣", "♠"];
+    const LABELS = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    let round = 1;
+    const totalRounds = 5;
+    let coins = 0;
+    let locked = false;
+    let curVal = 1 + Math.floor(Math.random() * 13);
+    let curSuit = SUITS[Math.floor(Math.random() * 4)];
+    let nextTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🃏 猜大小撲克（共 5 回合・A最小 K最大）</span>
+        <span id="mg-hi-round">第 1 / 5 回合</span>
+        <span id="mg-hi-coins">金幣：0</span>
+      </div>
+      <div class="mg-card-arena">
+        <div class="mg-poker-card" id="mg-hi-card">
+          <span class="mg-poker-suit">${curSuit}</span>
+          <strong class="mg-poker-num">${LABELS[curVal]}</strong>
+          <span class="mg-poker-sub">點數 ${curVal}</span>
+        </div>
+        <div class="mg-hi-controls">
+          <div id="mg-hi-msg" class="mg-status-line">猜猜看：下一張牌比 ${curVal} 大還是小？</div>
+          <div class="mg-hi-btns">
+            <button type="button" class="btn btn-gold btn-lg" id="mg-btn-higher">⬆️ 比較大</button>
+            <button type="button" class="btn btn-forest btn-lg" id="mg-btn-lower">⬇️ 比較小</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const cardEl = container.querySelector("#mg-hi-card");
+    const msgEl = container.querySelector("#mg-hi-msg");
+    const roundEl = container.querySelector("#mg-hi-round");
+    const coinsEl = container.querySelector("#mg-hi-coins");
+    const btnHi = container.querySelector("#mg-btn-higher");
+    const btnLo = container.querySelector("#mg-btn-lower");
+
+    function guess(dir) {
+      if (locked || round > totalRounds) return;
+      locked = true;
+      btnHi.disabled = true;
+      btnLo.disabled = true;
+      const nextVal = 1 + Math.floor(Math.random() * 13);
+      const nextSuit = SUITS[Math.floor(Math.random() * 4)];
+
+      let won = false;
+      if (nextVal === curVal) {
+        coins += 25;
+        msgEl.textContent = `🤝 竟然同點數 ${LABELS[nextVal]}！幸運加贈 +25 金幣！`;
+        window.SoundFX.playCorrect(1);
+      } else if ((dir === "hi" && nextVal > curVal) || (dir === "lo" && nextVal < curVal)) {
+        won = true;
+        coins += 30;
+        msgEl.textContent = `🎉 猜中了！下一張是 ${nextSuit}${LABELS[nextVal]}（${nextVal}點），+30 金幣！`;
+        window.SoundFX.playCorrect(round);
+      } else {
+        coins += 10;
+        msgEl.textContent = `😅 下一張是 ${nextSuit}${LABELS[nextVal]}（${nextVal}點），送你鼓勵獎 +10 金幣！`;
+        window.SoundFX.playWrong();
+      }
+
+      curVal = nextVal;
+      curSuit = nextSuit;
+      cardEl.innerHTML = `<span class="mg-poker-suit">${curSuit}</span><strong class="mg-poker-num">${LABELS[curVal]}</strong><span class="mg-poker-sub">點數 ${curVal}</span>`;
+      cardEl.classList.toggle("is-red", curSuit === "♥" || curSuit === "♦");
+      coinsEl.textContent = `金幣：${coins}`;
+
+      round += 1;
+      if (round > totalRounds) {
+        nextTimer = setTimeout(() => {
+          window.SoundFX.playFanfare(3);
+          window.VisualFX.burstConfetti();
+          if (onFinish) onFinish(coins, "猜大小撲克");
+        }, 900);
+      } else {
+        nextTimer = setTimeout(() => {
+          roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
+          msgEl.textContent = `下一張牌會比 ${curVal} 大還是小呢？`;
+          locked = false;
+          btnHi.disabled = false;
+          btnLo.disabled = false;
+        }, 850);
+      }
+    }
+
+    cardEl.classList.toggle("is-red", curSuit === "♥" || curSuit === "♦");
+    btnHi.addEventListener("click", () => guess("hi"));
+    btnLo.addEventListener("click", () => guess("lo"));
+
+    activeCleanup = () => {
+      if (nextTimer) clearTimeout(nextTimer);
+    };
+  }
+
   window.MiniGames = {
     start(type, container, onFinish) {
       if (type === "catcher") return startCatcherGame(container, onFinish);
@@ -642,6 +1224,12 @@
       if (type === "wheel") return startWheelGame(container, onFinish);
       if (type === "bubble") return startBubbleGame(container, onFinish);
       if (type === "make10") return startMake10Game(container, onFinish);
+      if (type === "dice") return startDiceGame(container, onFinish);
+      if (type === "chest") return startChestGame(container, onFinish);
+      if (type === "fishing") return startFishingGame(container, onFinish);
+      if (type === "color") return startColorGame(container, onFinish);
+      if (type === "simon") return startSimonGame(container, onFinish);
+      if (type === "higher") return startHigherGame(container, onFinish);
       return startWhackGame(container, onFinish);
     },
     stop: stopCurrentGame

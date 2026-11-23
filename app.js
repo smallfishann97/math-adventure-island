@@ -169,7 +169,7 @@
       id: "kingdom",
       shortName: "6號島",
       title: "👑 6號島・皇冠天空島",
-      unlockStars: 80,
+      unlockStars: 60,
       grassA: "#ebd6f7",
       grassB: "#cdaae6",
       grassStroke: "#ad84cc",
@@ -1297,7 +1297,7 @@
     quiz.giftUsed = false;
     document.getElementById("reward-gift-banner").classList.toggle("hidden", !passed);
     document.getElementById("gift-banner-title").textContent = "恭喜過關！獲得「過關小禮物」1 次！";
-    document.getElementById("gift-banner-desc").textContent = "【規則】每次過關只能從以下 6 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！";
+    document.getElementById("gift-banner-desc").textContent = "【規則】每次過關只能從以下 12 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！";
     document.querySelectorAll("button[data-play-mg]").forEach((b) => {
       b.disabled = false;
       b.style.opacity = "";
@@ -1518,7 +1518,7 @@
     });
 
     if (grouped.size === 0) {
-      listEl.innerHTML = `<div class="panel-card" style="grid-column:1/-1;text-align:center;box-shadow:none;background:var(--bg-ivory);"><p style="font-weight:900;color:var(--forest);">🎉 目前完全沒有錯題！你可以回到 2D 秘境島繼續冒險喔！</p></div>`;
+      listEl.innerHTML = `<div class="panel-card" style="grid-column:1/-1;text-align:center;box-shadow:none;background:var(--bg-ivory);"><p style="font-weight:900;color:var(--forest);">🎉 目前完全沒有錯題！你可以回到冒險島繼續冒險喔！</p></div>`;
       return;
     }
 
@@ -1547,7 +1547,7 @@
     const user = currentUser();
     const listEl = document.getElementById("history-list");
     if (!user.history || user.history.length === 0) {
-      listEl.innerHTML = `<p style="text-align:center;color:var(--muted);padding:24px;font-weight:800;">尚無答題記錄，快去 2D 秘境島挑戰第一關吧！</p>`;
+      listEl.innerHTML = `<p style="text-align:center;color:var(--muted);padding:24px;font-weight:800;">尚無答題記錄，快去冒險島挑戰第一關吧！</p>`;
       return;
     }
     listEl.innerHTML = user.history
@@ -1667,17 +1667,31 @@
       });
     });
 
-    // 背景音樂開關
+    // 背景音樂開關與曲風切換
     const bgmBtn = document.getElementById("btn-bgm-toggle");
+    const bgmTrackSel = document.getElementById("bgm-track-select");
+    function syncBgmBtnUI(on) {
+      if (!bgmBtn) return;
+      bgmBtn.setAttribute("aria-pressed", String(on));
+      bgmBtn.classList.toggle("is-playing", on);
+      const lbl = document.getElementById("bgm-label");
+      if (lbl) lbl.textContent = on ? "音樂播放中" : "開啟音樂";
+      const bubble = document.getElementById("bgm-hint-bubble");
+      if (bubble) bubble.classList.add("hidden");
+    }
     if (bgmBtn && window.MathDeluxe) {
       bgmBtn.addEventListener("click", () => {
         const on = window.MathDeluxe.bgm.toggle();
-        bgmBtn.setAttribute("aria-pressed", String(on));
-        bgmBtn.classList.toggle("is-playing", on);
-        const lbl = document.getElementById("bgm-label");
-        if (lbl) lbl.textContent = on ? "音樂播放中" : "開啟音樂";
-        const bubble = document.getElementById("bgm-hint-bubble");
-        if (bubble) bubble.classList.add("hidden");
+        syncBgmBtnUI(on);
+      });
+    }
+    if (bgmTrackSel && window.MathDeluxe) {
+      bgmTrackSel.addEventListener("change", () => {
+        window.MathDeluxe.bgm.setTrack(bgmTrackSel.value);
+        if (!window.MathDeluxe.bgm.playing) {
+          window.MathDeluxe.bgm.start();
+        }
+        syncBgmBtnUI(true);
       });
     }
 

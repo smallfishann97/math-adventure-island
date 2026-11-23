@@ -7,57 +7,174 @@
  * 5. 雙人同機 PK 搶答模式（10 回合對戰＋鍵盤/觸控搶答）
  */
 (function () {
-  // ==================== 1. 陽光小島輕快雙聲部八音盒 BGM（純 Web Audio API 原創編曲） ====================
+  // ==================== 1. 多曲風原創背景音樂 BGM（純 Web Audio API 零外部音檔） ====================
   class MusicBoxBGM {
     constructor() {
       this.ctx = null;
       this.timer = null;
       this.playing = false;
       this.step = 0;
+      this.trackId = "musicbox";
 
-      // 輕快活潑的 32 拍陽光海島旋律（C 大調，單位 Hz，0 代表休止符）
-      this.melody = [
-        // A 段：陽光跳躍啟程（C -> G -> Am -> F）
-        523.25, 659.25, 783.99, 0,      880.00, 783.99, 659.25, 0,
-        587.33, 659.25, 783.99, 659.25, 587.33, 0,      523.25, 0,
-        // B 段：輕快海風微揚（F -> C -> Dm -> G）
-        698.46, 880.00, 1046.5, 0,      880.00, 783.99, 659.25, 523.25,
-        587.33, 659.25, 783.99, 880.00, 783.99, 0,      0,      0,
-        // C 段：開心探索島嶼（C -> Em -> F -> G）
-        1046.5, 880.00, 783.99, 659.25, 783.99, 0,      659.25, 523.25,
-        698.46, 783.99, 880.00, 698.46, 783.99, 0,      587.33, 0,
-        // D 段：溫暖收尾再循環（Am -> F -> G -> C）
-        659.25, 783.99, 880.00, 1046.5, 880.00, 698.46, 659.25, 587.33,
-        523.25, 659.25, 783.99, 523.25, 523.25, 0,      0,      0
-      ];
+      // 4 首 100% 原創編曲（單位 Hz，0 代表休止符）
+      this.tracks = {
+        // 1. 島嶼八音盒（輕快療癒雙聲部 C 大調）
+        musicbox: {
+          name: "🎵 島嶼八音盒",
+          tempoMs: 240,
+          leadWave: "triangle",
+          bassWave: "sine",
+          leadGain: 0.058,
+          bassGain: 0.042,
+          leadDecay: 0.28,
+          bassDecay: 0.34,
+          chime: true,
+          melody: [
+            523.25, 659.25, 783.99, 0,      880.00, 783.99, 659.25, 0,
+            587.33, 659.25, 783.99, 659.25, 587.33, 0,      523.25, 0,
+            698.46, 880.00, 1046.5, 0,      880.00, 783.99, 659.25, 523.25,
+            587.33, 659.25, 783.99, 880.00, 783.99, 0,      0,      0,
+            1046.5, 880.00, 783.99, 659.25, 783.99, 0,      659.25, 523.25,
+            698.46, 783.99, 880.00, 698.46, 783.99, 0,      587.33, 0,
+            659.25, 783.99, 880.00, 1046.5, 880.00, 698.46, 659.25, 587.33,
+            523.25, 659.25, 783.99, 523.25, 523.25, 0,      0,      0
+          ],
+          bass: [
+            261.63, 0, 329.63, 0, 220.00, 0, 261.63, 0,
+            196.00, 0, 246.94, 0, 261.63, 0, 196.00, 0,
+            174.61, 0, 220.00, 0, 261.63, 0, 329.63, 0,
+            293.66, 0, 220.00, 0, 196.00, 0, 246.94, 0,
+            261.63, 0, 329.63, 0, 246.94, 0, 329.63, 0,
+            174.61, 0, 220.00, 0, 196.00, 0, 246.94, 0,
+            220.00, 0, 261.63, 0, 174.61, 0, 220.00, 0,
+            196.00, 0, 246.94, 0, 261.63, 0, 0,      0
+          ]
+        },
 
-      // 對應的溫暖撥弦低音伴奏（每 2 拍輕撥一聲，與主旋律形成豐滿和聲）
-      this.bass = [
-        261.63, 0, 329.63, 0, 220.00, 0, 261.63, 0,
-        196.00, 0, 246.94, 0, 261.63, 0, 196.00, 0,
-        174.61, 0, 220.00, 0, 261.63, 0, 329.63, 0,
-        293.66, 0, 220.00, 0, 196.00, 0, 246.94, 0,
-        261.63, 0, 329.63, 0, 246.94, 0, 329.63, 0,
-        174.61, 0, 220.00, 0, 196.00, 0, 246.94, 0,
-        220.00, 0, 261.63, 0, 174.61, 0, 220.00, 0,
-        196.00, 0, 246.94, 0, 261.63, 0, 0,      0
-      ];
+        // 2. 勇敢冒險曲（熱血 RPG 進行曲風格・勇者出征感）
+        adventure: {
+          name: "⚔️ 勇敢冒險曲",
+          tempoMs: 185,
+          leadWave: "square",
+          bassWave: "triangle",
+          leadGain: 0.032,
+          bassGain: 0.062,
+          leadDecay: 0.21,
+          bassDecay: 0.22,
+          chime: false,
+          melody: [
+            // A 段：號角吹響啟程
+            523.25, 0, 523.25, 659.25, 783.99, 0, 783.99, 880.00,
+            783.99, 659.25, 587.33, 659.25, 783.99, 0, 0, 0,
+            // B 段：翻山越嶺衝刺
+            880.00, 0, 880.00, 1046.5, 987.77, 880.00, 783.99, 659.25,
+            698.46, 783.99, 880.00, 698.46, 783.99, 0, 587.33, 0,
+            // C 段：發現神祕寶藏
+            659.25, 783.99, 1046.5, 0, 987.77, 880.00, 783.99, 0,
+            698.46, 659.25, 587.33, 659.25, 783.99, 880.00, 987.77, 0,
+            // D 段：凱旋勝利回歸
+            1046.5, 0, 783.99, 0, 880.00, 987.77, 1046.5, 0,
+            880.00, 783.99, 659.25, 587.33, 523.25, 0, 523.25, 0
+          ],
+          bass: [
+            261.63, 261.63, 196.00, 261.63, 261.63, 0, 196.00, 0,
+            196.00, 196.00, 246.94, 293.66, 196.00, 0, 196.00, 0,
+            220.00, 220.00, 261.63, 220.00, 196.00, 0, 164.81, 0,
+            174.61, 174.61, 220.00, 174.61, 196.00, 0, 246.94, 0,
+            261.63, 0, 329.63, 0, 246.94, 0, 196.00, 0,
+            174.61, 0, 220.00, 0, 196.00, 246.94, 293.66, 0,
+            261.63, 0, 196.00, 0, 174.61, 0, 196.00, 0,
+            220.00, 196.00, 174.61, 196.00, 261.63, 0, 130.81, 0
+          ]
+        },
+
+        // 3. 星空晚安曲（溫柔專注慢板，適合靜心算數學）
+        lullaby: {
+          name: "🌙 星空晚安曲",
+          tempoMs: 340,
+          leadWave: "sine",
+          bassWave: "sine",
+          leadGain: 0.052,
+          bassGain: 0.036,
+          leadDecay: 0.52,
+          bassDecay: 0.62,
+          chime: true,
+          melody: [
+            523.25, 0, 659.25, 783.99, 659.25, 0, 523.25, 0,
+            587.33, 0, 698.46, 880.00, 783.99, 0, 0,      0,
+            659.25, 0, 783.99, 1046.5, 880.00, 0, 698.46, 0,
+            659.25, 587.33, 523.25, 0, 523.25, 0, 0,      0
+          ],
+          bass: [
+            261.63, 0, 0, 0, 196.00, 0, 0, 0,
+            174.61, 0, 0, 0, 196.00, 0, 0, 0,
+            220.00, 0, 0, 0, 174.61, 0, 0, 0,
+            196.00, 0, 246.94, 0, 261.63, 0, 0, 0
+          ]
+        },
+
+        // 4. 甜點遊樂園（蹦蹦跳跳活潑嘉年華風格）
+        carnival: {
+          name: "🎡 甜點遊樂園",
+          tempoMs: 205,
+          leadWave: "triangle",
+          bassWave: "triangle",
+          leadGain: 0.062,
+          bassGain: 0.048,
+          leadDecay: 0.19,
+          bassDecay: 0.20,
+          chime: true,
+          melody: [
+            783.99, 659.25, 783.99, 1046.5, 880.00, 783.99, 659.25, 0,
+            698.46, 587.33, 698.46, 880.00, 783.99, 0,      587.33, 0,
+            523.25, 659.25, 783.99, 880.00, 1046.5, 880.00, 783.99, 659.25,
+            587.33, 698.46, 783.99, 587.33, 523.25, 0,      523.25, 0
+          ],
+          bass: [
+            261.63, 329.63, 392.00, 329.63, 220.00, 261.63, 329.63, 0,
+            174.61, 220.00, 261.63, 220.00, 196.00, 246.94, 293.66, 0,
+            261.63, 329.63, 392.00, 329.63, 174.61, 220.00, 261.63, 220.00,
+            196.00, 246.94, 293.66, 246.94, 261.63, 0,      196.00, 0
+          ]
+        }
+      };
+    }
+
+    currentTrack() {
+      return this.tracks[this.trackId] || this.tracks.musicbox;
+    }
+
+    getTrack() {
+      return this.trackId;
+    }
+
+    setTrack(id) {
+      if (!this.tracks[id]) return this.trackId;
+      this.trackId = id;
+      this.step = 0;
+      if (this.playing) {
+        if (this.timer) clearInterval(this.timer);
+        const tr = this.currentTrack();
+        this.tickBeat();
+        this.timer = setInterval(() => this.tickBeat(), tr.tempoMs);
+      }
+      return this.trackId;
     }
 
     playPluck(freq, isBass = false) {
       if (!freq || !this.ctx) return;
+      const tr = this.currentTrack();
       const now = this.ctx.currentTime;
 
-      // 主音色：清脆木琴/八音盒 triangle；低音用溫潤 sine
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = isBass ? "sine" : "triangle";
+      osc.type = isBass ? tr.bassWave : tr.leadWave;
       osc.frequency.setValueAtTime(freq, now);
 
-      const peak = isBass ? 0.042 : 0.058;
-      const decay = isBass ? 0.34 : 0.28;
+      const peak = isBass ? tr.bassGain : tr.leadGain;
+      const decay = isBass ? tr.bassDecay : tr.leadDecay;
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(peak, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(peak, now + 0.014);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
       osc.connect(gain);
@@ -65,14 +182,14 @@
       osc.start(now);
       osc.stop(now + decay + 0.03);
 
-      // 為主旋律疊加極輕柔的高八度水晶泛音，聽起來更像精緻八音盒
-      if (!isBass) {
+      // 八音盒／晚安曲／遊樂園疊加輕柔高八度水晶泛音
+      if (!isBass && tr.chime) {
         const chime = this.ctx.createOscillator();
         const chimeGain = this.ctx.createGain();
         chime.type = "sine";
         chime.frequency.setValueAtTime(freq * 2, now);
         chimeGain.gain.setValueAtTime(0.0001, now);
-        chimeGain.gain.exponentialRampToValueAtTime(0.016, now + 0.01);
+        chimeGain.gain.exponentialRampToValueAtTime(0.015, now + 0.01);
         chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
         chime.connect(chimeGain);
         chimeGain.connect(this.ctx.destination);
@@ -83,9 +200,10 @@
 
     tickBeat() {
       if (!this.playing) return;
-      this.playPluck(this.melody[this.step], false);
-      this.playPluck(this.bass[this.step], true);
-      this.step = (this.step + 1) % this.melody.length;
+      const tr = this.currentTrack();
+      this.playPluck(tr.melody[this.step % tr.melody.length], false);
+      this.playPluck(tr.bass[this.step % tr.bass.length], true);
+      this.step = (this.step + 1) % tr.melody.length;
     }
 
     start() {
@@ -95,8 +213,9 @@
       if (!this.ctx) this.ctx = new AudioCtx();
       if (this.ctx.state === "suspended") this.ctx.resume().catch(() => {});
       this.playing = true;
+      const tr = this.currentTrack();
       this.tickBeat();
-      this.timer = setInterval(() => this.tickBeat(), 240);
+      this.timer = setInterval(() => this.tickBeat(), tr.tempoMs);
     }
 
     stop() {
