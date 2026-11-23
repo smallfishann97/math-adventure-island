@@ -139,7 +139,7 @@
     town: {
       id: "town",
       shortName: "5號島",
-      title: "🏘️ 5號島・我的專屬自由島",
+      title: "🏘️ 5號島・職人小鎮島",
       unlockStars: 30,
       grassA: "#f6e7c4",
       grassB: "#e5cb98",
@@ -160,7 +160,7 @@
     kingdom: {
       id: "kingdom",
       shortName: "6號島",
-      title: "👑 6號島・我的夢幻天空島",
+      title: "👑 6號島・皇冠天空島",
       unlockStars: 80,
       grassA: "#ebd6f7",
       grassB: "#cdaae6",
