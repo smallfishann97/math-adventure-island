@@ -2895,9 +2895,12 @@ h1, h2, h3, .serif {
 
 .footer-disclaimer-text {
   margin: 0 auto 14px;
+  max-width: 820px;
   font-size: 0.82rem;
-  line-height: 1.75;
+  line-height: 1.85;
   color: var(--muted);
+  text-align: justify;
+  text-justify: inter-ideograph;
 }
 
 .footer-disclaimer-text strong {
