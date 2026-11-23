@@ -803,12 +803,12 @@ h1, h2, h3, .serif {
   animation: cloudDrift 28s linear infinite;
   z-index: 2;
 }
-.island-cloud.c1 { top: 18px; left: -10%; font-size: 2.3rem; animation-duration: 34s; }
-.island-cloud.c2 { top: 72px; left: -16%; font-size: 1.8rem; animation-duration: 42s; animation-delay: -12s; }
-.island-cloud.c3 { top: 34px; left: -8%; font-size: 2.6rem; animation-duration: 50s; animation-delay: -24s; }
-.island-cloud.c4 { top: 112px; left: -14%; font-size: 2.1rem; animation-duration: 38s; animation-delay: -6s; }
-.island-cloud.c5 { top: 52px; left: -12%; font-size: 1.7rem; animation-duration: 46s; animation-delay: -31s; }
-.island-cloud.c6 { top: 96px; left: -18%; font-size: 2.4rem; animation-duration: 54s; animation-delay: -40s; }
+.island-cloud.c1 { top: 6px; left: -10%; font-size: 2.2rem; animation-duration: 34s; }
+.island-cloud.c2 { top: 32px; left: -16%; font-size: 1.7rem; animation-duration: 42s; animation-delay: -12s; }
+.island-cloud.c3 { top: 14px; left: -8%; font-size: 2.4rem; animation-duration: 50s; animation-delay: -24s; }
+.island-cloud.c4 { top: 52px; left: -14%; font-size: 1.9rem; animation-duration: 38s; animation-delay: -6s; }
+.island-cloud.c5 { top: 22px; left: -12%; font-size: 1.65rem; animation-duration: 46s; animation-delay: -31s; }
+.island-cloud.c6 { top: 44px; left: -18%; font-size: 2.1rem; animation-duration: 54s; animation-delay: -40s; }
 
 @keyframes cloudDrift {
   from { transform: translateX(0); }
@@ -4464,4 +4464,169 @@ html, body {
   .mg-chest-card {
     padding: 12px 6px;
   }
+}
+
+/* ==================== 遊戲 13～20 專屬樣式 ==================== */
+.mg-rps-big {
+  font-size: 3.2rem;
+  line-height: 1.2;
+}
+
+.mg-scratch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.mg-scratch-card {
+  height: 92px;
+  border-radius: 16px;
+  border: 3px solid #d99b32;
+  background: linear-gradient(135deg, #ffe28a, #f2b749);
+  color: #5a4031;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #b87b1b;
+  transition: transform 0.14s ease;
+}
+
+.mg-scratch-card:hover:not(.scratched):not(.unpicked) {
+  transform: translateY(-3px);
+}
+
+.mg-scratch-card.scratched {
+  background: linear-gradient(180deg, #fffdf7, #e6f8ec);
+  border-color: #4da366;
+  box-shadow: 0 4px 0 #377f4d;
+  font-size: 1.25rem;
+  color: #2b7a47;
+}
+
+.mg-scratch-card.unpicked {
+  opacity: 0.55;
+  background: #f5ecdc;
+  border-color: #d6c3a5;
+  box-shadow: none;
+}
+
+.mg-slot-machine {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.mg-slot-reel {
+  width: 84px;
+  height: 94px;
+  border-radius: 18px;
+  border: 3px solid #d99b32;
+  background: linear-gradient(180deg, #fffdf9, #fff0cf);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  box-shadow: inset 0 4px 10px rgba(90, 64, 49, 0.1), 0 4px 0 #c68621;
+}
+
+.mg-react-pad {
+  width: 100%;
+  height: 170px;
+  border-radius: 20px;
+  border: 3px solid #5a4031;
+  font-family: inherit;
+  font-size: 1.35rem;
+  font-weight: 900;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+
+.mg-react-pad.is-wait {
+  background: linear-gradient(180deg, #fff5dc, #ffe1a8);
+  color: #7c4f1d;
+}
+
+.mg-react-pad.is-go {
+  background: linear-gradient(180deg, #7ad38a, #49ae62);
+  color: #ffffff;
+  box-shadow: 0 0 0 6px rgba(103, 198, 121, 0.35);
+}
+
+.mg-react-pad.is-done {
+  background: linear-gradient(180deg, #fffdf7, #e9f9ee);
+  color: #2d7a4c;
+}
+
+.mg-orchard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 330px;
+  margin: 12px auto 0;
+}
+
+.mg-orchard-spot {
+  height: 76px;
+  border-radius: 16px;
+  border: 2.5px solid #88be7e;
+  background: linear-gradient(180deg, #eaf9e4, #cdecc4);
+  font-size: 2.1rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.mg-orchard-spot.has-fruit {
+  background: linear-gradient(180deg, #fff9e3, #ffe5a6);
+  border-color: #e3a23d;
+  transform: scale(1.04);
+}
+
+.mg-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 320px;
+  margin: 12px auto 0;
+}
+
+.mg-emoji-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  border: 2px solid #e6c690;
+  background: #fffdf8;
+  font-size: 1.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.mg-emoji-cell:hover {
+  transform: scale(1.06);
+}
+
+.mg-emoji-cell.found {
+  background: #d8f5e1;
+  border-color: #469d61;
+  transform: scale(1.1);
+}
+
+.mg-balloon-stage {
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0 10px;
+}
+
+.mg-balloon-orb {
+  font-size: 3.2rem;
+  transition: transform 0.08s ease;
+  user-select: none;
 }

@@ -1216,6 +1216,651 @@
     };
   }
 
+  // ==================== 遊戲 13：✊ 猜拳大挑戰 ====================
+  function startRpsGame(container, onFinish) {
+    stopCurrentGame();
+    const MOVES = [
+      { id: "rock", label: "✊ 石頭", icon: "✊", beats: "scissors" },
+      { id: "scissors", label: "✌️ 剪刀", icon: "✌️", beats: "paper" },
+      { id: "paper", label: "🖐️ 布", icon: "🖐️", beats: "rock" },
+    ];
+    let round = 1;
+    const totalRounds = 3;
+    let coins = 0;
+    let locked = false;
+    let nextTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>✊ 猜拳大挑戰（共 3 回合）</span>
+        <span id="mg-rps-round">第 1 / 3 回合</span>
+        <span id="mg-rps-coins">金幣：0</span>
+      </div>
+      <div class="mg-dice-arena">
+        <div class="mg-dice-side">
+          <div class="mg-dice-who">🧑 你出拳</div>
+          <div class="mg-rps-big" id="mg-rps-you">❔</div>
+        </div>
+        <div class="mg-dice-vs">VS</div>
+        <div class="mg-dice-side">
+          <div class="mg-dice-who">🐶 柴柴島主</div>
+          <div class="mg-rps-big" id="mg-rps-cpu">❔</div>
+        </div>
+      </div>
+      <div id="mg-rps-msg" class="mg-status-line">選一個出拳！贏了 +40、平手 +25、輸了也有 +15 鼓勵金幣！</div>
+      <div class="mg-hi-btns" id="mg-rps-btns">
+        <button type="button" class="btn btn-gold btn-lg" data-rps="rock">✊ 石頭</button>
+        <button type="button" class="btn btn-forest btn-lg" data-rps="scissors">✌️ 剪刀</button>
+        <button type="button" class="btn btn-burgundy btn-lg" data-rps="paper">🖐️ 布</button>
+      </div>
+    `;
+
+    const youEl = container.querySelector("#mg-rps-you");
+    const cpuEl = container.querySelector("#mg-rps-cpu");
+    const msgEl = container.querySelector("#mg-rps-msg");
+    const roundEl = container.querySelector("#mg-rps-round");
+    const coinsEl = container.querySelector("#mg-rps-coins");
+    const btns = Array.from(container.querySelectorAll("button[data-rps]"));
+
+    btns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (locked || round > totalRounds) return;
+        locked = true;
+        const myMove = MOVES.find((m) => m.id === btn.dataset.rps);
+        const cpuMove = MOVES[Math.floor(Math.random() * 3)];
+        youEl.textContent = myMove.icon;
+        cpuEl.textContent = cpuMove.icon;
+
+        if (myMove.id === cpuMove.id) {
+          coins += 25;
+          msgEl.textContent = "🤝 平手！默契十足 +25 金幣！";
+          window.SoundFX.playCorrect(1);
+        } else if (myMove.beats === cpuMove.id) {
+          coins += 40;
+          msgEl.textContent = "🎉 你贏了柴柴島主！+40 金幣！";
+          window.SoundFX.playCorrect(round);
+        } else {
+          coins += 15;
+          msgEl.textContent = "🐶 柴柴贏了一點點，送你勇氣鼓勵 +15 金幣！";
+          window.SoundFX.playClick();
+        }
+        coinsEl.textContent = `金幣：${coins}`;
+        round += 1;
+        if (round > totalRounds) {
+          nextTimer = setTimeout(() => {
+            window.SoundFX.playFanfare(3);
+            window.VisualFX.burstConfetti();
+            if (onFinish) onFinish(coins, "猜拳大挑戰");
+          }, 850);
+        } else {
+          nextTimer = setTimeout(() => {
+            roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
+            youEl.textContent = "❔";
+            cpuEl.textContent = "❔";
+            msgEl.textContent = `第 ${round} 回合！準備好就出拳吧！`;
+            locked = false;
+          }, 850);
+        }
+      });
+    });
+
+    activeCleanup = () => {
+      if (nextTimer) clearTimeout(nextTimer);
+    };
+  }
+
+  // ==================== 遊戲 14：🎫 幸運刮刮樂 ====================
+  function startScratchGame(container, onFinish) {
+    stopCurrentGame();
+    const prizes = [15, 25, 35, 50, 70, 100].sort(() => Math.random() - 0.5);
+    let picksLeft = 3;
+    let total = 0;
+    let done = false;
+    let endTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎫 幸運刮刮樂（6 格中任刮 3 格！）</span>
+        <span id="mg-scr-left">還可刮 3 格</span>
+        <span id="mg-scr-coins">金幣：0</span>
+      </div>
+      <div id="mg-scr-msg" class="mg-status-line">最高獎金 +100 金幣藏在裡面，快點 3 張金色刮刮卡！</div>
+      <div class="mg-scratch-grid" id="mg-scratch-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-scratch-grid");
+    const leftEl = container.querySelector("#mg-scr-left");
+    const coinsEl = container.querySelector("#mg-scr-coins");
+    const msgEl = container.querySelector("#mg-scr-msg");
+
+    prizes.forEach((val, idx) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "mg-scratch-card";
+      card.innerHTML = `<span class="mg-scr-cover">✨ 刮開我 ✨</span>`;
+      card.addEventListener("click", () => {
+        if (done || card.classList.contains("scratched") || picksLeft <= 0) return;
+        card.classList.add("scratched");
+        card.innerHTML = `<strong>${val >= 70 ? "👑" : "🪙"} +${val}</strong><span>金幣</span>`;
+        total += val;
+        picksLeft -= 1;
+        leftEl.textContent = `還可刮 ${picksLeft} 格`;
+        coinsEl.textContent = `金幣：${total}`;
+        if (val >= 70) window.SoundFX.playFanfare(3);
+        else window.SoundFX.playCorrect(3 - picksLeft);
+        msgEl.textContent = val === 100 ? "🎉 刮中頭獎 +100 金幣！！" : `✨ 刮出了 +${val} 金幣！`;
+
+        if (picksLeft === 0) {
+          done = true;
+          Array.from(grid.children).forEach((el, i) => {
+            if (!el.classList.contains("scratched")) {
+              el.classList.add("unpicked");
+              el.innerHTML = `<span>+${prizes[i]}</span>`;
+            }
+          });
+          endTimer = setTimeout(() => {
+            window.SoundFX.playFanfare(3);
+            window.VisualFX.burstConfetti();
+            if (onFinish) onFinish(total, "幸運刮刮樂");
+          }, 950);
+        }
+      });
+      grid.appendChild(card);
+    });
+
+    activeCleanup = () => {
+      if (endTimer) clearTimeout(endTimer);
+    };
+  }
+
+  // ==================== 遊戲 15：🎰 水果拉霸機 ====================
+  function startSlotGame(container, onFinish) {
+    stopCurrentGame();
+    const SYMS = ["🍓", "🍊", "🍋", "🍑", "⭐", "👑"];
+    let spinsLeft = 3;
+    let total = 0;
+    let spinning = false;
+    let spinTimer = null;
+    let endTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎰 水果拉霸機（共拉 3 次！）</span>
+        <span id="mg-slot-left">剩餘 3 次</span>
+        <span id="mg-slot-coins">金幣：0</span>
+      </div>
+      <div class="mg-slot-machine">
+        <div class="mg-slot-reel" id="mg-reel-0">🍓</div>
+        <div class="mg-slot-reel" id="mg-reel-1">⭐</div>
+        <div class="mg-slot-reel" id="mg-reel-2">🍑</div>
+      </div>
+      <div id="mg-slot-msg" class="mg-status-line">三個相同 +90 金幣、兩個相同 +40 金幣、全不同 +20 金幣！</div>
+      <div style="text-align:center;margin-top:10px;">
+        <button type="button" class="btn btn-gold btn-lg" id="mg-slot-btn">🎰 拉下把手！</button>
+      </div>
+    `;
+
+    const reels = [0, 1, 2].map((i) => container.querySelector(`#mg-reel-${i}`));
+    const leftEl = container.querySelector("#mg-slot-left");
+    const coinsEl = container.querySelector("#mg-slot-coins");
+    const msgEl = container.querySelector("#mg-slot-msg");
+    const spinBtn = container.querySelector("#mg-slot-btn");
+
+    spinBtn.addEventListener("click", () => {
+      if (spinning || spinsLeft <= 0) return;
+      spinning = true;
+      spinBtn.disabled = true;
+      window.SoundFX.playClick();
+      let ticks = 0;
+      spinTimer = setInterval(() => {
+        ticks += 1;
+        const vals = [0, 1, 2].map(() => SYMS[Math.floor(Math.random() * SYMS.length)]);
+        reels.forEach((r, i) => (r.textContent = vals[i]));
+        if (ticks >= 12) {
+          clearInterval(spinTimer);
+          spinTimer = null;
+          spinsLeft -= 1;
+          leftEl.textContent = `剩餘 ${spinsLeft} 次`;
+
+          let prize = 20;
+          if (vals[0] === vals[1] && vals[1] === vals[2]) {
+            prize = 90;
+            msgEl.textContent = `🎊 超級大獎！三個 ${vals[0]} 連線 +90 金幣！`;
+            window.SoundFX.playFanfare(3);
+          } else if (vals[0] === vals[1] || vals[1] === vals[2] || vals[0] === vals[2]) {
+            prize = 40;
+            msgEl.textContent = "✨ 兩個相同連線！獲得 +40 金幣！";
+            window.SoundFX.playCorrect(2);
+          } else {
+            prize = 20;
+            msgEl.textContent = "🍬 可愛水果大集合！獲得 +20 金幣！";
+            window.SoundFX.playCorrect(1);
+          }
+          total += prize;
+          coinsEl.textContent = `金幣：${total}`;
+
+          if (spinsLeft <= 0) {
+            spinBtn.textContent = "結算金幣中…";
+            endTimer = setTimeout(() => {
+              window.VisualFX.burstConfetti();
+              if (onFinish) onFinish(total, "水果拉霸機");
+            }, 850);
+          } else {
+            spinning = false;
+            spinBtn.disabled = false;
+          }
+        }
+      }, 65);
+    });
+
+    activeCleanup = () => {
+      if (spinTimer) clearInterval(spinTimer);
+      if (endTimer) clearTimeout(endTimer);
+    };
+  }
+
+  // ==================== 遊戲 16：🔢 數字排排隊 ====================
+  function startOrderGame(container, onFinish) {
+    stopCurrentGame();
+    let round = 1;
+    const totalRounds = 2;
+    let totalCoins = 0;
+    let nextTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🔢 數字排排隊（從「最小」點到「最大」！）</span>
+        <span id="mg-ord-round">第 1 / 2 回合</span>
+        <span id="mg-ord-coins">金幣：0</span>
+      </div>
+      <div id="mg-ord-msg" class="mg-status-line">請由小到大依序點完 6 個數字！</div>
+      <div class="mg-candy-grid" id="mg-ord-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-ord-grid");
+    const roundEl = container.querySelector("#mg-ord-round");
+    const coinsEl = container.querySelector("#mg-ord-coins");
+    const msgEl = container.querySelector("#mg-ord-msg");
+
+    function setupRound() {
+      roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
+      const set = new Set();
+      while (set.size < 6) set.add(1 + Math.floor(Math.random() * 99));
+      const sorted = Array.from(set).sort((a, b) => a - b);
+      const shuffled = [...sorted].sort(() => Math.random() - 0.5);
+      let nextIdx = 0;
+      grid.innerHTML = "";
+      shuffled.forEach((num) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mg-candy-btn";
+        btn.textContent = String(num);
+        btn.addEventListener("click", () => {
+          if (btn.classList.contains("cleared")) return;
+          if (num === sorted[nextIdx]) {
+            btn.classList.add("cleared");
+            nextIdx += 1;
+            totalCoins += 10;
+            coinsEl.textContent = `金幣：${totalCoins}`;
+            window.SoundFX.playCorrect(nextIdx);
+            if (nextIdx >= sorted.length) {
+              msgEl.textContent = `🎉 第 ${round} 回合完美排序！`;
+              round += 1;
+              if (round > totalRounds) {
+                nextTimer = setTimeout(() => {
+                  window.SoundFX.playFanfare(3);
+                  window.VisualFX.burstConfetti();
+                  if (onFinish) onFinish(totalCoins, "數字排排隊");
+                }, 650);
+              } else {
+                nextTimer = setTimeout(() => {
+                  msgEl.textContent = "第 2 回合！再從最小點到最大吧！";
+                  setupRound();
+                }, 650);
+              }
+            }
+          } else {
+            window.SoundFX.playWrong();
+            btn.classList.add("wrong-flash");
+            setTimeout(() => btn.classList.remove("wrong-flash"), 320);
+          }
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    setupRound();
+    activeCleanup = () => {
+      if (nextTimer) clearTimeout(nextTimer);
+    };
+  }
+
+  // ==================== 遊戲 17：⚡ 閃電反應王 ====================
+  function startReactionGame(container, onFinish) {
+    stopCurrentGame();
+    let round = 1;
+    const totalRounds = 3;
+    let totalCoins = 0;
+    let stateMode = "waiting"; // waiting | ready | cool
+    let readyAt = 0;
+    let waitTimer = null;
+    let nextTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>⚡ 閃電反應王（共 3 回合）</span>
+        <span id="mg-re-round">第 1 / 3 回合</span>
+        <span id="mg-re-coins">金幣：0</span>
+      </div>
+      <button type="button" id="mg-re-pad" class="mg-react-pad is-wait">
+        ⏳ 等待變綠色…不要偷跑喔！
+      </button>
+      <div id="mg-re-msg" class="mg-status-line">畫面一變成綠色就立刻點下去！越快金幣越多！</div>
+    `;
+
+    const pad = container.querySelector("#mg-re-pad");
+    const roundEl = container.querySelector("#mg-re-round");
+    const coinsEl = container.querySelector("#mg-re-coins");
+    const msgEl = container.querySelector("#mg-re-msg");
+
+    function armRound() {
+      stateMode = "waiting";
+      roundEl.textContent = `第 ${round} / ${totalRounds} 回合`;
+      pad.className = "mg-react-pad is-wait";
+      pad.textContent = "⏳ 專心準備…等變成抹茶綠再點！";
+      const delay = 1100 + Math.floor(Math.random() * 1700);
+      waitTimer = setTimeout(() => {
+        stateMode = "ready";
+        readyAt = performance.now();
+        pad.className = "mg-react-pad is-go";
+        pad.textContent = "⚡ 就是現在！快點我！";
+      }, delay);
+    }
+
+    pad.addEventListener("pointerdown", (ev) => {
+      ev.preventDefault();
+      if (stateMode === "cool") return;
+      if (stateMode === "waiting") {
+        clearTimeout(waitTimer);
+        window.SoundFX.playWrong();
+        msgEl.textContent = "😅 太早點囉！重新等一次變綠色吧～";
+        armRound();
+        return;
+      }
+      if (stateMode === "ready") {
+        stateMode = "cool";
+        const ms = Math.round(performance.now() - readyAt);
+        const gain = ms <= 360 ? 50 : ms <= 580 ? 35 : 20;
+        totalCoins += gain;
+        coinsEl.textContent = `金幣：${totalCoins}`;
+        pad.className = "mg-react-pad is-done";
+        pad.textContent = `⚡ ${ms} 毫秒！獲得 +${gain} 金幣！`;
+        msgEl.textContent = ms <= 360 ? "🚀 閃電神速！拿滿 +50 金幣！" : `👍 反應時間 ${ms} 毫秒，+ ${gain} 金幣！`;
+        window.SoundFX.playCorrect(round);
+
+        round += 1;
+        if (round > totalRounds) {
+          nextTimer = setTimeout(() => {
+            window.SoundFX.playFanfare(3);
+            window.VisualFX.burstConfetti();
+            if (onFinish) onFinish(totalCoins, "閃電反應王");
+          }, 850);
+        } else {
+          nextTimer = setTimeout(armRound, 900);
+        }
+      }
+    });
+
+    armRound();
+    activeCleanup = () => {
+      clearTimeout(waitTimer);
+      clearTimeout(nextTimer);
+    };
+  }
+
+  // ==================== 遊戲 18：🍎 果園採蘋果 ====================
+  function startAppleGame(container, onFinish) {
+    stopCurrentGame();
+    let timeLeft = 15;
+    let coins = 0;
+    let finished = false;
+    let popTimer = null;
+    let countTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🍎 果園採蘋果（採紅蘋果 +15、金星果 +35，避開毛毛蟲！）</span>
+        <span id="mg-app-time">剩餘 15 秒</span>
+        <span id="mg-app-coins">金幣：0</span>
+      </div>
+      <div class="mg-orchard-grid" id="mg-orchard-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-orchard-grid");
+    const timeEl = container.querySelector("#mg-app-time");
+    const coinsEl = container.querySelector("#mg-app-coins");
+
+    const spots = [];
+    for (let i = 0; i < 9; i++) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "mg-orchard-spot";
+      btn.textContent = "🌿";
+      btn.dataset.val = "0";
+      btn.addEventListener("pointerdown", (ev) => {
+        ev.preventDefault();
+        if (finished) return;
+        const v = Number(btn.dataset.val || 0);
+        if (v === 0) return;
+        coins = Math.max(0, coins + v);
+        coinsEl.textContent = `金幣：${coins}`;
+        if (v > 0) window.SoundFX.playCorrect(1);
+        else window.SoundFX.playWrong();
+        btn.dataset.val = "0";
+        btn.textContent = v > 0 ? "✨" : "💥";
+        btn.classList.remove("has-fruit");
+      });
+      grid.appendChild(btn);
+      spots.push(btn);
+    }
+
+    function refreshOrchard() {
+      if (finished) return;
+      spots.forEach((s) => {
+        s.dataset.val = "0";
+        s.textContent = "🌿";
+        s.classList.remove("has-fruit");
+      });
+      const count = 2 + Math.floor(Math.random() * 2);
+      const idxs = [0, 1, 2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5).slice(0, count);
+      idxs.forEach((idx) => {
+        const r = Math.random();
+        const spot = spots[idx];
+        spot.classList.add("has-fruit");
+        if (r < 0.58) {
+          spot.textContent = "🍎";
+          spot.dataset.val = "15";
+        } else if (r < 0.80) {
+          spot.textContent = "🌟";
+          spot.dataset.val = "35";
+        } else {
+          spot.textContent = "🐛";
+          spot.dataset.val = "-10";
+        }
+      });
+    }
+
+    refreshOrchard();
+    popTimer = setInterval(refreshOrchard, 950);
+    countTimer = setInterval(() => {
+      timeLeft -= 1;
+      timeEl.textContent = `剩餘 ${timeLeft} 秒`;
+      if (timeLeft <= 0) {
+        finished = true;
+        clearInterval(popTimer);
+        clearInterval(countTimer);
+        window.SoundFX.playFanfare(3);
+        window.VisualFX.burstConfetti();
+        if (onFinish) onFinish(Math.max(25, coins), "果園採蘋果");
+      }
+    }, 1000);
+
+    activeCleanup = () => {
+      finished = true;
+      clearInterval(popTimer);
+      clearInterval(countTimer);
+    };
+  }
+
+  // ==================== 遊戲 19：🔍 找找小動物 ====================
+  function startEmojiGame(container, onFinish) {
+    stopCurrentGame();
+    const PAIRS = [
+      ["🐱", "🦊"],
+      ["🐻", "🐼"],
+      ["🐸", "🐢"],
+      ["🐰", "🐹"],
+      ["🐶", "🐺"],
+      ["🐥", "🦆"],
+    ].sort(() => Math.random() - 0.5);
+    let round = 1;
+    const totalRounds = 3;
+    let totalCoins = 0;
+    let locked = false;
+    let nextTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🔍 找找小動物（共 3 題・找出唯一不一樣的動物！）</span>
+        <span id="mg-em-round">第 1 / 3 題</span>
+        <span id="mg-em-coins">金幣：0</span>
+      </div>
+      <div id="mg-em-msg" class="mg-status-line">裡面藏了 1 隻不一樣的小動物，快把牠點出來！</div>
+      <div class="mg-emoji-grid" id="mg-emoji-grid"></div>
+    `;
+
+    const grid = container.querySelector("#mg-emoji-grid");
+    const roundEl = container.querySelector("#mg-em-round");
+    const coinsEl = container.querySelector("#mg-em-coins");
+    const msgEl = container.querySelector("#mg-em-msg");
+
+    function renderRound() {
+      locked = false;
+      roundEl.textContent = `第 ${round} / ${totalRounds} 題`;
+      const [mainIcon, oddIcon] = PAIRS[(round - 1) % PAIRS.length];
+      const oddIdx = Math.floor(Math.random() * 16);
+      grid.innerHTML = "";
+      for (let i = 0; i < 16; i++) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "mg-emoji-cell";
+        btn.textContent = i === oddIdx ? oddIcon : mainIcon;
+        btn.addEventListener("click", () => {
+          if (locked) return;
+          if (i === oddIdx) {
+            locked = true;
+            btn.classList.add("found");
+            totalCoins += 45;
+            coinsEl.textContent = `金幣：${totalCoins}`;
+            msgEl.textContent = `🎉 眼力超強！找到小 ${oddIcon}，+45 金幣！`;
+            window.SoundFX.playCorrect(round);
+            round += 1;
+            if (round > totalRounds) {
+              nextTimer = setTimeout(() => {
+                window.SoundFX.playFanfare(3);
+                window.VisualFX.burstConfetti();
+                if (onFinish) onFinish(totalCoins, "找找小動物");
+              }, 700);
+            } else {
+              nextTimer = setTimeout(() => {
+                msgEl.textContent = `第 ${round} 題！哪一隻跟大家不一樣呢？`;
+                renderRound();
+              }, 700);
+            }
+          } else {
+            window.SoundFX.playWrong();
+            btn.classList.add("wrong-flash");
+            setTimeout(() => btn.classList.remove("wrong-flash"), 280);
+          }
+        });
+        grid.appendChild(btn);
+      }
+    }
+
+    renderRound();
+    activeCleanup = () => {
+      if (nextTimer) clearTimeout(nextTimer);
+    };
+  }
+
+  // ==================== 遊戲 20：🎈 氣球打氣王 ====================
+  function startBalloonGame(container, onFinish) {
+    stopCurrentGame();
+    let timeLeft = 10;
+    let pumps = 0;
+    const goal = 32;
+    let finished = false;
+    let countTimer = null;
+
+    container.innerHTML = `
+      <div class="mg-header-bar">
+        <span>🎈 氣球打氣王（10 秒內狂點打氣！）</span>
+        <span id="mg-bal-time">剩餘 10 秒</span>
+        <span id="mg-bal-cnt">打氣 0 / ${goal} 下</span>
+      </div>
+      <div class="mg-balloon-stage">
+        <div id="mg-balloon-orb" class="mg-balloon-orb">🎈</div>
+      </div>
+      <div style="text-align:center;">
+        <button type="button" class="btn btn-gold btn-lg" id="mg-pump-btn" style="min-width:210px;">💨 用力打氣！</button>
+      </div>
+    `;
+
+    const orb = container.querySelector("#mg-balloon-orb");
+    const timeEl = container.querySelector("#mg-bal-time");
+    const cntEl = container.querySelector("#mg-bal-cnt");
+    const pumpBtn = container.querySelector("#mg-pump-btn");
+
+    function finishBalloon(jackpot) {
+      if (finished) return;
+      finished = true;
+      clearInterval(countTimer);
+      const reward = jackpot ? 140 : Math.max(25, Math.round(pumps * 3.5));
+      orb.textContent = jackpot ? "🎊" : "🎈";
+      window.SoundFX.playFanfare(3);
+      window.VisualFX.burstConfetti();
+      setTimeout(() => {
+        if (onFinish) onFinish(reward, "氣球打氣王");
+      }, 450);
+    }
+
+    pumpBtn.addEventListener("pointerdown", (ev) => {
+      ev.preventDefault();
+      if (finished) return;
+      pumps += 1;
+      cntEl.textContent = `打氣 ${pumps} / ${goal} 下`;
+      const scale = 1 + (pumps / goal) * 1.45;
+      orb.style.transform = `scale(${scale.toFixed(2)})`;
+      window.SoundFX.playClick();
+      if (pumps >= goal) {
+        finishBalloon(true);
+      }
+    });
+
+    countTimer = setInterval(() => {
+      timeLeft -= 1;
+      timeEl.textContent = `剩餘 ${timeLeft} 秒`;
+      if (timeLeft <= 0) {
+        finishBalloon(false);
+      }
+    }, 1000);
+
+    activeCleanup = () => {
+      finished = true;
+      clearInterval(countTimer);
+    };
+  }
+
   window.MiniGames = {
     start(type, container, onFinish) {
       if (type === "catcher") return startCatcherGame(container, onFinish);
@@ -1230,6 +1875,14 @@
       if (type === "color") return startColorGame(container, onFinish);
       if (type === "simon") return startSimonGame(container, onFinish);
       if (type === "higher") return startHigherGame(container, onFinish);
+      if (type === "rps") return startRpsGame(container, onFinish);
+      if (type === "scratch") return startScratchGame(container, onFinish);
+      if (type === "slot") return startSlotGame(container, onFinish);
+      if (type === "order") return startOrderGame(container, onFinish);
+      if (type === "reaction") return startReactionGame(container, onFinish);
+      if (type === "apple") return startAppleGame(container, onFinish);
+      if (type === "emoji") return startEmojiGame(container, onFinish);
+      if (type === "balloon") return startBalloonGame(container, onFinish);
       return startWhackGame(container, onFinish);
     },
     stop: stopCurrentGame

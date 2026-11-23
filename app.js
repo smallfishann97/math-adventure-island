@@ -1324,7 +1324,7 @@
     quiz.giftUsed = false;
     document.getElementById("reward-gift-banner").classList.toggle("hidden", !passed);
     document.getElementById("gift-banner-title").textContent = "恭喜過關！獲得「過關小禮物」1 次！";
-    document.getElementById("gift-banner-desc").textContent = "【規則】每次過關只能從以下 12 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！";
+    document.getElementById("gift-banner-desc").textContent = "【規則】每次過關只能從以下 20 款小遊戲中「任選 1 款」玩一次，選好就出發賺金幣吧！";
     document.querySelectorAll("button[data-play-mg]").forEach((b) => {
       b.disabled = false;
       b.style.opacity = "";
