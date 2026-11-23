@@ -440,11 +440,17 @@
     if (!stageEl) return;
 
     const sp = PET_SPECIES[user.pet.species] || PET_SPECIES.shiba;
+    if ((user.pet.xp || 0) > 100) user.pet.xp = 100;
     const st = getPetStage(user.pet.xp || 0);
     const sleeping = Boolean(user.pet.sleeping);
+    const isMax = (user.pet.xp || 0) >= 100;
     stageEl.innerHTML = renderPetSvg(user.pet.species, st.lv, sleeping);
     if (nameEl) nameEl.textContent = `${sp.name}${sleeping ? "（💤 熟睡中）" : ""}`;
-    if (levelEl) levelEl.textContent = `Lv.${st.lv} ${st.title}（成長值 ${user.pet.xp} / ${st.nextXp}）`;
+    if (levelEl) {
+      levelEl.textContent = isMax
+        ? `Lv.${st.lv} ${st.title}（成長值 100 / 100・MAX 滿級！）`
+        : `Lv.${st.lv} ${st.title}（成長值 ${user.pet.xp || 0} / ${st.nextXp}）`;
+    }
     if (xpBar) xpBar.style.width = `${Math.min(100, Math.round(((user.pet.xp || 0) / st.nextXp) * 100))}%`;
     if (cookieEl) cookieEl.textContent = String(user.pet.cookies || 0);
     if (sleepBtn) sleepBtn.textContent = sleeping ? "☀️ 叫醒小夥伴" : "😴 哄牠睡覺";
@@ -1126,6 +1132,16 @@
         const user = ensureSuperState(api.getUser());
         if (!user) return;
         const speech = document.getElementById("pet-speech-bubble");
+        if ((user.pet.xp || 0) >= 100) {
+          user.pet.xp = 100;
+          window.SoundFX && window.SoundFX.playFanfare(2);
+          if (speech) {
+            speech.dataset.custom = "1";
+            speech.textContent = "👑 我已經長到最高滿級 100 / 100 (MAX) 囉！不用再扣餅乾，按「🎾 陪牠玩耍」跟我玩吧！";
+          }
+          renderPetPanel();
+          return;
+        }
         if ((user.pet.cookies || 0) <= 0) {
           window.SoundFX && window.SoundFX.playWrong();
           if (speech) {
@@ -1137,7 +1153,7 @@
         const prevLv = getPetStage(user.pet.xp || 0).lv;
         user.pet.sleeping = false;
         user.pet.cookies -= 1;
-        user.pet.xp = (user.pet.xp || 0) + 6;
+        user.pet.xp = Math.min(100, (user.pet.xp || 0) + 6);
         const nextLv = getPetStage(user.pet.xp).lv;
         api.saveStore();
         if (nextLv > prevLv) {
@@ -1382,8 +1398,15 @@
       if (!users.length) {
         profBox.innerHTML = `<p style="text-align:center;color:var(--muted);font-weight:800;padding:10px;">目前尚未建立任何冒險者角色。</p>`;
       } else {
-        profBox.innerHTML = users
+        const curUser = api ? api.getUser() : null;
+        const curId = curUser ? curUser.id : null;
+        const sortedUsers = [...users].sort((a, b) => (a.id === curId ? -1 : b.id === curId ? 1 : 0));
+        profBox.innerHTML = sortedUsers
           .map((u) => {
+            const isOnlineNow = curId && u.id === curId;
+            const onlineBadge = isOnlineNow
+              ? `<span class="ver-tag" style="background:#d8f5e2;border:1.5px solid #48a363;color:#1e6b36;margin-left:6px;padding:2px 9px;font-size:0.76rem;">🟢 目前在線中</span>`
+              : "";
             const cleared = Object.values(u.stageStars || {}).filter((s) => s > 0).length;
             const stars = Object.values(u.stageStars || {}).reduce((a, b) => a + b, 0);
             const hist = u.history || [];
@@ -1393,8 +1416,8 @@
             const petXp = (u.pet && u.pet.xp) || 0;
             const petLv = getPetStage(petXp).lv;
             return `
-              <div class="exam-rev-row ok" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-                <strong>🧑‍🎓 ${esc(u.name)}</strong>
+              <div class="exam-rev-row ok" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;${isOnlineNow ? "background:#f2fcf5;border-color:#5bb876;" : ""}">
+                <strong>🧑‍🎓 ${esc(u.name)}${onlineBadge}</strong>
                 <span>通關：<b>${cleared}/160</b> ｜ ⭐ <b>${stars}</b> ｜ 🪙 <b>${u.coins || 0}</b> ｜ 作答：<b>${totalQ}題 (${acc}%)</b> ｜ 錯題：<b>${(u.mistakes || []).length}</b> ｜ 寵物：<b>Lv.${petLv}</b></span>
               </div>`;
           })
@@ -1461,12 +1484,24 @@
       listEl.innerHTML = `<p style="text-align:center;color:var(--muted);font-weight:800;padding:12px;">目前尚無新的意見回饋留言。</p>`;
       return;
     }
-    listEl.innerHTML = items.map((it) => `
-      <div class="exam-rev-row ok">
-        <strong>【${esc(it.category)}】來自：${esc(it.sender)} <span style="font-weight:700;color:var(--muted);font-size:0.78rem;">（${esc(it.date)}${it.replyTo ? ` ｜ 回覆方式：${esc(it.replyTo)}` : ""}）</span></strong>
-        <p style="margin:6px 0 0;white-space:pre-wrap;">${esc(it.message)}</p>
+    listEl.innerHTML = items.map((it, idx) => `
+      <div class="exam-rev-row ok" style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div>
+          <strong>【${esc(it.category)}】來自：${esc(it.sender)} <span style="font-weight:700;color:var(--muted);font-size:0.78rem;">（${esc(it.date)}${it.replyTo ? ` ｜ 回覆方式：${esc(it.replyTo)}` : ""}）</span></strong>
+          <p style="margin:6px 0 0;white-space:pre-wrap;">${esc(it.message)}</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" data-del-fb="${idx}" title="刪除此則留言">✕</button>
       </div>
     `).join("");
+
+    listEl.querySelectorAll("button[data-del-fb]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.delFb);
+        items.splice(i, 1);
+        localStorage.setItem("mai_site_feedback_inbox", JSON.stringify(items));
+        renderAdminFeedbackList();
+      });
+    });
   }
 
   async function bumpGlobalMemberCount(times = 1) {
@@ -1486,16 +1521,39 @@
   }
 
   async function initSiteCounters() {
-    // 0. 公開線上人數（結合時段活躍基準與本機分頁心跳）
-    const hour = new Date().getHours();
-    const peakBase = (hour >= 16 && hour <= 22) ? 3 : (hour >= 8 && hour <= 15) ? 2 : 1;
-    onlineCount = peakBase + (Math.floor(Date.now() / 45000) % 2);
+    // 0. 公開線上人數（真實統計目前開啟中的活躍連線／分頁數，1 人在線就顯示 1 人，絕不超過累計拜訪人次）
+    const tabId = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+    function pulseOnlinePresence() {
+      try {
+        const now = Date.now();
+        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
+        raw[tabId] = now;
+        Object.keys(raw).forEach((k) => {
+          if (now - raw[k] > 12000) delete raw[k];
+        });
+        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
+        const activeCnt = Math.max(1, Object.keys(raw).length);
+        const maxAllowed = Math.max(1, cachedVisits);
+        onlineCount = Math.min(activeCnt, maxAllowed);
+      } catch (_) {
+        onlineCount = 1;
+      }
+    }
+    pulseOnlinePresence();
+    window.addEventListener("beforeunload", () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
+        delete raw[tabId];
+        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
+      } catch (_) {}
+    });
     renderCounterDOM();
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
       const curSec = Math.max(1, Math.floor((Date.now() - sessionStartMs) / 1000));
       localStorage.setItem("mai_total_stay_sec", String(priorTotalStaySec + curSec));
+      pulseOnlinePresence();
       renderCounterDOM();
     }, 1000);
 
@@ -1787,6 +1845,63 @@
         renderAdminExtraAnalytics();
         window.SoundFX && window.SoundFX.playClick();
         showAdminToolToast(`↺ 已將「${u.name}」的星星、金幣與寵物進度恢復為初始歸零狀態！`);
+      });
+    }
+
+    // 匯出站長後台完整資料（意見回饋留言＋所有冒險者成績＋網站人氣統計 CSV，支援 Excel 直接開）
+    const btnExportCsv = document.getElementById("admin-btn-export-csv");
+    if (btnExportCsv) {
+      btnExportCsv.addEventListener("click", () => {
+        const csvCell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+        const rows = [];
+        rows.push(["【數學遊戲冒險島・站長專屬數據與意見回饋匯出報表】", `匯出時間：${new Date().toLocaleString("zh-TW", { hour12: false })}`]);
+        rows.push(["累計拜訪人次", cachedVisits, "已建立冒險者總數", Math.max(getLocalMemberIds().length, cachedMembers, 1), "目前線上人數", onlineCount]);
+        rows.push([]);
+        rows.push(["=== 一、站內「聯絡我們」意見回饋留言 ==="]);
+        rows.push(["留言時間", "回饋類別", "稱呼", "回覆聯絡方式", "留言內容"]);
+        let fbs = [];
+        try {
+          fbs = JSON.parse(localStorage.getItem("mai_site_feedback_inbox") || "[]");
+        } catch (_) {}
+        if (!fbs.length) {
+          rows.push(["(尚無留言)"]);
+        } else {
+          fbs.forEach((f) => rows.push([f.date, f.category, f.sender, f.replyTo || "", f.message]));
+        }
+        rows.push([]);
+        rows.push(["=== 二、本機所有冒險者成績總覽 ==="]);
+        rows.push(["角色名稱", "已通關數(/160)", "累計星星", "金幣", "總作答題數", "平均正確率(%)", "待複習錯題數", "電子寵物等級", "寵物成長值"]);
+        try {
+          const raw = JSON.parse(localStorage.getItem("grade3_math_luxury_store_v1") || "{}");
+          Object.values(raw.users || {}).forEach((u) => {
+            const cleared = Object.values(u.stageStars || {}).filter((s) => s > 0).length;
+            const stars = Object.values(u.stageStars || {}).reduce((a, b) => a + b, 0);
+            const hist = u.history || [];
+            const tq = hist.reduce((s, h) => s + (h.total || 0), 0);
+            const oq = hist.reduce((s, h) => s + (h.correct || 0), 0);
+            const acc = tq > 0 ? Math.round((oq / tq) * 100) : 0;
+            const pxp = Math.min(100, (u.pet && u.pet.xp) || 0);
+            const plv = getPetStage(pxp).lv;
+            rows.push([u.name, cleared, stars, u.coins || 0, tq, acc, (u.mistakes || []).length, `Lv.${plv}`, `${pxp}/100`]);
+          });
+        } catch (_) {}
+
+        const csvContent = "\uFEFF" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `數學遊戲冒險島-站長後台與留言報表-${todayStr()}.csv`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      });
+    }
+
+    const btnClearFb = document.getElementById("admin-btn-clear-feedback");
+    if (btnClearFb) {
+      btnClearFb.addEventListener("click", () => {
+        localStorage.setItem("mai_site_feedback_inbox", "[]");
+        renderAdminFeedbackList();
       });
     }
 

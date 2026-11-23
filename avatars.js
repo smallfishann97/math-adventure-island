@@ -203,6 +203,125 @@
           <ellipse cx="50" cy="63" rx="4.8" ry="3.2" fill="#463E3B" />
           <path d="M 43 70 Q 50 75 50 67 Q 50 75 57 70" fill="none" stroke="#463E3B" stroke-width="2.5" stroke-linecap="round" />
         </svg>`
+    },
+    {
+      id: "fox",
+      name: "焦糖狐狸",
+      svg: `
+        <svg viewBox="0 0 100 100" class="avatar-svg" role="img" aria-label="原創焦糖狐狸頭像">
+          <circle cx="50" cy="50" r="48" fill="#FFEFE2" />
+          <!-- 大尖耳 -->
+          <polygon points="18,44 14,12 44,28" fill="#EE7F4B" stroke="#5A3826" stroke-width="3" stroke-linejoin="round" />
+          <polygon points="21,36 18,18 36,28" fill="#5A3826" />
+          <polygon points="82,44 86,12 56,28" fill="#EE7F4B" stroke="#5A3826" stroke-width="3" stroke-linejoin="round" />
+          <polygon points="79,36 82,18 64,28" fill="#5A3826" />
+          <!-- 狐狸臉 -->
+          <ellipse cx="50" cy="58" rx="35" ry="29" fill="#F28A54" stroke="#5A3826" stroke-width="3" />
+          <!-- 奶油雙頰絨毛 -->
+          <path d="M 16 60 Q 34 46 50 62 Q 66 46 84 60 C 80 78 66 86 50 86 C 34 86 20 78 16 60 Z" fill="#FFFDF8" />
+          <!-- 亮眼 -->
+          <circle cx="36" cy="55" r="4.8" fill="#422B1D" />
+          <circle cx="34.5" cy="53.2" r="1.8" fill="#FFFFFF" />
+          <circle cx="64" cy="55" r="4.8" fill="#422B1D" />
+          <circle cx="62.5" cy="53.2" r="1.8" fill="#FFFFFF" />
+          <!-- 腮紅 -->
+          <ellipse cx="26" cy="64" rx="5.8" ry="3.6" fill="#FF948A" opacity="0.72" />
+          <ellipse cx="74" cy="64" rx="5.8" ry="3.6" fill="#FF948A" opacity="0.72" />
+          <!-- 鼻與微笑 -->
+          <ellipse cx="50" cy="63" rx="4.4" ry="3.2" fill="#422B1D" />
+          <path d="M 43 70 Q 50 75 50 67 Q 50 75 57 70" fill="none" stroke="#422B1D" stroke-width="2.5" stroke-linecap="round" />
+        </svg>`
+    },
+    {
+      id: "koala",
+      name: "呆萌無尾熊",
+      svg: `
+        <svg viewBox="0 0 100 100" class="avatar-svg" role="img" aria-label="原創呆萌無尾熊頭像">
+          <circle cx="50" cy="50" r="48" fill="#F2ECF9" />
+          <!-- 蓬鬆大圓耳 -->
+          <circle cx="20" cy="36" r="16" fill="#9E948E" stroke="#574B45" stroke-width="3" />
+          <circle cx="20" cy="36" r="9" fill="#FFF5EE" />
+          <circle cx="80" cy="36" r="16" fill="#9E948E" stroke="#574B45" stroke-width="3" />
+          <circle cx="80" cy="36" r="9" fill="#FFF5EE" />
+          <!-- 圓臉 -->
+          <ellipse cx="50" cy="58" rx="33" ry="29" fill="#B5ABA4" stroke="#574B45" stroke-width="3" />
+          <!-- 頭頂尤加利葉 -->
+          <path d="M 50 28 Q 62 15 72 22 Q 60 32 50 28 Z" fill="#67B882" stroke="#357A4D" stroke-width="2" />
+          <!-- 亮眼 -->
+          <circle cx="36" cy="55" r="4.8" fill="#3E332E" />
+          <circle cx="34.5" cy="53.3" r="1.7" fill="#FFFFFF" />
+          <circle cx="64" cy="55" r="4.8" fill="#3E332E" />
+          <circle cx="62.5" cy="53.3" r="1.7" fill="#FFFFFF" />
+          <!-- 腮紅 -->
+          <ellipse cx="27" cy="65" rx="6" ry="3.8" fill="#FF9AA8" opacity="0.72" />
+          <ellipse cx="73" cy="65" rx="6" ry="3.8" fill="#FF9AA8" opacity="0.72" />
+          <!-- 招牌大橢圓黑鼻與微笑 -->
+          <ellipse cx="50" cy="61" rx="6.5" ry="8.5" fill="#4A3F3A" />
+          <ellipse cx="48" cy="58" rx="2" ry="2.8" fill="#8C7E78" />
+          <path d="M 44 73 Q 50 78 56 73" fill="none" stroke="#4A3F3A" stroke-width="2.5" stroke-linecap="round" />
+        </svg>`
+    },
+    {
+      id: "dino",
+      name: "抹茶小恐龍",
+      svg: `
+        <svg viewBox="0 0 100 100" class="avatar-svg" role="img" aria-label="原創抹茶小恐龍頭像">
+          <circle cx="50" cy="50" r="48" fill="#EAF9EC" />
+          <!-- 頭頂可愛金黃小角棘 -->
+          <polygon points="43,28 50,12 57,28" fill="#FFD35C" stroke="#5A4031" stroke-width="2.6" stroke-linejoin="round" />
+          <polygon points="27,34 30,20 39,30" fill="#FFA85C" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round" />
+          <polygon points="73,34 70,20 61,30" fill="#FFA85C" stroke="#5A4031" stroke-width="2.4" stroke-linejoin="round" />
+          <!-- 圓臉 -->
+          <ellipse cx="50" cy="58" rx="34" ry="29" fill="#86CF8C" stroke="#436B47" stroke-width="3" />
+          <!-- 淺奶油下巴 -->
+          <path d="M 24 66 Q 50 58 76 66 C 72 80 62 86 50 86 C 38 86 28 80 24 66 Z" fill="#F4FCEB" />
+          <!-- 臉頰斑點 -->
+          <circle cx="30" cy="46" r="3.5" fill="#5BB364" opacity="0.65" />
+          <circle cx="70" cy="46" r="4" fill="#5BB364" opacity="0.65" />
+          <!-- 大眼 -->
+          <circle cx="37" cy="55" r="5" fill="#3B2D23" />
+          <circle cx="35.5" cy="53.2" r="1.8" fill="#FFFFFF" />
+          <circle cx="63" cy="55" r="5" fill="#3B2D23" />
+          <circle cx="61.5" cy="53.2" r="1.8" fill="#FFFFFF" />
+          <!-- 腮紅 -->
+          <ellipse cx="27" cy="63" rx="6" ry="3.6" fill="#FF968E" opacity="0.72" />
+          <ellipse cx="73" cy="63" rx="6" ry="3.6" fill="#FF968E" opacity="0.72" />
+          <!-- 小鼻孔與微笑小尖牙 -->
+          <circle cx="46" cy="61" r="1.8" fill="#3D6B42" />
+          <circle cx="54" cy="61" r="1.8" fill="#3D6B42" />
+          <path d="M 41 69 Q 50 76 59 69" fill="none" stroke="#3B2D23" stroke-width="2.6" stroke-linecap="round" />
+        </svg>`
+    },
+    {
+      id: "hamster",
+      name: "葵花小倉鼠",
+      svg: `
+        <svg viewBox="0 0 100 100" class="avatar-svg" role="img" aria-label="原創葵花小倉鼠頭像">
+          <circle cx="50" cy="50" r="48" fill="#FFF4E4" />
+          <!-- 小圓耳 -->
+          <circle cx="25" cy="30" r="11" fill="#F2B872" stroke="#6B4828" stroke-width="3" />
+          <circle cx="25" cy="30" r="5.5" fill="#FFB6B9" />
+          <circle cx="75" cy="30" r="11" fill="#F2B872" stroke="#6B4828" stroke-width="3" />
+          <circle cx="75" cy="30" r="5.5" fill="#FFB6B9" />
+          <!-- 鼓鼓雙頰大圓臉 -->
+          <path d="M 16 62 C 14 40, 30 28, 50 28 C 70 28, 86 40, 84 62 C 86 78, 70 86, 50 86 C 30 86, 14 78, 16 62 Z" fill="#F6C78A" stroke="#6B4828" stroke-width="3" />
+          <!-- 雪白胖臉頰與肚肚 -->
+          <path d="M 18 64 C 18 52, 34 52, 50 60 C 66 52, 82 52, 82 64 C 82 78, 68 85, 50 85 C 32 85, 18 78, 18 64 Z" fill="#FFFDF9" />
+          <!-- 頭頂小葵花籽 -->
+          <ellipse cx="50" cy="24" rx="4.5" ry="7" fill="#5A4031" stroke="#FFFDF9" stroke-width="1.2" />
+          <line x1="50" y1="18" x2="50" y2="30" stroke="#E8D3B9" stroke-width="1.4" />
+          <!-- 水汪汪大眼 -->
+          <circle cx="37" cy="53" r="5" fill="#422B1A" />
+          <circle cx="35.5" cy="51.2" r="1.8" fill="#FFFFFF" />
+          <circle cx="63" cy="53" r="5" fill="#422B1A" />
+          <circle cx="61.5" cy="51.2" r="1.8" fill="#FFFFFF" />
+          <!-- 鼓鼓腮紅 -->
+          <ellipse cx="26" cy="64" rx="7" ry="4.5" fill="#FF969A" opacity="0.75" />
+          <ellipse cx="74" cy="64" rx="7" ry="4.5" fill="#FF969A" opacity="0.75" />
+          <!-- 粉紅小鼻與小門牙微笑 -->
+          <ellipse cx="50" cy="60" rx="3.5" ry="2.5" fill="#F07878" />
+          <path d="M 43 66 Q 50 72 57 66" fill="none" stroke="#6B4828" stroke-width="2.4" stroke-linecap="round" />
+        </svg>`
     }
   ];
 

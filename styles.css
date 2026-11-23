@@ -5046,18 +5046,18 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: linear-gradient(180deg, #fffdf7, #fff1cf);
-  border: 2px solid #e4af4d;
+  background: linear-gradient(180deg, #fffafa, #fde8ec);
+  border: 2px solid #e39ca8;
   border-radius: 999px;
   padding: 5px 14px;
   font-size: 0.84rem;
   font-weight: 800;
   color: #5a4031;
-  box-shadow: 0 2px 0 rgba(217, 155, 50, 0.35);
+  box-shadow: 0 2px 0 rgba(214, 134, 149, 0.32);
 }
 
 .site-counter-pill strong {
-  color: #c86218;
+  color: #c24b62;
   font-size: 0.96rem;
   font-weight: 900;
 }
