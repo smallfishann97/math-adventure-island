@@ -3999,6 +3999,41 @@ html, body {
   cursor: pointer;
 }
 
+/* ==================== 醒目立體「自由選關模式」開關 ==================== */
+.unlock-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff3c4, #ffe08a);
+  border: 2.5px solid #df9624;
+  color: #5a3812;
+  font-size: 0.92rem;
+  font-weight: 900;
+  box-shadow: 0 4px 0 #c97f14;
+  cursor: pointer;
+  transition: transform 0.14s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.unlock-toggle:hover {
+  transform: translateY(-2px);
+}
+
+.unlock-toggle input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  accent-color: #2f7a50;
+  cursor: pointer;
+}
+
+.unlock-toggle:has(input:checked) {
+  background: linear-gradient(135deg, #52b079, #3c9462);
+  border-color: #2c734b;
+  color: #fffdf9;
+  box-shadow: 0 4px 0 #235d3c;
+}
+
 @media (max-width: 768px) {
   .archipelago-bar {
     padding: 8px 10px;

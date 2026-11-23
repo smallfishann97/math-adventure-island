@@ -480,10 +480,19 @@
     const customPropsHtml = window.MathExtras
       ? window.MathExtras.getPlacedIslandPropsHtml(user, state.decorateMode ? state.pickedDecorId : null, isl.id)
       : "";
+    const isMovableFixedIsland = isl.id === "town" || isl.id === "kingdom";
     const propsHtml =
       props
-        .map((p) => {
+        .map((p, idx) => {
           const iconHtml = window.MathIcons ? window.MathIcons.renderIcon(p.svgId, "svg-prop-icon") : "";
+          if (isMovableFixedIsland) {
+            const fixedKey = `fixed_${isl.id}_${idx}`;
+            const saved = user.customPositions && user.customPositions[fixedKey];
+            const px = saved ? saved.x : p.x;
+            const py = saved ? saved.y : p.y;
+            const selCls = state.decorateMode && state.pickedDecorId === fixedKey ? "is-picked" : "";
+            return `<div class="island-prop custom-prop ${selCls}" data-custom-prop="${fixedKey}" style="left:${px}px;top:${py}px;" title="佈置模式可點我自由移動位置"><span class="prop-emoji ${p.cls}">${iconHtml}</span></div>`;
+          }
           return `<div class="island-prop" style="left:${p.x}px;top:${p.y}px;"><span class="prop-emoji ${p.cls}">${iconHtml}</span></div>`;
         })
         .join("") + customPropsHtml;
@@ -1773,7 +1782,7 @@
         if (plane && state.pickedDecorId) {
           const x = Math.max(60, Math.min(860, Math.round(ev.offsetX)));
           const y = Math.max(70, Math.min(445, Math.round(ev.offsetY)));
-          if (!user.placedItems.includes(state.pickedDecorId)) {
+          if (!state.pickedDecorId.startsWith("fixed_") && !user.placedItems.includes(state.pickedDecorId)) {
             user.placedItems.push(state.pickedDecorId);
           }
           user.customPositions[state.pickedDecorId] = {
@@ -1866,17 +1875,28 @@
         .map((id) => window.MathExtras.SHOP_ITEMS.find((it) => it.id === id))
         .filter(Boolean);
 
-      if (owned.length === 0) {
-        tray.innerHTML = `<span style="font-size:0.86rem;color:var(--muted);font-weight:800;">你還沒有購買裝飾品喔！快去「🛍️ 商店徽章」用閃亮金幣買裝飾或 Q 版小人物吧！</span>`;
+      const curIsl = ISLANDS_CONFIG[state.currentIsland || "main"] || ISLANDS_CONFIG.main;
+      const isFixedPicked = state.pickedDecorId && state.pickedDecorId.startsWith("fixed_");
+
+      if (owned.length === 0 && !isFixedPicked) {
+        if (curIsl.id === "town" || curIsl.id === "kingdom") {
+          if (hint) hint.textContent = `✨ 在「${curIsl.title}」可以直接點選島上任何小屋、城堡或景觀自由移動（點「↺ 恢復預設位置」可一鍵歸位）！`;
+          tray.innerHTML = `<span style="font-size:0.86rem;color:var(--muted);font-weight:800;">點島上任意景觀就能拿起移動！也可以去「🛍️ 商店徽章」買更多裝飾與 Q 版小人物！</span>`;
+        } else {
+          tray.innerHTML = `<span style="font-size:0.86rem;color:var(--muted);font-weight:800;">你還沒有購買裝飾品喔！快去「🛍️ 商店徽章」用閃亮金幣買裝飾或 Q 版小人物吧！</span>`;
+        }
         return;
       }
-      if (!state.pickedDecorId || !user.ownedItems.includes(state.pickedDecorId)) {
-        state.pickedDecorId = owned[0].id;
+      if (!isFixedPicked && (!state.pickedDecorId || !user.ownedItems.includes(state.pickedDecorId))) {
+        state.pickedDecorId = owned.length ? owned[0].id : null;
       }
       const pickedObj = owned.find((o) => o.id === state.pickedDecorId);
-      const curIsl = ISLANDS_CONFIG[state.currentIsland || "main"] || ISLANDS_CONFIG.main;
-      if (hint && pickedObj) {
-        hint.textContent = `✨ 目前在「${curIsl.title}」・已拿起「${pickedObj.name}」：直接點擊島上任何空地即可放下！`;
+      if (hint) {
+        if (isFixedPicked) {
+          hint.textContent = `✨ 已拿起「${curIsl.title}」的島上景觀：請直接點擊島上任何你想搬過去的位置！（點「↺ 恢復預設位置」可一鍵歸位）`;
+        } else if (pickedObj) {
+          hint.textContent = `✨ 目前在「${curIsl.title}」・已拿起「${pickedObj.name}」：直接點擊島上任何空地即可放下！`;
+        }
       }
       tray.innerHTML = owned
         .map((it) => {
