@@ -989,18 +989,15 @@
         if (!user) return;
         const sp = PET_SPECIES[user.pet.species] || PET_SPECIES.shiba;
         const line = sp.quotes[Math.floor(Math.random() * sp.quotes.length)];
-        user.pet.xp = (user.pet.xp || 0) + 2;
-        api.saveStore();
         window.SoundFX && window.SoundFX.playCorrect(1);
         const speech = document.getElementById("pet-speech-bubble");
         if (speech) {
           speech.dataset.custom = "1";
-          speech.textContent = line;
+          speech.textContent = `${line}（餵我吃🍪餅乾才會長大進化喔！）`;
         }
         if (window.SpeechFX && window.SoundFX && window.SoundFX.enabled) {
           window.SpeechFX.speak(line);
         }
-        renderPetPanel();
       });
     }
 
