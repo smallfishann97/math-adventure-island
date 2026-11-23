@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261123w" />
+  <link rel="stylesheet" href="styles.css?v=20261124d" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -39,6 +39,7 @@
       <div class="site-counter-bar" aria-label="網站人氣統計">
         <span class="site-counter-pill">👣 累計拜訪人次：<strong data-site-visits>1</strong></span>
         <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上：<strong data-site-online>1</strong> 人</span>
+        <button type="button" class="site-counter-pill lb-open-pill" data-open-leaderboard>🏆 冒險者榮譽排行榜</button>
       </div>
 
       <div id="existing-profiles-wrap" class="profiles-section hidden">
@@ -80,6 +81,7 @@
             🐾 寵物任務
             <span class="badge-count hidden" id="pet-quest-badge">0</span>
           </button>
+          <button class="nav-pill" id="nav-leaderboard" type="button" data-open-leaderboard>🏆 榮譽排行榜</button>
           <button class="nav-pill" id="nav-original" type="button">✨ 原創挑戰區</button>
           <button class="nav-pill" id="nav-arcade" type="button">⚡ 閃電與PK</button>
           <button class="nav-pill" id="nav-shop" type="button">🛍️ 商店徽章</button>
@@ -903,6 +905,7 @@
       <div class="site-counter-bar footer-counter-bar" aria-label="網站人氣統計">
         <span class="site-counter-pill">👣 累計拜訪人次：<strong data-site-visits>1</strong></span>
         <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上：<strong data-site-online>1</strong> 人</span>
+        <button type="button" class="site-counter-pill lb-open-pill" data-open-leaderboard>🏆 冒險者榮譽排行榜</button>
       </div>
       <p class="footer-brand">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
       <p class="footer-copy" id="footer-secret-trigger" title="Copyright © 2026 Ann Lu">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
@@ -1333,6 +1336,32 @@
     </div>
   </div>
 
+  <!-- 🏆 公開冒險者榮譽排行榜彈窗（登入頁、頂部導覽列與頁尾皆可公開開啟查看） -->
+  <div id="leaderboard-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lb-modal-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <div>
+          <h3 id="lb-modal-title">🏆 數學遊戲冒險島・公開冒險者榮譽排行榜</h3>
+          <p style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">凡於本站建立冒險者身分並闖關練習，皆會自動榮登公開英雄榜！</p>
+        </div>
+      </div>
+
+      <div class="review-filter" id="lb-sort-tabs" style="margin-bottom:14px;justify-content:center;flex-wrap:wrap;">
+        <button type="button" class="filter-chip active" data-lb-sort="stars">⭐ 總星光闖關榜</button>
+        <button type="button" class="filter-chip" data-lb-sort="coins">🪙 金幣富豪榜</button>
+        <button type="button" class="filter-chip" data-lb-sort="accuracy">🎯 答題神準學霸榜</button>
+        <button type="button" class="filter-chip" data-lb-sort="pets">🐾 寵物養成大師榜</button>
+      </div>
+
+      <div id="leaderboard-podium" class="lb-podium-grid"></div>
+      <div id="leaderboard-list" class="lb-list-wrap"></div>
+
+      <div class="legal-footer-actions" style="margin-top:14px;">
+        <button type="button" class="btn btn-gold btn-lg" id="btn-close-leaderboard">✨ 繼續闖關衝榜！</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
@@ -1344,7 +1373,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261124c"></script>
+  <script src="super-features.js?v=20261124d"></script>
   <script src="app.js?v=20261123t"></script>
 </body>
 </html>

@@ -2153,6 +2153,156 @@
         setTimeout(() => openAdminModal(true), 500);
       }
     } catch (_) {}
+
+    // 7. 🏆 公開冒險者榮譽排行榜（登入頁、頂部導覽列與頁尾皆可公開開啟）
+    const lbModal = document.getElementById("leaderboard-modal");
+    const btnCloseLb = document.getElementById("btn-close-leaderboard");
+    const lbTabs = document.getElementById("lb-sort-tabs");
+    let currentLbSort = "stars";
+
+    function getTitleByStars(stars, cleared) {
+      if (cleared >= 160) return "👑 傳說大滿貫島主";
+      if (stars >= 120) return "🎓 冒險島數學大博士";
+      if (stars >= 60) return "🌟 皇冠天空探險王";
+      if (stars >= 30) return "🏘️ 職人小鎮開拓者";
+      if (stars >= 10) return "🧭 勇敢航海小達人";
+      return "🌱 新星見習冒險家";
+    }
+
+    function renderPublicLeaderboard() {
+      const podiumEl = document.getElementById("leaderboard-podium");
+      const listEl = document.getElementById("leaderboard-list");
+      if (!podiumEl || !listEl) return;
+
+      let usersMap = {};
+      let activeUid = null;
+      try {
+        const raw = localStorage.getItem("grade3_math_luxury_store_v1");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          usersMap = (parsed && parsed.users) || {};
+          activeUid = parsed && parsed.activeUserId;
+        }
+      } catch (_) {}
+
+      const entries = Object.values(usersMap).map((u) => {
+        const cleared = Object.values(u.stageStars || {}).filter((s) => s > 0).length;
+        const stars = Object.values(u.stageStars || {}).reduce((a, b) => a + b, 0);
+        const coins = u.coins || 0;
+        const ownedCnt = (u.ownedItems || []).length;
+        const hist = u.history || [];
+        const totalQ = hist.reduce((s, h) => s + (h.total || 0), 0);
+        const okQ = hist.reduce((s, h) => s + (h.correct || 0), 0);
+        const acc = totalQ > 0 ? Math.round((okQ / totalQ) * 100) : 0;
+        let petTotalXp = 0;
+        if (u.pet && u.pet.xpMap) {
+          petTotalXp = Object.values(u.pet.xpMap).reduce((a, b) => a + Math.min(100, Number(b) || 0), 0);
+        } else if (u.pet && u.pet.xp) {
+          petTotalXp = Math.min(100, Number(u.pet.xp) || 0);
+        }
+        return {
+          id: u.id,
+          name: u.name || "冒險者",
+          avatar: u.avatar || "shiba",
+          cleared,
+          stars,
+          coins,
+          ownedCnt,
+          totalQ,
+          okQ,
+          acc,
+          petTotalXp,
+          title: getTitleByStars(stars, cleared),
+          isMe: Boolean(activeUid && u.id === activeUid),
+        };
+      });
+
+      if (!entries.length) {
+        podiumEl.innerHTML = "";
+        listEl.innerHTML = `<p style="text-align:center;color:var(--muted);font-weight:800;padding:24px;">目前尚未建立冒險者身分，快回登入頁建立第一個冒險者搶下冠軍寶座吧！</p>`;
+        return;
+      }
+
+      entries.sort((a, b) => {
+        if (currentLbSort === "coins") return b.coins - a.coins || b.ownedCnt - a.ownedCnt || b.stars - a.stars;
+        if (currentLbSort === "accuracy") return b.okQ - a.okQ || b.acc - a.acc || b.stars - a.stars;
+        if (currentLbSort === "pets") return b.petTotalXp - a.petTotalXp || b.stars - a.stars;
+        return b.stars - a.stars || b.cleared - a.cleared || b.coins - a.coins;
+      });
+
+      const medals = ["🥇 冠軍", "🥈 亞軍", "🥉 季軍"];
+      const top3 = entries.slice(0, 3);
+      podiumEl.innerHTML = top3
+        .map((e, i) => {
+          const avHtml = window.AvatarArt ? window.AvatarArt.render(e.avatar, "avatar-md") : "🦊";
+          const mainMetric =
+            currentLbSort === "coins"
+              ? `🪙 ${e.coins.toLocaleString()} 金幣（收藏 ${e.ownedCnt} 件）`
+              : currentLbSort === "accuracy"
+              ? `🎯 答對 ${e.okQ} 題（正確率 ${e.acc}%）`
+              : currentLbSort === "pets"
+              ? `🐾 寵物總成長 ${e.petTotalXp} 點`
+              : `⭐ ${e.stars} 顆星（通關 ${e.cleared}/160）`;
+          return `
+            <div class="lb-podium-card rank-${i + 1} ${e.isMe ? "is-me" : ""}">
+              <div class="lb-medal-tag">${medals[i]}</div>
+              <div class="lb-podium-avatar">${avHtml}</div>
+              <strong class="lb-podium-name">${esc(e.name)}${e.isMe ? ` <span class="lb-me-tag">目前登入</span>` : ""}</strong>
+              <span class="lb-title-badge">${e.title}</span>
+              <div class="lb-podium-metric">${mainMetric}</div>
+            </div>`;
+        })
+        .join("");
+
+      listEl.innerHTML = entries
+        .map((e, i) => {
+          const avHtml = window.AvatarArt ? window.AvatarArt.render(e.avatar, "avatar-sm") : "🦊";
+          const rankBadge = i === 0 ? "🥇 1" : i === 1 ? "🥈 2" : i === 2 ? "🥉 3" : `第 ${i + 1} 名`;
+          return `
+            <div class="lb-row ${e.isMe ? "is-me" : ""}">
+              <div class="lb-row-left">
+                <span class="lb-rank-num">${rankBadge}</span>
+                ${avHtml}
+                <div>
+                  <strong>${esc(e.name)}${e.isMe ? ` <span class="lb-me-tag">目前登入</span>` : ""}</strong>
+                  <span class="lb-title-inline">${e.title}</span>
+                </div>
+              </div>
+              <div class="lb-row-stats">
+                <span>⭐ <b>${e.stars}</b> 星 (${e.cleared}/160關)</span>
+                <span>🪙 <b>${e.coins}</b> 金幣</span>
+                <span>🎯 答對 <b>${e.okQ}</b> 題 (${e.acc}%)</span>
+                <span>🐾 寵物 <b>${e.petTotalXp}</b> 點</span>
+              </div>
+            </div>`;
+        })
+        .join("");
+    }
+
+    document.querySelectorAll("[data-open-leaderboard]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        renderPublicLeaderboard();
+        if (lbModal) lbModal.classList.remove("hidden");
+      });
+    });
+
+    if (lbTabs) {
+      lbTabs.addEventListener("click", (ev) => {
+        const b = ev.target.closest("button[data-lb-sort]");
+        if (!b) return;
+        window.SoundFX && window.SoundFX.playClick();
+        currentLbSort = b.dataset.lbSort;
+        lbTabs.querySelectorAll("button[data-lb-sort]").forEach((el) => {
+          el.classList.toggle("active", el === b);
+        });
+        renderPublicLeaderboard();
+      });
+    }
+
+    if (btnCloseLb && lbModal) {
+      btnCloseLb.addEventListener("click", () => lbModal.classList.add("hidden"));
+    }
   }
 
   window.MathSuper = {
