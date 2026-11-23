@@ -147,14 +147,22 @@
       beachFill: "#fff5df",
       showUnitPins: false,
       fixedProps: [
-        { x: 148, y: 182, svgId: "house", cls: "prop-house" },
-        { x: 785, y: 175, svgId: "cottage", cls: "prop-house" }
+        { x: 150, y: 195, svgId: "house", cls: "prop-house" },
+        { x: 270, y: 145, svgId: "house_cafe", cls: "prop-house" },
+        { x: 675, y: 148, svgId: "house_bakery", cls: "prop-house" },
+        { x: 790, y: 198, svgId: "cottage", cls: "prop-house" },
+        { x: 465, y: 278, svgId: "fountain", cls: "prop-house" },
+        { x: 120, y: 335, svgId: "plant_maple", cls: "" },
+        { x: 820, y: 330, svgId: "plant_appletree", cls: "" },
+        { x: 225, y: 375, svgId: "veh_bike", cls: "" },
+        { x: 715, y: 375, svgId: "plant_daisy", cls: "" },
+        { x: 560, y: 138, svgId: "lantern", cls: "" }
       ],
       decorSvg: `
         <path d="M 135 270 H 795 M 465 130 V 395" fill="none" stroke="#fff8e8" stroke-width="26" stroke-linecap="round" opacity="0.88" />
         <path d="M 135 270 H 795 M 465 130 V 395" fill="none" stroke="#dfb982" stroke-width="2.5" stroke-dasharray="8 8" />
-        <circle cx="465" cy="270" r="56" fill="#fff3d6" stroke="#e5b869" stroke-width="4" />
-        <circle cx="465" cy="270" r="24" fill="#ffe6a8" opacity="0.8" />
+        <circle cx="465" cy="270" r="64" fill="#fff3d6" stroke="#e5b869" stroke-width="4" />
+        <circle cx="465" cy="270" r="32" fill="#ffe6a8" opacity="0.8" />
       `
     },
     kingdom: {
@@ -168,8 +176,16 @@
       beachFill: "#fff4c7",
       showUnitPins: false,
       fixedProps: [
-        { x: 155, y: 175, svgId: "rainbow", cls: "" },
-        { x: 790, y: 175, svgId: "shootingstar", cls: "" }
+        { x: 468, y: 162, svgId: "castle", cls: "prop-house" },
+        { x: 468, y: 278, svgId: "crown_monument", cls: "prop-house" },
+        { x: 160, y: 185, svgId: "rainbow", cls: "" },
+        { x: 780, y: 180, svgId: "shootingstar", cls: "" },
+        { x: 275, y: 145, svgId: "balloon", cls: "" },
+        { x: 665, y: 145, svgId: "fireworks", cls: "" },
+        { x: 135, y: 340, svgId: "sakura", cls: "" },
+        { x: 810, y: 335, svgId: "sakura", cls: "" },
+        { x: 245, y: 365, svgId: "unicorn", cls: "" },
+        { x: 695, y: 365, svgId: "crystal", cls: "" }
       ],
       decorSvg: `
         <ellipse cx="468" cy="262" rx="195" ry="102" fill="#fff6fb" stroke="#f2c46d" stroke-width="4" opacity="0.82" />
