@@ -4034,6 +4034,90 @@ html, body {
   box-shadow: 0 4px 0 #235d3c;
 }
 
+/* ==================== 醒目「開啟音樂」按鈕與指向提示氣泡 ==================== */
+.bgm-btn-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bgm-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff3c4, #ffe08a);
+  border: 2px solid #df9624;
+  color: #5a3812;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 #c97f14;
+  animation: bgmGlowPulse 2.4s ease-in-out infinite;
+  transition: transform 0.14s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.bgm-pill-btn:hover {
+  transform: translateY(-2px);
+}
+
+.bgm-pill-btn.is-playing {
+  background: linear-gradient(135deg, #52b079, #3c9462);
+  border-color: #2c734b;
+  color: #fffdf9;
+  box-shadow: 0 3px 0 #235d3c;
+  animation: none;
+}
+
+.bgm-pill-btn.is-playing .bgm-note-icon {
+  display: inline-block;
+  animation: bgmNoteSway 1.1s ease-in-out infinite;
+}
+
+@keyframes bgmGlowPulse {
+  0%, 100% { box-shadow: 0 3px 0 #c97f14, 0 0 0 0 rgba(242, 164, 59, 0.48); }
+  50% { box-shadow: 0 3px 0 #c97f14, 0 0 0 7px rgba(242, 164, 59, 0); }
+}
+
+@keyframes bgmNoteSway {
+  0%, 100% { transform: rotate(-10deg) translateY(0); }
+  50% { transform: rotate(12deg) translateY(-2px); }
+}
+
+.bgm-hint-bubble {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fffdf7;
+  border: 2px solid var(--gold);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding: 7px 12px;
+  border-radius: 14px;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(90, 64, 49, 0.2);
+  z-index: 120;
+  animation: bgmHintBob 1.6s ease-in-out infinite;
+}
+
+.bgm-hint-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  right: 22px;
+  border: 7px solid transparent;
+  border-bottom-color: var(--gold);
+}
+
+@keyframes bgmHintBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
 @media (max-width: 768px) {
   .archipelago-bar {
     padding: 8px 10px;

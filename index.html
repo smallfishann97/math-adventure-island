@@ -99,9 +99,13 @@
             <button type="button" class="fs-btn" data-fs="xl" title="特大字體">特大</button>
           </div>
 
-          <button class="icon-toggle" id="btn-bgm-toggle" type="button" aria-pressed="false" title="開啟／關閉八音盒背景音樂">
-            <span id="bgm-icon">🎵</span>
-          </button>
+          <div class="bgm-btn-wrap">
+            <button class="bgm-pill-btn" id="btn-bgm-toggle" type="button" aria-pressed="false" title="開啟／關閉八音盒背景音樂">
+              <span id="bgm-icon" class="bgm-note-icon">🎵</span>
+              <span id="bgm-label">開啟音樂</span>
+            </button>
+            <div id="bgm-hint-bubble" class="bgm-hint-bubble hidden" role="status">👆 點這裡有可愛背景音樂喔！</div>
+          </div>
 
           <button class="icon-toggle" id="btn-sound-toggle" type="button" aria-pressed="true" title="切換答題音效">
             <span id="sound-icon">🔊</span>

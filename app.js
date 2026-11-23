@@ -399,6 +399,15 @@
     applyFontSize(u.fontSize || "md");
     refreshAllHomeUI();
     showView("home", "home");
+
+    // 剛登島時若尚未開啟背景音樂，顯示 6 秒可愛指向提示氣泡
+    const bgmBubble = document.getElementById("bgm-hint-bubble");
+    const bgmBtnEl = document.getElementById("btn-bgm-toggle");
+    if (bgmBubble && bgmBtnEl && bgmBtnEl.getAttribute("aria-pressed") !== "true") {
+      bgmBubble.classList.remove("hidden");
+      clearTimeout(window._bgmHintTimer);
+      window._bgmHintTimer = setTimeout(() => bgmBubble.classList.add("hidden"), 6000);
+    }
   }
 
   // ===========================================================================
@@ -1664,8 +1673,12 @@
       bgmBtn.addEventListener("click", () => {
         const on = window.MathDeluxe.bgm.toggle();
         bgmBtn.setAttribute("aria-pressed", String(on));
+        bgmBtn.classList.toggle("is-playing", on);
         document.getElementById("bgm-icon").textContent = on ? "🎶" : "🎵";
-        bgmBtn.style.background = on ? "var(--gold-soft)" : "#fff";
+        const lbl = document.getElementById("bgm-label");
+        if (lbl) lbl.textContent = on ? "音樂播放中" : "開啟音樂";
+        const bubble = document.getElementById("bgm-hint-bubble");
+        if (bubble) bubble.classList.add("hidden");
       });
     }
 
