@@ -214,63 +214,121 @@
       ctx.font = "900 24px 'Noto Sans TC', sans-serif";
       ctx.fillText(`🏆 特頒「${awardTitle}」`, w / 2, 392);
 
-      // 底部日期與版權
+      // 底部日期
       ctx.fillStyle = "#785946";
       ctx.font = "700 18px 'Noto Sans TC', sans-serif";
-      ctx.fillText(`頒發日期：${today}　　數學遊戲冒險島 敬頒`, w / 2, 466);
-
-      ctx.fillStyle = "#9c7d67";
-      ctx.font = "700 13px sans-serif";
-      ctx.fillText("Copyright © 2026 Ann Lu. All Rights Reserved.", w / 2, 502);
+      ctx.fillText(`頒發日期：${today}　　數學遊戲冒險島 敬頒`, w / 2, 468);
 
       // 未達標時於預覽圖加上浮水印提醒
-      if (totalStars < CERT_MIN_STARS) {
+      const gate = getCertGate(user, awardTitle);
+      if (!gate.unlocked) {
         ctx.save();
         ctx.translate(w / 2, h / 2);
         ctx.rotate(-0.22);
         ctx.fillStyle = "rgba(184, 107, 24, 0.16)";
-        ctx.font = "900 38px 'Noto Sans TC', sans-serif";
-        ctx.fillText(`🔒 累計滿 ${CERT_MIN_STARS} 顆星解鎖領取`, 0, 0);
+        ctx.font = "900 34px 'Noto Sans TC', sans-serif";
+        ctx.fillText(`🔒 ${gate.watermark}`, 0, 0);
         ctx.restore();
       }
     }
 
-    const CERT_MIN_STARS = 15;
     const statusEl = document.getElementById("cert-unlock-status");
 
-    if (titleSel) titleSel.addEventListener("change", drawCert);
-
-    function getStarCount() {
-      const user = getUserFn();
-      return user ? Object.values(user.stageStars || {}).reduce((a, b) => a + b, 0) : 0;
+    function getMaxUnitCleared(user) {
+      const counts = {};
+      Object.entries((user && user.stageStars) || {}).forEach(([k, v]) => {
+        if (v > 0) {
+          const uid = k.split("-")[0];
+          counts[uid] = (counts[uid] || 0) + 1;
+        }
+      });
+      const vals = Object.values(counts);
+      return vals.length ? Math.max(...vals) : 0;
     }
 
-    function updateCertGateUI(totalStars) {
-      const unlocked = totalStars >= CERT_MIN_STARS;
+    // 四張專屬獎狀各自的達標標準
+    function getCertGate(user, awardTitle) {
+      const totalStars = user ? Object.values(user.stageStars || {}).reduce((a, b) => a + b, 0) : 0;
+      const blitzBest = (user && user.blitzBest) || 0;
+      const checkinDays = (user && user.checkinDays) || 0;
+      const maxUnitCleared = getMaxUnitCleared(user);
+
+      if (awardTitle.includes("閃電")) {
+        const req = 10;
+        const ok = blitzBest >= req;
+        return {
+          unlocked: ok,
+          watermark: `閃電賽達 ${req} 題解鎖領取`,
+          statusText: ok
+            ? `🎉 已達標（閃電賽最佳 ${blitzBest} 題）！可以下載或列印「${awardTitle}」獎狀囉！`
+            : `🔒 「${awardTitle}」門檻：60 秒閃電賽最佳紀錄達 ${req} 題（目前 ${blitzBest} 題，還差 ${req - blitzBest} 題！）`,
+          toastText: `🔒 還差 ${req - blitzBest} 題就能領取「${awardTitle}」喔！\n快去「⚡ 閃電與PK」挑戰 60 秒達 ${req} 題吧！`
+        };
+      }
+      if (awardTitle.includes("全勤")) {
+        const req = 3;
+        const ok = checkinDays >= req;
+        return {
+          unlocked: ok,
+          watermark: `累計簽到 ${req} 天解鎖領取`,
+          statusText: ok
+            ? `🎉 已達標（累計簽到 ${checkinDays} 天）！可以下載或列印「${awardTitle}」獎狀囉！`
+            : `🔒 「${awardTitle}」門檻：每日登島簽到累計達 ${req} 天（目前 ${checkinDays} 天，還差 ${req - checkinDays} 天！）`,
+          toastText: `🔒 還差 ${req - checkinDays} 天簽到就能領取「${awardTitle}」喔！\n記得每天到「🛍️ 商店徽章」簽到打卡！`
+        };
+      }
+      if (awardTitle.includes("單元全破")) {
+        const req = 10;
+        const ok = maxUnitCleared >= req;
+        return {
+          unlocked: ok,
+          watermark: `任一單元 10 關全破解鎖`,
+          statusText: ok
+            ? `🎉 已達標（已全破單一單元 10 關）！可以下載或列印「${awardTitle}」獎狀囉！`
+            : `🔒 「${awardTitle}」門檻：任一數學單元 10 關全部過關（目前單一單元最高 ${maxUnitCleared} / 10 關！）`,
+          toastText: `🔒 還差 ${req - maxUnitCleared} 關就能領取「${awardTitle}」喔！\n把任一個單元的 10 關全破就達標了！`
+        };
+      }
+      // 預設：國小三年級數學小博士
+      const req = 30;
+      const ok = totalStars >= req;
+      return {
+        unlocked: ok,
+        watermark: `累計滿 ${req} 顆星解鎖領取`,
+        statusText: ok
+          ? `🎉 已達標（累計 ⭐ ${totalStars} 顆星）！可以下載或列印「${awardTitle}」獎狀囉！`
+          : `🔒 「${awardTitle}」門檻：累計收集 ⭐ ${req} 顆星星（目前 ⭐ ${totalStars} 顆，再集 ${req - totalStars} 顆星就能領取！）`,
+        toastText: `🔒 還差 ${req - totalStars} 顆星就能領取「${awardTitle}」喔！\n快去闖關收集 ⭐ ${req} 顆星吧！`
+      };
+    }
+
+    function updateCertGateUI() {
+      const user = getUserFn();
+      const awardTitle = titleSel ? titleSel.value : "國小三年級數學小博士";
+      const gate = getCertGate(user, awardTitle);
       if (statusEl) {
-        if (unlocked) {
-          statusEl.textContent = `🎉 恭喜達標（已累計 ⭐ ${totalStars} 顆星）！現在可以下載或列印您的專屬榮譽獎狀囉！`;
+        statusEl.textContent = gate.statusText;
+        if (gate.unlocked) {
           statusEl.style.background = "linear-gradient(135deg, #e9f9ee, #d6f3df)";
           statusEl.style.borderColor = "rgba(82, 176, 121, 0.5)";
         } else {
-          const need = CERT_MIN_STARS - totalStars;
-          statusEl.textContent = `🔒 榮譽獎狀下載／列印門檻：累計 ⭐ ${CERT_MIN_STARS} 顆星解鎖（目前 ⭐ ${totalStars} 顆，再集 ${need} 顆星就能領取！）`;
           statusEl.style.background = "";
           statusEl.style.borderColor = "";
         }
       }
-      dlBtn.style.opacity = unlocked ? "1" : "0.65";
-      prBtn.style.opacity = unlocked ? "1" : "0.65";
+      dlBtn.style.opacity = gate.unlocked ? "1" : "0.65";
+      prBtn.style.opacity = gate.unlocked ? "1" : "0.65";
     }
 
     function checkCertUnlocked() {
-      const totalStars = getStarCount();
-      if (totalStars < CERT_MIN_STARS) {
-        const need = CERT_MIN_STARS - totalStars;
+      const user = getUserFn();
+      const awardTitle = titleSel ? titleSel.value : "國小三年級數學小博士";
+      const gate = getCertGate(user, awardTitle);
+      if (!gate.unlocked) {
         window.SoundFX.playWrong();
         if (window.VisualFX) {
           window.VisualFX.spawnFloatingText(
-            `🔒 還差 ${need} 顆星才能下載或列印獎狀喔！\n先去闖關收集 ⭐ ${CERT_MIN_STARS} 顆星吧！`,
+            gate.toastText,
             "#b86b18",
             window.innerWidth / 2,
             window.innerHeight * 0.36
@@ -279,6 +337,13 @@
         return false;
       }
       return true;
+    }
+
+    if (titleSel) {
+      titleSel.addEventListener("change", () => {
+        drawCert();
+        updateCertGateUI();
+      });
     }
 
     dlBtn.addEventListener("click", () => {
@@ -305,7 +370,7 @@
 
     window.MathDeluxeDrawCert = () => {
       drawCert();
-      updateCertGateUI(getStarCount());
+      updateCertGateUI();
     };
   }
 
