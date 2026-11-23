@@ -1851,50 +1851,78 @@
       });
     }
 
-    // 匯出站長後台完整資料（意見回饋留言＋所有冒險者成績＋網站人氣統計 CSV，支援 Excel 直接開）
+    // 僅匯出「站內聯絡我們收到的意見回饋留言」（自動寬欄 Excel .xls 格式，不出現 ########、不截斷文字）
     const btnExportCsv = document.getElementById("admin-btn-export-csv");
     if (btnExportCsv) {
       btnExportCsv.addEventListener("click", () => {
-        const csvCell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-        const rows = [];
-        rows.push(["【數學遊戲冒險島・站長專屬數據與意見回饋匯出報表】", `匯出時間：${new Date().toLocaleString("zh-TW", { hour12: false })}`]);
-        rows.push(["累計拜訪人次", cachedVisits, "已建立冒險者總數", Math.max(getLocalMemberIds().length, cachedMembers, 1), "目前線上人數", onlineCount]);
-        rows.push([]);
-        rows.push(["=== 一、站內「聯絡我們」意見回饋留言 ==="]);
-        rows.push(["留言時間", "回饋類別", "稱呼", "回覆聯絡方式", "留言內容"]);
         let fbs = [];
         try {
           fbs = JSON.parse(localStorage.getItem("mai_site_feedback_inbox") || "[]");
         } catch (_) {}
-        if (!fbs.length) {
-          rows.push(["(尚無留言)"]);
-        } else {
-          fbs.forEach((f) => rows.push([f.date, f.category, f.sender, f.replyTo || "", f.message]));
-        }
-        rows.push([]);
-        rows.push(["=== 二、本機所有冒險者成績總覽 ==="]);
-        rows.push(["角色名稱", "已通關數(/160)", "累計星星", "金幣", "總作答題數", "平均正確率(%)", "待複習錯題數", "電子寵物等級", "寵物成長值"]);
-        try {
-          const raw = JSON.parse(localStorage.getItem("grade3_math_luxury_store_v1") || "{}");
-          Object.values(raw.users || {}).forEach((u) => {
-            const cleared = Object.values(u.stageStars || {}).filter((s) => s > 0).length;
-            const stars = Object.values(u.stageStars || {}).reduce((a, b) => a + b, 0);
-            const hist = u.history || [];
-            const tq = hist.reduce((s, h) => s + (h.total || 0), 0);
-            const oq = hist.reduce((s, h) => s + (h.correct || 0), 0);
-            const acc = tq > 0 ? Math.round((oq / tq) * 100) : 0;
-            const pxp = Math.min(100, (u.pet && u.pet.xp) || 0);
-            const plv = getPetStage(pxp).lv;
-            rows.push([u.name, cleared, stars, u.coins || 0, tq, acc, (u.mistakes || []).length, `Lv.${plv}`, `${pxp}/100`]);
-          });
-        } catch (_) {}
 
-        const csvContent = "\uFEFF" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const rowsHtml = fbs.length
+          ? fbs
+              .map(
+                (f, i) => `
+              <tr>
+                <td style="text-align:center;mso-number-format:'\\@';">${i + 1}</td>
+                <td style="mso-number-format:'\\@';">${esc(f.date || "")}</td>
+                <td style="mso-number-format:'\\@';">${esc(f.category || "")}</td>
+                <td style="mso-number-format:'\\@';">${esc(f.sender || "")}</td>
+                <td style="mso-number-format:'\\@';">${esc(f.replyTo || "未提供")}</td>
+                <td style="mso-number-format:'\\@';white-space:pre-wrap;">${esc(f.message || "")}</td>
+              </tr>`
+              )
+              .join("")
+          : `<tr><td colspan="6" style="text-align:center;padding:14px;">目前尚無收到的意見回饋留言</td></tr>`;
+
+        const excelHtml = `
+          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+          <head>
+            <meta charset="UTF-8" />
+            <style>
+              table { border-collapse: collapse; font-family: "Microsoft JhengHei", sans-serif; font-size: 11pt; }
+              th { background-color: #FCE8B2; color: #4A3525; font-weight: bold; border: 1px solid #C8A668; padding: 8px 12px; text-align: left; }
+              td { border: 1px solid #D8C7A8; padding: 8px 12px; color: #2C2018; vertical-align: top; }
+            </style>
+          </head>
+          <body>
+            <table>
+              <colgroup>
+                <col width="65" style="width:48pt;" />
+                <col width="210" style="width:158pt;" />
+                <col width="175" style="width:132pt;" />
+                <col width="160" style="width:120pt;" />
+                <col width="220" style="width:165pt;" />
+                <col width="460" style="width:345pt;" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th colspan="6" style="background-color:#FFF5D6;font-size:13pt;text-align:center;padding:10px;">
+                    📬 數學遊戲冒險島・站內「聯絡我們」意見回饋留言清單（匯出時間：${new Date().toLocaleString("zh-TW", { hour12: false })}）
+                  </th>
+                </tr>
+                <tr>
+                  <th style="text-align:center;">編號</th>
+                  <th>留言時間</th>
+                  <th>回饋類別</th>
+                  <th>您的稱呼</th>
+                  <th>回覆聯絡方式</th>
+                  <th>留言內容</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </body>
+          </html>`;
+
+        const blob = new Blob(["\uFEFF" + excelHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `數學遊戲冒險島-站長後台與留言報表-${todayStr()}.csv`;
+        a.download = `數學遊戲冒險島-意見回饋留言-${todayStr()}.xls`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       });
