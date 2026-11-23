@@ -1524,45 +1524,91 @@
     });
   }
 
+  // 幫免費雲端計數器 API 加上 4 秒超時保護，並同時支援主備雙雲端節點
+  async function fetchCounterJson(url, timeoutMs = 4200) {
+    const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const t = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
+    try {
+      const res = await fetch(url, ctrl ? { signal: ctrl.signal, cache: "no-store" } : { cache: "no-store" });
+      if (t) clearTimeout(t);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (_) {
+      if (t) clearTimeout(t);
+      return null;
+    }
+  }
+
   async function bumpGlobalMemberCount(times = 1) {
     for (let i = 0; i < times; i++) {
-      try {
-        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/up`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && typeof data.count === "number") {
-            cachedMembers = Math.max(cachedMembers, data.count);
-            localStorage.setItem("mai_cached_members", String(cachedMembers));
-          }
-        }
-      } catch (_) {}
+      const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/up`);
+      if (data && typeof data.count === "number") {
+        cachedMembers = Math.max(cachedMembers, data.count);
+        localStorage.setItem("mai_cached_members", String(cachedMembers));
+      }
     }
     renderCounterDOM();
   }
 
   async function initSiteCounters() {
-    // 0. 全網跨裝置＋多視窗「目前線上人數」（每 10 秒即時同步雲端 5 分鐘活躍時間窗與本機開啟分頁數）
+    // 0. 全網跨裝置＋多視窗「目前線上人數」（每 10 秒即時同步：BroadcastChannel 跨分頁即時心跳 + localStorage + 15 分鐘雲端活躍池）
     const tabId = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-    let lastPingBucket = -1;
-    let cloudOnline = 1;
+    let lastPingBucket = Number(sessionStorage.getItem("mai_online_bucket") || -1);
+    let cloudOnline = Number(sessionStorage.getItem("mai_cloud_online") || 1);
+    const activePeers = new Map();
+
+    // BroadcastChannel：同一台電腦開啟多個分頁或視窗時，0 延遲即時互通線上人數
+    let bc = null;
+    try {
+      if (typeof BroadcastChannel !== "undefined") {
+        bc = new BroadcastChannel("mai_online_presence_channel");
+        bc.onmessage = (ev) => {
+          const d = ev && ev.data;
+          if (!d || !d.tabId) return;
+          if (d.type === "bye") {
+            activePeers.delete(d.tabId);
+          } else {
+            activePeers.set(d.tabId, Date.now());
+            if (d.type === "hello" && bc) {
+              try { bc.postMessage({ type: "ack", tabId }); } catch (_) {}
+            }
+          }
+          onlineCount = Math.max(1, getLocalActiveTabsCount(), cloudOnline);
+          renderCounterDOM();
+        };
+        bc.postMessage({ type: "hello", tabId });
+      }
+    } catch (_) {}
 
     function getLocalActiveTabsCount() {
+      const now = Date.now();
+      activePeers.set(tabId, now);
+      for (const [k, ts] of activePeers.entries()) {
+        if (now - ts > 25000) activePeers.delete(k);
+      }
+      let lsCount = 1;
       try {
-        const now = Date.now();
         const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
         raw[tabId] = now;
         Object.keys(raw).forEach((k) => {
-          if (now - raw[k] > 15000) delete raw[k];
+          if (now - raw[k] > 25000) delete raw[k];
         });
         localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
-        return Math.max(1, Object.keys(raw).length);
-      } catch (_) {
-        return 1;
-      }
+        lsCount = Object.keys(raw).length;
+      } catch (_) {}
+      return Math.max(1, activePeers.size, lsCount);
     }
+
+    window.addEventListener("storage", (ev) => {
+      if (ev.key === "mai_active_tabs") {
+        onlineCount = Math.max(1, getLocalActiveTabsCount(), cloudOnline);
+        renderCounterDOM();
+      }
+    });
 
     window.addEventListener("beforeunload", () => {
       try {
+        if (bc) bc.postMessage({ type: "bye", tabId });
         const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
         delete raw[tabId];
         localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
@@ -1571,22 +1617,31 @@
 
     async function syncGlobalOnlinePresence() {
       const localTabs = getLocalActiveTabsCount();
-      const bucket = Math.floor(Date.now() / 300000);
-      const bucketKey = `online5m_${bucket}`;
       try {
-        const url = lastPingBucket !== bucket
-          ? `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up`
-          : `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/`;
-        lastPingBucket = bucket;
-        const res = await fetch(url);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && typeof data.count === "number") {
-            cloudOnline = Math.max(1, data.count);
-          }
-        }
+        if (bc) bc.postMessage({ type: "ping", tabId });
       } catch (_) {}
+
+      // 先立刻用本機與已知狀態更新畫面（絕不被網路卡住）
       onlineCount = Math.max(1, localTabs, cloudOnline);
+      renderCounterDOM();
+
+      // 15 分鐘雲端活躍池（900,000 ms）：每個新連線在每個 15 分鐘區間自動 +1，同區間內查詢最新雲端同時在線人數
+      const bucket = Math.floor(Date.now() / 900000);
+      const bucketKey = `online15m_${bucket}`;
+      const isFirstPingInBucket = lastPingBucket !== bucket;
+      const url = isFirstPingInBucket
+        ? `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up`
+        : `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/`;
+
+      const data = await fetchCounterJson(url, 4000);
+      if (data && typeof data.count === "number") {
+        lastPingBucket = bucket;
+        sessionStorage.setItem("mai_online_bucket", String(bucket));
+        cloudOnline = Math.max(1, data.count);
+        sessionStorage.setItem("mai_cloud_online", String(cloudOnline));
+      }
+
+      onlineCount = Math.max(1, getLocalActiveTabsCount(), cloudOnline);
       if (onlineCount > cachedVisits) {
         cachedVisits = onlineCount;
         localStorage.setItem("mai_cached_visits", String(cachedVisits));
@@ -1603,56 +1658,49 @@
       renderCounterDOM();
     }, 1000);
 
-    // 1. 累計拜訪人次（版主後台查看）
-    if (!sessionStorage.getItem("mai_visit_bumped")) {
-      sessionStorage.setItem("mai_visit_bumped", "1");
-      cachedVisits = Math.max(1, cachedVisits + 1);
-      localStorage.setItem("mai_cached_visits", String(cachedVisits));
-      try {
-        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/up`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && typeof data.count === "number") {
-            cachedVisits = Math.max(cachedVisits, data.count);
-            localStorage.setItem("mai_cached_visits", String(cachedVisits));
-          }
+    // 1. 累計拜訪人次（背景非阻塞更新）
+    (async () => {
+      if (!sessionStorage.getItem("mai_visit_bumped")) {
+        sessionStorage.setItem("mai_visit_bumped", "1");
+        cachedVisits = Math.max(1, cachedVisits + 1);
+        localStorage.setItem("mai_cached_visits", String(cachedVisits));
+        renderCounterDOM();
+        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/up`);
+        if (data && typeof data.count === "number") {
+          cachedVisits = Math.max(cachedVisits, data.count);
+          localStorage.setItem("mai_cached_visits", String(cachedVisits));
+          renderCounterDOM();
         }
-      } catch (_) {}
-    } else {
-      try {
-        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && typeof data.count === "number") {
-            cachedVisits = Math.max(cachedVisits, data.count);
-            localStorage.setItem("mai_cached_visits", String(cachedVisits));
-          }
+      } else {
+        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/`);
+        if (data && typeof data.count === "number") {
+          cachedVisits = Math.max(cachedVisits, data.count);
+          localStorage.setItem("mai_cached_visits", String(cachedVisits));
+          renderCounterDOM();
         }
-      } catch (_) {}
-    }
+      }
+    })();
 
-    // 2. 已建立冒險者人數（版主後台查看）
-    const localIds = getLocalMemberIds();
-    let syncedIds = [];
-    try {
-      syncedIds = JSON.parse(localStorage.getItem("mai_synced_member_ids") || "[]");
-    } catch (_) {}
-    const unsynced = localIds.filter((id) => !syncedIds.includes(id));
-    if (unsynced.length > 0) {
-      localStorage.setItem("mai_synced_member_ids", JSON.stringify([...syncedIds, ...unsynced]));
-      await bumpGlobalMemberCount(unsynced.length);
-    } else {
+    // 2. 已建立冒險者人數（背景非阻塞更新）
+    (async () => {
+      const localIds = getLocalMemberIds();
+      let syncedIds = [];
       try {
-        const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && typeof data.count === "number") {
-            cachedMembers = Math.max(cachedMembers, data.count);
-            localStorage.setItem("mai_cached_members", String(cachedMembers));
-          }
-        }
+        syncedIds = JSON.parse(localStorage.getItem("mai_synced_member_ids") || "[]");
       } catch (_) {}
-    }
+      const unsynced = localIds.filter((id) => !syncedIds.includes(id));
+      if (unsynced.length > 0) {
+        localStorage.setItem("mai_synced_member_ids", JSON.stringify([...syncedIds, ...unsynced]));
+        await bumpGlobalMemberCount(unsynced.length);
+      } else {
+        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/`);
+        if (data && typeof data.count === "number") {
+          cachedMembers = Math.max(cachedMembers, data.count);
+          localStorage.setItem("mai_cached_members", String(cachedMembers));
+          renderCounterDOM();
+        }
+      }
+    })();
 
     renderCounterDOM();
 
