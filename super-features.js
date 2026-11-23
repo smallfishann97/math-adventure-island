@@ -1559,7 +1559,15 @@
       });
     }
 
-    // 5. 👑 站長專屬數據後台（點頁尾「👑 站長專屬」並輸入密碼 ann97 解鎖）
+    // 5. 👑 站長專屬數據後台（點頁尾「👑 站長專屬」並輸入站長高強度密碼解鎖）
+    const ADMIN_KEY_B64 = "YW5uOTcwOThwb2lsa2ptbmIxMjNxd2Vhc2R6eGM=";
+    function checkAdminPwd(str) {
+      try {
+        return btoa(String(str || "").trim()) === ADMIN_KEY_B64;
+      } catch (_) {
+        return false;
+      }
+    }
     const adminModal = document.getElementById("admin-stats-modal");
     const btnOpenAdmin = document.getElementById("btn-open-admin");
     const btnCloseAdmin = document.getElementById("btn-close-admin");
@@ -1593,7 +1601,7 @@
       authGate.addEventListener("submit", (ev) => {
         ev.preventDefault();
         const val = (pwdInput ? pwdInput.value : "").trim();
-        if (val === "ann97") {
+        if (checkAdminPwd(val)) {
           adminUnlocked = true;
           window.SoundFX && window.SoundFX.playCorrect(2);
           authGate.classList.add("hidden");
@@ -1613,7 +1621,7 @@
 
     try {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("admin") === "ann97") {
+      if (checkAdminPwd(params.get("admin"))) {
         setTimeout(() => openAdminModal(true), 500);
       }
     } catch (_) {}
