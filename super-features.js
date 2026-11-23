@@ -1772,6 +1772,23 @@
         showAdminToolToast(`👑 已為「${u.name}」開啟 160 關全破滿星（共 480 顆星，所有島嶼與大滿貫獎狀全解鎖）！`);
       });
     }
+    const btnResetUser = document.getElementById("admin-btn-reset-user");
+    if (btnResetUser) {
+      btnResetUser.addEventListener("click", () => {
+        const u = api ? ensureSuperState(api.getUser()) : null;
+        if (!u) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
+        u.stageStars = {};
+        u.originalStars = {};
+        u.coins = 0;
+        u.grandSlamClaimed = false;
+        u.pet = { species: u.pet ? u.pet.species : "shiba", name: "柴犬麻糬", xp: 0, cookies: 3, mood: 100, sleeping: false };
+        api.saveStore();
+        api.refreshHome();
+        renderAdminExtraAnalytics();
+        window.SoundFX && window.SoundFX.playClick();
+        showAdminToolToast(`↺ 已將「${u.name}」的星星、金幣與寵物進度恢復為初始歸零狀態！`);
+      });
+    }
 
     try {
       const params = new URLSearchParams(window.location.search);
