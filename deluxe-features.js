@@ -222,11 +222,67 @@
       ctx.fillStyle = "#9c7d67";
       ctx.font = "700 13px sans-serif";
       ctx.fillText("Copyright © 2026 Ann Lu. All Rights Reserved.", w / 2, 502);
+
+      // 未達標時於預覽圖加上浮水印提醒
+      if (totalStars < CERT_MIN_STARS) {
+        ctx.save();
+        ctx.translate(w / 2, h / 2);
+        ctx.rotate(-0.22);
+        ctx.fillStyle = "rgba(184, 107, 24, 0.16)";
+        ctx.font = "900 38px 'Noto Sans TC', sans-serif";
+        ctx.fillText(`🔒 累計滿 ${CERT_MIN_STARS} 顆星解鎖領取`, 0, 0);
+        ctx.restore();
+      }
     }
+
+    const CERT_MIN_STARS = 15;
+    const statusEl = document.getElementById("cert-unlock-status");
 
     if (titleSel) titleSel.addEventListener("change", drawCert);
 
+    function getStarCount() {
+      const user = getUserFn();
+      return user ? Object.values(user.stageStars || {}).reduce((a, b) => a + b, 0) : 0;
+    }
+
+    function updateCertGateUI(totalStars) {
+      const unlocked = totalStars >= CERT_MIN_STARS;
+      if (statusEl) {
+        if (unlocked) {
+          statusEl.textContent = `🎉 恭喜達標（已累計 ⭐ ${totalStars} 顆星）！現在可以下載或列印您的專屬榮譽獎狀囉！`;
+          statusEl.style.background = "linear-gradient(135deg, #e9f9ee, #d6f3df)";
+          statusEl.style.borderColor = "rgba(82, 176, 121, 0.5)";
+        } else {
+          const need = CERT_MIN_STARS - totalStars;
+          statusEl.textContent = `🔒 榮譽獎狀下載／列印門檻：累計 ⭐ ${CERT_MIN_STARS} 顆星解鎖（目前 ⭐ ${totalStars} 顆，再集 ${need} 顆星就能領取！）`;
+          statusEl.style.background = "";
+          statusEl.style.borderColor = "";
+        }
+      }
+      dlBtn.style.opacity = unlocked ? "1" : "0.65";
+      prBtn.style.opacity = unlocked ? "1" : "0.65";
+    }
+
+    function checkCertUnlocked() {
+      const totalStars = getStarCount();
+      if (totalStars < CERT_MIN_STARS) {
+        const need = CERT_MIN_STARS - totalStars;
+        window.SoundFX.playWrong();
+        if (window.VisualFX) {
+          window.VisualFX.spawnFloatingText(
+            `🔒 還差 ${need} 顆星才能下載或列印獎狀喔！\n先去闖關收集 ⭐ ${CERT_MIN_STARS} 顆星吧！`,
+            "#b86b18",
+            window.innerWidth / 2,
+            window.innerHeight * 0.36
+          );
+        }
+        return false;
+      }
+      return true;
+    }
+
     dlBtn.addEventListener("click", () => {
+      if (!checkCertUnlocked()) return;
       window.SoundFX.playClick();
       drawCert();
       const user = getUserFn();
@@ -237,6 +293,7 @@
     });
 
     prBtn.addEventListener("click", () => {
+      if (!checkCertUnlocked()) return;
       window.SoundFX.playClick();
       drawCert();
       const dataUrl = canvas.toDataURL("image/png");
@@ -246,7 +303,10 @@
       w.document.close();
     });
 
-    window.MathDeluxeDrawCert = drawCert;
+    window.MathDeluxeDrawCert = () => {
+      drawCert();
+      updateCertGateUI(getStarCount());
+    };
   }
 
   // ==================== 產生即時心算題（供閃電賽 & 雙人 PK 共用） ====================
