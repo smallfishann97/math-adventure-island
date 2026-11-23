@@ -1551,7 +1551,7 @@
       renderCounterDOM();
     }
     syncGlobalOnlinePresence();
-    setInterval(syncGlobalOnlinePresence, 30000);
+    setInterval(syncGlobalOnlinePresence, 10000);
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
