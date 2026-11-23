@@ -1670,12 +1670,17 @@
       loginAs(btn.dataset.loginUid);
     });
 
-    // 建立新角色登入
+    // 建立新角色登入（單機最多 10 位冒險者上限保護）
     document.getElementById("login-form").addEventListener("submit", (ev) => {
       ev.preventDefault();
       const nameInput = document.getElementById("login-name-input");
       const name = nameInput.value.trim();
       if (!name) return;
+      if (Object.keys(store.users || {}).length >= 10) {
+        window.SoundFX.playWrong();
+        alert("⚠️ 本台裝置最多可建立 10 位冒險者（目前已滿 10 位）！\n請先點擊上方既有角色右上角的「✕」刪除不用的角色，就能建立新冒險者囉！");
+        return;
+      }
       window.SoundFX.playCorrect(2);
       const id = "u_" + Date.now();
       store.users[id] = createEmptyProfile(id, name, state.selectedAvatar);
