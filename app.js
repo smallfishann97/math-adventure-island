@@ -1674,7 +1674,6 @@
         const on = window.MathDeluxe.bgm.toggle();
         bgmBtn.setAttribute("aria-pressed", String(on));
         bgmBtn.classList.toggle("is-playing", on);
-        document.getElementById("bgm-icon").textContent = on ? "🎶" : "🎵";
         const lbl = document.getElementById("bgm-label");
         if (lbl) lbl.textContent = on ? "音樂播放中" : "開啟音樂";
         const bubble = document.getElementById("bgm-hint-bubble");

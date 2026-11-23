@@ -4044,31 +4044,37 @@ html, body {
 .bgm-pill-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 13px;
+  gap: 6px;
+  padding: 5px 14px 5px 6px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #fff3c4, #ffe08a);
-  border: 2px solid #df9624;
+  background: linear-gradient(180deg, #fff6d2 0%, #ffd978 100%);
+  border: 2.5px solid #fffdf7;
   color: #5a3812;
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 900;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 0 3px 0 #c97f14;
+  box-shadow: 0 4px 0 #d98e20, 0 6px 14px rgba(217, 142, 32, 0.28);
   animation: bgmGlowPulse 2.4s ease-in-out infinite;
   transition: transform 0.14s ease, background 0.16s ease, color 0.16s ease;
 }
 
+.bgm-q-svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
 .bgm-pill-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.03);
 }
 
 .bgm-pill-btn.is-playing {
-  background: linear-gradient(135deg, #52b079, #3c9462);
-  border-color: #2c734b;
+  background: linear-gradient(180deg, #6bd194 0%, #42a369 100%);
+  border-color: #fffdf7;
   color: #fffdf9;
-  box-shadow: 0 3px 0 #235d3c;
+  box-shadow: 0 4px 0 #2b7a4b, 0 6px 14px rgba(43, 122, 75, 0.28);
   animation: none;
 }
 
