@@ -156,40 +156,106 @@
       const cleared = Object.values(user.stageStars || {}).filter((s) => s > 0).length;
       const today = new Date().toLocaleDateString("zh-TW");
 
-      // 奶油象牙底色
-      ctx.fillStyle = "#fffdf6";
+      // 依不同獎狀自動切換 5 款專屬馬卡龍繪本風主題（完全無藍色）
+      let theme = {
+        bgA: "#fffdf6", bgB: "#fff5dc", outer: "#d4943a", inner: "#f0c975",
+        accent: "#f2a43b", nameColor: "#388d5c", pillBg: "#fff3d6",
+        corner: "✦", sealEmoji: "🏆", subtitle: "MATH ADVENTURE ISLAND・金獎證書"
+      };
+      if (awardTitle.includes("閃電")) {
+        theme = {
+          bgA: "#fff9f3", bgB: "#ffe9d6", outer: "#e66b58", inner: "#f7b267",
+          accent: "#e86a5a", nameColor: "#c8523d", pillBg: "#ffece3",
+          corner: "⚡", sealEmoji: "⚡", subtitle: "SPEED MATH MASTER・閃電神算證書"
+        };
+      } else if (awardTitle.includes("全勤")) {
+        theme = {
+          bgA: "#f6fdf7", bgB: "#e3f7e8", outer: "#4aa36c", inner: "#8fd4a4",
+          accent: "#3f9660", nameColor: "#2d7a4c", pillBg: "#e6f8ec",
+          corner: "🍃", sealEmoji: "🌟", subtitle: "DAILY CHECK-IN STAR・勤學模範證書"
+        };
+      } else if (awardTitle.includes("單元全破")) {
+        theme = {
+          bgA: "#fdf7ff", bgB: "#f3e3fa", outer: "#b076cf", inner: "#e6b873",
+          accent: "#a564c7", nameColor: "#7e469e", pillBg: "#f6e8fc",
+          corner: "👑", sealEmoji: "👑", subtitle: "UNIT CHAMPION・單元制霸冠軍證書"
+        };
+      } else if (awardTitle.includes("大滿貫")) {
+        theme = {
+          bgA: "#fffaf0", bgB: "#ffe6c4", outer: "#d64e52", inner: "#f4bd46",
+          accent: "#d64e52", nameColor: "#b83539", pillBg: "#fff0cc",
+          corner: "🎆", sealEmoji: "👑", subtitle: "LEGENDARY 160 STAGES・傳說大滿貫證書"
+        };
+      }
+
+      // 漸層暖色紙張底色
+      const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+      bgGrad.addColorStop(0, theme.bgA);
+      bgGrad.addColorStop(1, theme.bgB);
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // 外金框＋內雙框
-      ctx.strokeStyle = "#d4943a";
+      // 柔和圓點花紋背景
+      ctx.fillStyle = "rgba(212, 148, 58, 0.08)";
+      for (let gx = 70; gx < w - 50; gx += 52) {
+        for (let gy = 70; gy < h - 50; gy += 52) {
+          ctx.beginPath();
+          ctx.arc(gx, gy, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // 外框＋內雙花邊框
+      ctx.strokeStyle = theme.outer;
       ctx.lineWidth = 14;
       ctx.strokeRect(20, 20, w - 40, h - 40);
-      ctx.strokeStyle = "#f0c975";
+      ctx.strokeStyle = theme.inner;
       ctx.lineWidth = 4;
       ctx.strokeRect(36, 36, w - 72, h - 72);
 
-      // 四角裝飾星芒
-      ctx.fillStyle = "#f2a43b";
+      // 四角專屬主題飾紋
+      ctx.fillStyle = theme.accent;
       ctx.font = "28px sans-serif";
       ctx.textAlign = "center";
-      [[58, 66], [w - 58, 66], [58, h - 48], [w - 58, h - 48]].forEach(([x, y]) => ctx.fillText("✦", x, y));
+      [[60, 68], [w - 60, 68], [60, h - 46], [w - 60, h - 46]].forEach(([x, y]) => ctx.fillText(theme.corner, x, y));
+
+      // 右下角專屬金色圓形印章
+      ctx.save();
+      ctx.translate(w - 115, h - 108);
+      ctx.fillStyle = theme.pillBg;
+      ctx.strokeStyle = theme.outer;
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, 38, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = theme.inner;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 31, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = "28px sans-serif";
+      ctx.fillText(theme.sealEmoji, 0, 9);
+      ctx.restore();
 
       // 標題
-      ctx.fillStyle = "#a66f22";
+      ctx.fillStyle = theme.outer;
       ctx.font = "900 18px 'Noto Sans TC', sans-serif";
-      ctx.fillText("MATH ADVENTURE ISLAND・榮譽證書", w / 2, 92);
+      ctx.fillText(theme.subtitle, w / 2, 92);
 
       ctx.fillStyle = "#5a4031";
       ctx.font = "900 44px 'Noto Sans TC', sans-serif";
       ctx.fillText("榮 譽 獎 狀", w / 2, 152);
 
       // 頒發對象
-      ctx.fillStyle = "#388d5c";
+      ctx.fillStyle = theme.nameColor;
       ctx.font = "900 34px 'Noto Sans TC', sans-serif";
       ctx.fillText(`${user.name}  同學`, w / 2, 224);
 
-      ctx.strokeStyle = "#f0c975";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = theme.inner;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(w / 2 - 160, 238);
       ctx.lineTo(w / 2 + 160, 238);
@@ -202,17 +268,17 @@
       ctx.fillText(`累計通關 ${cleared} 關・收集 ${totalStars} 顆榮譽星星・擁有 ${user.coins || 0} 枚閃亮金幣`, w / 2, 326);
 
       // 頒發稱號徽章
-      ctx.fillStyle = "#fff3d6";
+      ctx.fillStyle = theme.pillBg;
       ctx.beginPath();
-      ctx.roundRect(w / 2 - 210, 355, 420, 56, 28);
+      ctx.roundRect(w / 2 - 220, 355, 440, 56, 28);
       ctx.fill();
-      ctx.strokeStyle = "#f2a43b";
+      ctx.strokeStyle = theme.outer;
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      ctx.fillStyle = "#c97b18";
+      ctx.fillStyle = theme.outer;
       ctx.font = "900 24px 'Noto Sans TC', sans-serif";
-      ctx.fillText(`🏆 特頒「${awardTitle}」`, w / 2, 392);
+      ctx.fillText(`${theme.sealEmoji} 特頒「${awardTitle}」`, w / 2, 392);
 
       // 底部日期
       ctx.fillStyle = "#785946";
@@ -275,6 +341,19 @@
             ? `🎉 已達標（累計簽到 ${checkinDays} 天）！可以下載或列印「${awardTitle}」獎狀囉！`
             : `🔒 「${awardTitle}」門檻：每日登島簽到累計達 ${req} 天（目前 ${checkinDays} 天，還差 ${req - checkinDays} 天！）`,
           toastText: `🔒 還差 ${req - checkinDays} 天簽到就能領取「${awardTitle}」喔！\n記得每天到「🛍️ 商店徽章」簽到打卡！`
+        };
+      }
+      if (awardTitle.includes("大滿貫")) {
+        const clearedAll = user ? Object.values(user.stageStars || {}).filter((s) => s > 0).length : 0;
+        const req = 160;
+        const ok = clearedAll >= req;
+        return {
+          unlocked: ok,
+          watermark: `全破 160 關解鎖傳說獎狀`,
+          statusText: ok
+            ? `🎉 傳說達成（160 關全破）！可以下載或列印「${awardTitle}」典藏獎狀囉！`
+            : `🔒 「${awardTitle}」門檻：完成全部 16 單元共 ${req} 關（目前 ${clearedAll} / ${req} 關！）`,
+          toastText: `🔒 還差 ${req - clearedAll} 關就能解鎖「${awardTitle}」典藏獎狀喔！\n一起朝 160 關大滿貫邁進！`
         };
       }
       if (awardTitle.includes("單元全破")) {
