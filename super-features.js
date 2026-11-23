@@ -53,10 +53,20 @@
         species: "shiba",
         name: "柴犬麻糬",
         xp: 0,
+        xpMap: { shiba: 0 },
         cookies: 3,
         mood: 100,
       };
     }
+    if (!user.pet.xpMap || typeof user.pet.xpMap !== "object") {
+      user.pet.xpMap = {};
+      if ((user.pet.xp || 0) > 0) {
+        user.pet.xpMap[user.pet.species || "shiba"] = Math.min(100, user.pet.xp);
+      }
+    }
+    const curSp = user.pet.species || "shiba";
+    user.pet.xp = Math.min(100, user.pet.xpMap[curSp] || 0);
+    user.pet.xpMap[curSp] = user.pet.xp;
     return user;
   }
 
@@ -461,7 +471,11 @@
     }
 
     document.querySelectorAll("button[data-pet-species]").forEach((b) => {
-      b.classList.toggle("active", b.dataset.petSpecies === user.pet.species);
+      const spId = b.dataset.petSpecies;
+      b.classList.toggle("active", spId === user.pet.species);
+      if (!b.dataset.baseLabel) b.dataset.baseLabel = b.textContent;
+      const spXp = Math.min(100, (user.pet.xpMap && user.pet.xpMap[spId]) || 0);
+      b.textContent = spXp >= 100 ? `${b.dataset.baseLabel} 👑` : spXp > 0 ? `${b.dataset.baseLabel} (${spXp})` : b.dataset.baseLabel;
     });
   }
 
@@ -1111,12 +1125,13 @@
       });
     }
 
-    // 電子寵物切換、餵食、玩耍、買餅乾
+    // 電子寵物切換、餵食、玩耍、買餅乾（8 隻小夥伴各自獨立計算成長值 0~100）
     document.querySelectorAll("button[data-pet-species]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const user = ensureSuperState(api.getUser());
         if (!user) return;
         user.pet.species = btn.dataset.petSpecies;
+        user.pet.xp = Math.min(100, user.pet.xpMap[user.pet.species] || 0);
         api.saveStore();
         window.SoundFX && window.SoundFX.playClick();
         const speech = document.getElementById("pet-speech-bubble");
@@ -1131,13 +1146,16 @@
       btnFeed.addEventListener("click", () => {
         const user = ensureSuperState(api.getUser());
         if (!user) return;
+        const spId = user.pet.species || "shiba";
+        const curXp = Math.min(100, user.pet.xpMap[spId] || 0);
         const speech = document.getElementById("pet-speech-bubble");
-        if ((user.pet.xp || 0) >= 100) {
+        if (curXp >= 100) {
+          user.pet.xpMap[spId] = 100;
           user.pet.xp = 100;
           window.SoundFX && window.SoundFX.playFanfare(2);
           if (speech) {
             speech.dataset.custom = "1";
-            speech.textContent = "👑 我已經長到最高滿級 100 / 100 (MAX) 囉！不用再扣餅乾，按「🎾 陪牠玩耍」跟我玩吧！";
+            speech.textContent = "👑 這隻小夥伴已經養到最高滿級 100 / 100 (MAX) 囉！快點下方切換另一隻小夥伴，把 8 隻都養大吧！";
           }
           renderPetPanel();
           return;
@@ -1150,11 +1168,13 @@
           }
           return;
         }
-        const prevLv = getPetStage(user.pet.xp || 0).lv;
+        const prevLv = getPetStage(curXp).lv;
         user.pet.sleeping = false;
         user.pet.cookies -= 1;
-        user.pet.xp = Math.min(100, (user.pet.xp || 0) + 6);
-        const nextLv = getPetStage(user.pet.xp).lv;
+        const nextXp = Math.min(100, curXp + 6);
+        user.pet.xpMap[spId] = nextXp;
+        user.pet.xp = nextXp;
+        const nextLv = getPetStage(nextXp).lv;
         api.saveStore();
         if (nextLv > prevLv) {
           window.SoundFX && window.SoundFX.playFanfare(3);
@@ -1722,19 +1742,53 @@
     const dashContent = document.getElementById("admin-dashboard-content");
     const pwdInput = document.getElementById("admin-pwd-input");
     const pwdErr = document.getElementById("admin-pwd-err");
+    const clGate = document.getElementById("changelog-auth-gate");
+    const clContent = document.getElementById("changelog-locked-content");
+    const clPwdInput = document.getElementById("changelog-pwd-input");
+    const clPwdErr = document.getElementById("changelog-pwd-err");
     let adminUnlocked = false;
+
+    function syncAdminLockUI() {
+      if (authGate) authGate.classList.toggle("hidden", adminUnlocked);
+      if (dashContent) dashContent.classList.toggle("hidden", !adminUnlocked);
+      if (clGate) clGate.classList.toggle("hidden", adminUnlocked);
+      if (clContent) clContent.classList.toggle("hidden", !adminUnlocked);
+      if (pwdErr) pwdErr.classList.add("hidden");
+      if (clPwdErr) clPwdErr.classList.add("hidden");
+    }
 
     function openAdminModal(forceUnlock = false) {
       if (!adminModal) return;
       if (forceUnlock) adminUnlocked = true;
       renderCounterDOM();
       renderAdminFeedbackList();
-      if (authGate) authGate.classList.toggle("hidden", adminUnlocked);
-      if (dashContent) dashContent.classList.toggle("hidden", !adminUnlocked);
-      if (pwdErr) pwdErr.classList.add("hidden");
+      syncAdminLockUI();
       if (pwdInput) pwdInput.value = "";
       adminModal.classList.remove("hidden");
       if (!adminUnlocked && pwdInput) setTimeout(() => pwdInput.focus(), 60);
+    }
+
+    document.querySelectorAll('[data-open-legal="changelog"]').forEach((btn) => {
+      btn.addEventListener("click", () => {
+        syncAdminLockUI();
+        if (clPwdInput) clPwdInput.value = "";
+        if (!adminUnlocked && clPwdInput) setTimeout(() => clPwdInput.focus(), 60);
+      });
+    });
+
+    if (clGate) {
+      clGate.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const val = (clPwdInput ? clPwdInput.value : "").trim();
+        if (checkAdminPwd(val)) {
+          adminUnlocked = true;
+          window.SoundFX && window.SoundFX.playCorrect(2);
+          syncAdminLockUI();
+        } else {
+          window.SoundFX && window.SoundFX.playWrong();
+          if (clPwdErr) clPwdErr.classList.remove("hidden");
+        }
+      });
     }
 
     if (btnOpenAdmin) {
@@ -1751,8 +1805,7 @@
         if (checkAdminPwd(val)) {
           adminUnlocked = true;
           window.SoundFX && window.SoundFX.playCorrect(2);
-          authGate.classList.add("hidden");
-          if (dashContent) dashContent.classList.remove("hidden");
+          syncAdminLockUI();
           renderCounterDOM();
           renderAdminFeedbackList();
         } else {
@@ -1851,7 +1904,178 @@
       });
     }
 
-    // 僅匯出「站內聯絡我們收到的意見回饋留言」（自動寬欄 Excel .xls 格式，不出現 ########、不截斷文字）
+    // 僅匯出「站內聯絡我們收到的意見回饋留言」（原生 OpenXML .xlsx 格式：Excel 直接開啟零警告彈窗、預設超寬欄寬不出現 ########）
+    function buildTrueXlsxBlob(rows) {
+      const enc = new TextEncoder();
+      const crcTable = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) {
+        let c = n;
+        for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+        crcTable[n] = c >>> 0;
+      }
+      function crc32(bytes) {
+        let c = 0xffffffff;
+        for (let i = 0; i < bytes.length; i++) c = crcTable[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+        return (c ^ 0xffffffff) >>> 0;
+      }
+      function xmlEsc(s) {
+        return String(s ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+      }
+      const colLetters = ["A", "B", "C", "D", "E", "F"];
+      const sheetRowsXml = rows
+        .map((r, rIdx) => {
+          const rowNum = rIdx + 1;
+          const styleId = rIdx === 0 ? 1 : 2;
+          const cells = r
+            .map((val, cIdx) => `<c r="${colLetters[cIdx]}${rowNum}" s="${styleId}" t="inlineStr"><is><t>${xmlEsc(val)}</t></is></c>`)
+            .join("");
+          return `<row r="${rowNum}" ht="${rIdx === 0 ? 24 : 20}" customHeight="1">${cells}</row>`;
+        })
+        .join("");
+
+      const files = [
+        {
+          name: "[Content_Types].xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`,
+        },
+        {
+          name: "_rels/.rels",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`,
+        },
+        {
+          name: "xl/workbook.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="意見回饋留言" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`,
+        },
+        {
+          name: "xl/_rels/workbook.xml.rels",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`,
+        },
+        {
+          name: "xl/styles.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="2">
+    <font><sz val="11"/><name val="Microsoft JhengHei"/></font>
+    <font><b/><sz val="11"/><color rgb="FF4A3525"/><name val="Microsoft JhengHei"/></font>
+  </fonts>
+  <fills count="3">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFCE8B2"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border>
+      <left style="thin"><color rgb="FFD0BC98"/></left>
+      <right style="thin"><color rgb="FFD0BC98"/></right>
+      <top style="thin"><color rgb="FFD0BC98"/></top>
+      <bottom style="thin"><color rgb="FFD0BC98"/></bottom>
+      <diagonal/>
+    </border>
+  </borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="3">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="49" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+    <xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+  </cellXfs>
+</styleSheet>`,
+        },
+        {
+          name: "xl/worksheets/sheet1.xml",
+          content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <cols>
+    <col min="1" max="1" width="10" customWidth="1"/>
+    <col min="2" max="2" width="24" customWidth="1"/>
+    <col min="3" max="3" width="22" customWidth="1"/>
+    <col min="4" max="4" width="20" customWidth="1"/>
+    <col min="5" max="5" width="26" customWidth="1"/>
+    <col min="6" max="6" width="54" customWidth="1"/>
+  </cols>
+  <sheetData>${sheetRowsXml}</sheetData>
+</worksheet>`,
+        },
+      ];
+
+      // 組裝 Store-only (無壓縮 Method 0) 標準 ZIP 二進位封包
+      const localParts = [];
+      const centralParts = [];
+      let offset = 0;
+
+      files.forEach((f) => {
+        const nameBytes = enc.encode(f.name);
+        const dataBytes = enc.encode(f.content);
+        const crc = crc32(dataBytes);
+        const size = dataBytes.length;
+
+        const lh = new Uint8Array(30 + nameBytes.length);
+        const lv = new DataView(lh.buffer);
+        lv.setUint32(0, 0x04034b50, true);
+        lv.setUint16(4, 20, true);
+        lv.setUint16(6, 0x0800, true);
+        lv.setUint16(8, 0, true);
+        lv.setUint32(14, crc, true);
+        lv.setUint32(18, size, true);
+        lv.setUint32(22, size, true);
+        lv.setUint16(26, nameBytes.length, true);
+        lh.set(nameBytes, 30);
+        localParts.push(lh, dataBytes);
+
+        const ch = new Uint8Array(46 + nameBytes.length);
+        const cv = new DataView(ch.buffer);
+        cv.setUint32(0, 0x02014b50, true);
+        cv.setUint16(4, 20, true);
+        cv.setUint16(6, 20, true);
+        cv.setUint16(8, 0x0800, true);
+        cv.setUint16(10, 0, true);
+        cv.setUint32(16, crc, true);
+        cv.setUint32(20, size, true);
+        cv.setUint32(24, size, true);
+        cv.setUint16(28, nameBytes.length, true);
+        cv.setUint32(42, offset, true);
+        ch.set(nameBytes, 46);
+        centralParts.push(ch);
+
+        offset += lh.length + size;
+      });
+
+      const centralSize = centralParts.reduce((s, p) => s + p.length, 0);
+      const eocd = new Uint8Array(22);
+      const ev = new DataView(eocd.buffer);
+      ev.setUint32(0, 0x06054b50, true);
+      ev.setUint16(8, files.length, true);
+      ev.setUint16(10, files.length, true);
+      ev.setUint32(12, centralSize, true);
+      ev.setUint32(16, offset, true);
+
+      return new Blob([...localParts, ...centralParts, eocd], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+    }
+
     const btnExportCsv = document.getElementById("admin-btn-export-csv");
     if (btnExportCsv) {
       btnExportCsv.addEventListener("click", () => {
@@ -1860,69 +2084,27 @@
           fbs = JSON.parse(localStorage.getItem("mai_site_feedback_inbox") || "[]");
         } catch (_) {}
 
-        const rowsHtml = fbs.length
-          ? fbs
-              .map(
-                (f, i) => `
-              <tr>
-                <td style="text-align:center;mso-number-format:'\\@';">${i + 1}</td>
-                <td style="mso-number-format:'\\@';">${esc(f.date || "")}</td>
-                <td style="mso-number-format:'\\@';">${esc(f.category || "")}</td>
-                <td style="mso-number-format:'\\@';">${esc(f.sender || "")}</td>
-                <td style="mso-number-format:'\\@';">${esc(f.replyTo || "未提供")}</td>
-                <td style="mso-number-format:'\\@';white-space:pre-wrap;">${esc(f.message || "")}</td>
-              </tr>`
-              )
-              .join("")
-          : `<tr><td colspan="6" style="text-align:center;padding:14px;">目前尚無收到的意見回饋留言</td></tr>`;
+        const rows = [["編號", "留言時間", "回饋類別", "您的稱呼", "回覆聯絡方式", "留言內容"]];
+        if (!fbs.length) {
+          rows.push(["-", "-", "-", "-", "-", "目前尚無收到的意見回饋留言"]);
+        } else {
+          fbs.forEach((f, i) => {
+            rows.push([
+              String(i + 1),
+              String(f.date || ""),
+              String(f.category || ""),
+              String(f.sender || ""),
+              String(f.replyTo || "未提供"),
+              String(f.message || ""),
+            ]);
+          });
+        }
 
-        const excelHtml = `
-          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-          <head>
-            <meta charset="UTF-8" />
-            <style>
-              table { border-collapse: collapse; font-family: "Microsoft JhengHei", sans-serif; font-size: 11pt; }
-              th { background-color: #FCE8B2; color: #4A3525; font-weight: bold; border: 1px solid #C8A668; padding: 8px 12px; text-align: left; }
-              td { border: 1px solid #D8C7A8; padding: 8px 12px; color: #2C2018; vertical-align: top; }
-            </style>
-          </head>
-          <body>
-            <table>
-              <colgroup>
-                <col width="65" style="width:48pt;" />
-                <col width="210" style="width:158pt;" />
-                <col width="175" style="width:132pt;" />
-                <col width="160" style="width:120pt;" />
-                <col width="220" style="width:165pt;" />
-                <col width="460" style="width:345pt;" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th colspan="6" style="background-color:#FFF5D6;font-size:13pt;text-align:center;padding:10px;">
-                    📬 數學遊戲冒險島・站內「聯絡我們」意見回饋留言清單（匯出時間：${new Date().toLocaleString("zh-TW", { hour12: false })}）
-                  </th>
-                </tr>
-                <tr>
-                  <th style="text-align:center;">編號</th>
-                  <th>留言時間</th>
-                  <th>回饋類別</th>
-                  <th>您的稱呼</th>
-                  <th>回覆聯絡方式</th>
-                  <th>留言內容</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rowsHtml}
-              </tbody>
-            </table>
-          </body>
-          </html>`;
-
-        const blob = new Blob(["\uFEFF" + excelHtml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+        const blob = buildTrueXlsxBlob(rows);
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `數學遊戲冒險島-意見回饋留言-${todayStr()}.xls`;
+        a.download = `數學遊戲冒險島-意見回饋留言-${todayStr()}.xlsx`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       });

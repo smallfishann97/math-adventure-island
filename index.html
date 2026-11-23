@@ -971,14 +971,30 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-top">
         <div>
-          <h3 id="title-legal-changelog">🚀 數學遊戲冒險島・最新版本公告</h3>
+          <h3 id="title-legal-changelog">🚀 數學遊戲冒險島・最新版本公告（站長專屬）</h3>
           <p id="changelog-auto-sub" style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">系統進版自動同步日誌 (v1.1.0 ~ <span data-auto-ver>v2.2.0</span>)</p>
         </div>
       </div>
-      <div id="changelog-auto-banner" class="weekly-comment" style="margin-bottom:12px;">
-        🔄 系統進版自動偵測：目前線上運行版本 <strong data-auto-ver>v2.2.0</strong>（最新同步日期：<span data-auto-date>2026-11-23</span>）
-      </div>
-      <div class="legal-cards">
+
+      <!-- 更版日誌站長密碼驗證門檻 -->
+      <form id="changelog-auth-gate" class="print-form" style="text-align:center;padding:12px 0;">
+        <p style="font-weight:800;color:var(--ink-soft);margin:0 0 12px;">
+          🔒 此版本日誌為站長 Ann Lu 專屬查閱，請輸入站長密碼解鎖查看：
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;max-width:380px;margin:0 auto;">
+          <input type="password" id="changelog-pwd-input" class="luxury-input" placeholder="請輸入站長專屬密碼…" autocomplete="off" />
+          <button type="submit" class="btn btn-gold">🔑 解鎖</button>
+        </div>
+        <p id="changelog-pwd-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.86rem;margin:10px 0 0;">
+          ❌ 密碼不正確，僅限站長本人查閱喔！
+        </p>
+      </form>
+
+      <div id="changelog-locked-content" class="hidden">
+        <div id="changelog-auto-banner" class="weekly-comment" style="margin-bottom:12px;">
+          🔄 系統進版自動偵測：目前線上運行版本 <strong data-auto-ver>v2.2.0</strong>（最新同步日期：<span data-auto-date>2026-11-23</span>）
+        </div>
+        <div class="legal-cards">
         <div class="legal-card changelog-latest">
           <div class="changelog-head">
             <span class="ver-badge latest"><span data-auto-ver>v2.2.0</span> (最新)</span>
@@ -1050,13 +1066,10 @@
             <li><strong>🧰 學習好幫手</strong>：內建 27 張語音翻轉名詞字卡、答題手寫草稿紙、互動時鐘／分數披薩／直尺教具、學習診斷雷達圖與 A4 列印練習卷。</li>
           </ul>
         </div>
+        </div>
       </div>
-      <div class="changelog-footer">
-        <label class="unlock-toggle" style="font-size:0.86rem;">
-          <input type="checkbox" id="chk-hide-changelog" checked />
-          <span>本次更新不再自動彈出</span>
-        </label>
-        <button type="button" class="btn btn-gold btn-lg" data-close-legal>🚀 我知道了，開始冒險</button>
+      <div class="changelog-footer" style="justify-content:center;">
+        <button type="button" class="btn btn-ghost" data-close-legal>關閉視窗</button>
       </div>
     </div>
   </div>
@@ -1243,7 +1256,7 @@
         <div id="contact-submit-toast" class="island-unlock-toast hidden" style="margin:6px 0;background:#e8f9ee;border-color:#5bb876;color:#276b3d;">
           ✅ 感謝您的寶貴回饋！您的留言已成功送達系統囉！
         </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;">
           <button type="button" class="btn btn-ghost" id="btn-close-contact">取消關閉</button>
           <button type="submit" class="btn btn-gold btn-lg" id="btn-submit-contact">📨 送出回饋留言</button>
         </div>
@@ -1331,7 +1344,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261124a"></script>
+  <script src="super-features.js?v=20261124c"></script>
   <script src="app.js?v=20261123t"></script>
 </body>
 </html>
