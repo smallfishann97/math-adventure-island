@@ -262,11 +262,12 @@ h1, h2, h3, .serif {
 .profile-meta span { font-size: 0.78rem; color: var(--gold-dark); font-weight: 700; }
 
 .avatar-picker {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 74px);
   justify-content: center;
+  justify-items: center;
   gap: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+  margin: 0 auto 16px;
 }
 
 .avatar-opt {

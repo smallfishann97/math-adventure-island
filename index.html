@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124d" />
+  <link rel="stylesheet" href="styles.css?v=20261124e" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -1066,7 +1066,7 @@
           <h4>🗺️ 108 課綱 16 單元完整題庫、語音字卡與手寫草稿紙</h4>
           <ul>
             <li><strong>📚 分單元 160 關冒險</strong>：完整對應 108 課綱國小三年級 24 項條目，每題皆附對錯雙欄解析與原創 SVG 圖形說明。</li>
-            <li><strong>🧰 學習好幫手</strong>：內建 27 張語音翻轉名詞字卡、答題手寫草稿紙、互動時鐘／分數披薩／直尺教具、學習診斷雷達圖與 A4 列印練習卷。</li>
+            <li><strong>🧰 學習好幫手</strong>：內建 50 張語音翻轉名詞字卡、答題手寫草稿紙、互動時鐘／分數披薩／直尺教具、學習診斷雷達圖與 A4 列印練習卷。</li>
           </ul>
         </div>
         </div>
@@ -1339,8 +1339,8 @@
   <!-- 🏆 公開冒險者榮譽排行榜彈窗（登入頁、頂部導覽列與頁尾皆可公開開啟查看） -->
   <div id="leaderboard-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lb-modal-title">
     <div class="modal-dialog modal-lg">
-      <div class="modal-top">
-        <div>
+      <div class="modal-top" style="justify-content:center;text-align:center;">
+        <div style="width:100%;text-align:center;">
           <h3 id="lb-modal-title">🏆 數學遊戲冒險島・公開冒險者榮譽排行榜</h3>
           <p style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);">凡於本站建立冒險者身分並闖關練習，皆會自動榮登公開英雄榜！</p>
         </div>
@@ -1356,7 +1356,7 @@
       <div id="leaderboard-podium" class="lb-podium-grid"></div>
       <div id="leaderboard-list" class="lb-list-wrap"></div>
 
-      <div class="legal-footer-actions" style="margin-top:14px;">
+      <div class="legal-footer-actions" style="margin-top:14px;display:flex;justify-content:center;text-align:center;">
         <button type="button" class="btn btn-gold btn-lg" id="btn-close-leaderboard">✨ 繼續闖關衝榜！</button>
       </div>
     </div>
@@ -1365,7 +1365,7 @@
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
-  <script src="data/math-glossary.js"></script>
+  <script src="data/math-glossary.js?v=20261124e"></script>
   <script src="avatars.js?v=20261123w"></script>
   <script src="svg-icons.js"></script>
   <script src="audio-fx.js"></script>
@@ -1373,7 +1373,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261124d"></script>
+  <script src="super-features.js?v=20261124e"></script>
   <script src="app.js?v=20261123t"></script>
 </body>
 </html>

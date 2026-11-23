@@ -1541,32 +1541,55 @@
   }
 
   async function initSiteCounters() {
-    // 0. 全網跨裝置「目前線上人數」（每 2 分鐘時間窗全網心跳統計：全球有幾台手機/電腦正開著網站，就真實顯示幾人！）
+    // 0. 全網跨裝置＋多視窗「目前線上人數」（每 10 秒即時同步雲端 5 分鐘活躍時間窗與本機開啟分頁數）
+    const tabId = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
     let lastPingBucket = -1;
-    async function syncGlobalOnlinePresence() {
-      const bucket = Math.floor(Date.now() / 120000);
-      const bucketKey = `online_${bucket}`;
+    let cloudOnline = 1;
+
+    function getLocalActiveTabsCount() {
       try {
-        if (lastPingBucket !== bucket) {
-          lastPingBucket = bucket;
-          const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data && typeof data.count === "number") {
-              onlineCount = Math.max(1, Math.min(data.count, Math.max(1, cachedVisits)));
-            }
-          }
-        } else {
-          const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data && typeof data.count === "number") {
-              onlineCount = Math.max(1, Math.min(data.count, Math.max(1, cachedVisits)));
-            }
+        const now = Date.now();
+        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
+        raw[tabId] = now;
+        Object.keys(raw).forEach((k) => {
+          if (now - raw[k] > 15000) delete raw[k];
+        });
+        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
+        return Math.max(1, Object.keys(raw).length);
+      } catch (_) {
+        return 1;
+      }
+    }
+
+    window.addEventListener("beforeunload", () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
+        delete raw[tabId];
+        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
+      } catch (_) {}
+    });
+
+    async function syncGlobalOnlinePresence() {
+      const localTabs = getLocalActiveTabsCount();
+      const bucket = Math.floor(Date.now() / 300000);
+      const bucketKey = `online5m_${bucket}`;
+      try {
+        const url = lastPingBucket !== bucket
+          ? `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up`
+          : `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/`;
+        lastPingBucket = bucket;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === "number") {
+            cloudOnline = Math.max(1, data.count);
           }
         }
-      } catch (_) {
-        onlineCount = Math.max(1, onlineCount);
+      } catch (_) {}
+      onlineCount = Math.max(1, localTabs, cloudOnline);
+      if (onlineCount > cachedVisits) {
+        cachedVisits = onlineCount;
+        localStorage.setItem("mai_cached_visits", String(cachedVisits));
       }
       renderCounterDOM();
     }
