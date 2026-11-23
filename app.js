@@ -49,7 +49,7 @@
     { x: 755, y: 210 }
   ];
 
-  // 6 座群島設定（1~4號島直接開放且各負責 4 個單元；5號島 30星解鎖、6號島 80星解鎖純淨大島！）
+  // 6 座群島設定（1~4號島直接開放且各負責 4 個單元；5號島 30星解鎖、6號島 60星解鎖！6座島全數擁有 10 個可自由移動與一鍵還原的預設景觀！）
   const ISLANDS_CONFIG = {
     main: {
       id: "main",
@@ -64,12 +64,16 @@
       beachFill: "#f5e3b5",
       showUnitPins: true,
       fixedProps: [
-        { x: 265, y: 145, svgId: "tree_round", cls: "" },
-        { x: 475, y: 155, svgId: "tree_pine", cls: "" },
-        { x: 675, y: 145, svgId: "house", cls: "prop-house" },
-        { x: 120, y: 255, svgId: "tent", cls: "" },
-        { x: 455, y: 385, svgId: "sunflower", cls: "" },
-        { x: 830, y: 300, svgId: "palm", cls: "" }
+        { x: 140, y: 185, svgId: "tree_round", cls: "" },
+        { x: 265, y: 145, svgId: "tree_pine", cls: "" },
+        { x: 478, y: 142, svgId: "windmill", cls: "prop-house" },
+        { x: 645, y: 145, svgId: "house", cls: "prop-house" },
+        { x: 118, y: 262, svgId: "tent", cls: "" },
+        { x: 305, y: 372, svgId: "campfire", cls: "" },
+        { x: 455, y: 388, svgId: "sunflower", cls: "" },
+        { x: 690, y: 365, svgId: "mushroom", cls: "" },
+        { x: 830, y: 300, svgId: "palm", cls: "" },
+        { x: 472, y: 258, svgId: "clover", cls: "" }
       ],
       decorSvg: ""
     },
@@ -87,8 +91,15 @@
       showUnitPins: true,
       fixedProps: [
         { x: 145, y: 185, svgId: "sakura", cls: "" },
-        { x: 790, y: 155, svgId: "tree_round", cls: "" },
-        { x: 130, y: 370, svgId: "tulip", cls: "" }
+        { x: 268, y: 142, svgId: "cottage", cls: "prop-house" },
+        { x: 482, y: 145, svgId: "fountain", cls: "prop-house" },
+        { x: 645, y: 148, svgId: "tree_round", cls: "" },
+        { x: 122, y: 270, svgId: "butterfly", cls: "" },
+        { x: 130, y: 378, svgId: "tulip", cls: "" },
+        { x: 325, y: 372, svgId: "duck", cls: "" },
+        { x: 472, y: 258, svgId: "rose", cls: "" },
+        { x: 695, y: 365, svgId: "bee", cls: "" },
+        { x: 822, y: 312, svgId: "plant_daisy", cls: "" }
       ],
       decorSvg: `
         <ellipse cx="465" cy="255" rx="95" ry="44" fill="#fff0c9" stroke="#fffdf7" stroke-width="5" opacity="0.9" />
@@ -109,7 +120,15 @@
       showUnitPins: true,
       fixedProps: [
         { x: 145, y: 175, svgId: "lollipop", cls: "" },
-        { x: 815, y: 165, svgId: "balloon", cls: "" }
+        { x: 268, y: 142, svgId: "house_bakery", cls: "prop-house" },
+        { x: 482, y: 142, svgId: "carousel", cls: "prop-house" },
+        { x: 645, y: 148, svgId: "house_cafe", cls: "prop-house" },
+        { x: 825, y: 172, svgId: "balloon", cls: "" },
+        { x: 120, y: 268, svgId: "rainbow", cls: "" },
+        { x: 315, y: 375, svgId: "cake", cls: "" },
+        { x: 468, y: 262, svgId: "icecream", cls: "" },
+        { x: 695, y: 368, svgId: "donut", cls: "" },
+        { x: 825, y: 312, svgId: "fireworks", cls: "" }
       ],
       decorSvg: `
         <ellipse cx="468" cy="260" rx="185" ry="96" fill="#fff4df" stroke="#f2c48d" stroke-width="4" stroke-dasharray="10 8" opacity="0.82" />
@@ -128,8 +147,16 @@
       beachFill: "#fff3d1",
       showUnitPins: true,
       fixedProps: [
-        { x: 135, y: 355, svgId: "palm", cls: "" },
-        { x: 825, y: 325, svgId: "palm", cls: "" }
+        { x: 148, y: 185, svgId: "lighthouse", cls: "prop-house" },
+        { x: 272, y: 145, svgId: "shootingstar", cls: "" },
+        { x: 482, y: 142, svgId: "lantern", cls: "" },
+        { x: 645, y: 145, svgId: "palm", cls: "" },
+        { x: 125, y: 362, svgId: "palm", cls: "" },
+        { x: 318, y: 375, svgId: "sailboat", cls: "" },
+        { x: 468, y: 262, svgId: "crystal", cls: "" },
+        { x: 692, y: 365, svgId: "shell", cls: "" },
+        { x: 825, y: 325, svgId: "campfire", cls: "" },
+        { x: 818, y: 168, svgId: "duck", cls: "" }
       ],
       decorSvg: `
         <rect x="425" y="388" width="76" height="26" rx="6" fill="#c78d56" stroke="#7d5129" stroke-width="2.5" />
@@ -489,7 +516,7 @@
     const customPropsHtml = window.MathExtras
       ? window.MathExtras.getPlacedIslandPropsHtml(user, state.decorateMode ? state.pickedDecorId : null, isl.id)
       : "";
-    const isMovableFixedIsland = isl.id === "town" || isl.id === "kingdom";
+    const isMovableFixedIsland = true;
     const propsHtml =
       props
         .map((p, idx) => {
@@ -1905,12 +1932,8 @@
       const isFixedPicked = state.pickedDecorId && state.pickedDecorId.startsWith("fixed_");
 
       if (owned.length === 0 && !isFixedPicked) {
-        if (curIsl.id === "town" || curIsl.id === "kingdom") {
-          if (hint) hint.textContent = `✨ 在「${curIsl.title}」可以直接點選島上任何小屋、城堡或景觀自由移動（點「↺ 恢復預設位置」可一鍵歸位）！`;
-          tray.innerHTML = `<span style="font-size:0.86rem;color:var(--muted);font-weight:800;">點島上任意景觀就能拿起移動！也可以去「🛍️ 商店徽章」買更多裝飾與 Q 版小人物！</span>`;
-        } else {
-          tray.innerHTML = `<span style="font-size:0.86rem;color:var(--muted);font-weight:800;">你還沒有購買裝飾品喔！快去「🛍️ 商店徽章」用閃亮金幣買裝飾或 Q 版小人物吧！</span>`;
-        }
+        if (hint) hint.textContent = `✨ 在「${curIsl.title}」可以直接點選島上任何小屋、花草或景觀自由移動（點「↺ 恢復預設位置」可一鍵歸位）！`;
+        tray.innerHTML = `<span style="font-size:0.86rem;color:var(--muted);font-weight:800;">點島上任意景觀就能拿起移動！也可以去「🛍️ 商店徽章」買更多裝飾與 Q 版小人物！</span>`;
         return;
       }
       if (!isFixedPicked && (!state.pickedDecorId || !user.ownedItems.includes(state.pickedDecorId))) {
