@@ -831,7 +831,7 @@
               <div id="pet-level-text" class="pet-level-text">Lv.1 🥚 暖暖神秘蛋</div>
               <div class="pet-xp-wrap"><div id="pet-xp-fill" class="pet-xp-fill" style="width:0%"></div></div>
               <div class="pet-action-row">
-                <button type="button" class="btn btn-gold" id="btn-pet-feed">🍪 餵食餅乾 (+6)</button>
+                <button type="button" class="btn btn-gold" id="btn-pet-feed">🍪 餵餅乾（成長+6）</button>
                 <button type="button" class="btn btn-forest" id="btn-pet-play">🎾 陪牠玩耍</button>
                 <button type="button" class="btn btn-burgundy" id="btn-pet-sleep">😴 哄牠睡覺</button>
                 <button type="button" class="btn btn-ghost" id="btn-pet-buy-cookie">🪙 15金幣買3餅乾</button>
@@ -1275,6 +1275,22 @@
           <div class="wk-kpi"><span>⏳ 累計總停留學習時間</span><strong data-stay-total>0 分鐘</strong></div>
           <div class="wk-kpi"><span>📊 平均每次拜訪停留時間</span><strong data-stay-avg>0 分鐘</strong></div>
         </div>
+
+        <h4 style="margin:0 0 8px;color:var(--ink);">🎁 站長一鍵測試／教學展示工具（對目前登入角色生效）</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <button type="button" class="btn btn-gold btn-sm" id="admin-btn-add-coins">🪙 +1,000 金幣</button>
+          <button type="button" class="btn btn-forest btn-sm" id="admin-btn-add-cookies">🍪 +50 塊寵物餅乾</button>
+          <button type="button" class="btn btn-burgundy btn-sm" id="admin-btn-add-stars">⭐ 集滿 90 星（解鎖 5、6 號島）</button>
+          <button type="button" class="btn btn-gold btn-sm" id="admin-btn-full-clear">👑 160 關全破滿星</button>
+        </div>
+        <div id="admin-tool-toast" class="island-unlock-toast hidden" style="margin:0 0 14px;background:#e8f9ee;border-color:#5bb876;color:#276b3d;"></div>
+
+        <h4 style="margin:0 0 8px;color:var(--ink);">🏆 本機所有冒險者成績總覽表</h4>
+        <div id="admin-profiles-table" class="exam-review-scroll" style="max-height:190px;margin-bottom:16px;"></div>
+
+        <h4 style="margin:0 0 8px;color:var(--ink);">📉 熱門練習單元 Top 3 ＆ 易錯大魔王單元 Top 3</h4>
+        <div id="admin-unit-analytics" class="exam-diag-grid" style="margin-bottom:16px;"></div>
+
         <h4 style="margin:0 0 8px;color:var(--ink);">📬 站內「聯絡我們」收到的意見回饋留言</h4>
         <div id="admin-feedback-list" class="exam-review-scroll" style="max-height:220px;"></div>
       </div>
@@ -1296,7 +1312,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261123s"></script>
+  <script src="super-features.js?v=20261123u"></script>
   <script src="app.js?v=20261123t"></script>
 </body>
 </html>

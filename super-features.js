@@ -1364,7 +1364,93 @@
     });
   }
 
+  function renderAdminExtraAnalytics() {
+    const profBox = document.getElementById("admin-profiles-table");
+    const unitBox = document.getElementById("admin-unit-analytics");
+    const bank = api ? api.getBank() : window.GRADE3_MATH_BANK;
+    let usersMap = {};
+    try {
+      const raw = localStorage.getItem("grade3_math_luxury_store_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        usersMap = (parsed && parsed.users) || {};
+      }
+    } catch (_) {}
+    const users = Object.values(usersMap);
+
+    if (profBox) {
+      if (!users.length) {
+        profBox.innerHTML = `<p style="text-align:center;color:var(--muted);font-weight:800;padding:10px;">目前尚未建立任何冒險者角色。</p>`;
+      } else {
+        profBox.innerHTML = users
+          .map((u) => {
+            const cleared = Object.values(u.stageStars || {}).filter((s) => s > 0).length;
+            const stars = Object.values(u.stageStars || {}).reduce((a, b) => a + b, 0);
+            const hist = u.history || [];
+            const totalQ = hist.reduce((s, h) => s + (h.total || 0), 0);
+            const okQ = hist.reduce((s, h) => s + (h.correct || 0), 0);
+            const acc = totalQ > 0 ? Math.round((okQ / totalQ) * 100) : 0;
+            const petXp = (u.pet && u.pet.xp) || 0;
+            const petLv = getPetStage(petXp).lv;
+            return `
+              <div class="exam-rev-row ok" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+                <strong>🧑‍🎓 ${esc(u.name)}</strong>
+                <span>通關：<b>${cleared}/160</b> ｜ ⭐ <b>${stars}</b> ｜ 🪙 <b>${u.coins || 0}</b> ｜ 作答：<b>${totalQ}題 (${acc}%)</b> ｜ 錯題：<b>${(u.mistakes || []).length}</b> ｜ 寵物：<b>Lv.${petLv}</b></span>
+              </div>`;
+          })
+          .join("");
+      }
+    }
+
+    if (unitBox && bank && bank.units) {
+      const qUnitMap = new Map();
+      const unitStats = new Map();
+      bank.units.forEach((u) => {
+        unitStats.set(u.id, { title: `第${String(u.order).padStart(2, "0")}單元 ${u.title}`, played: 0, mistakes: 0 });
+        (u.questions || []).forEach((q) => qUnitMap.set(q.id, u.id));
+      });
+
+      users.forEach((u) => {
+        Object.entries(u.stageStars || {}).forEach(([k, st]) => {
+          if (st > 0) {
+            const uid = k.split("-s")[0];
+            if (unitStats.has(uid)) unitStats.get(uid).played += 1;
+          }
+        });
+        (u.mistakes || []).forEach((qid) => {
+          const uid = qUnitMap.get(qid);
+          if (uid && unitStats.has(uid)) unitStats.get(uid).mistakes += 1;
+        });
+        (u.history || []).forEach((h) => {
+          (h.items || []).forEach((it) => {
+            const uid = qUnitMap.get(it.qid);
+            if (uid && unitStats.has(uid)) {
+              unitStats.get(uid).played += 1;
+              if (!it.isCorrect) unitStats.get(uid).mistakes += 1;
+            }
+          });
+        });
+      });
+
+      const arr = Array.from(unitStats.values());
+      const topPlayed = [...arr].filter((x) => x.played > 0).sort((a, b) => b.played - a.played).slice(0, 3);
+      const topMistakes = [...arr].filter((x) => x.mistakes > 0).sort((a, b) => b.mistakes - a.mistakes).slice(0, 3);
+
+      unitBox.innerHTML = `
+        <div class="exam-diag-box good">
+          <h4>🔥 最熱門練習單元 Top 3</h4>
+          <p>${topPlayed.length ? topPlayed.map((x, i) => `${i + 1}. ${x.title}（熱度 ${x.played}）`).join("<br/>") : "尚無單元練習記錄"}</p>
+        </div>
+        <div class="exam-diag-box warn">
+          <h4>😈 最常答錯大魔王單元 Top 3</h4>
+          <p>${topMistakes.length ? topMistakes.map((x, i) => `${i + 1}. ${x.title}（累計錯 ${x.mistakes} 次）`).join("<br/>") : "目前零錯題！表現超棒！"}</p>
+        </div>
+      `;
+    }
+  }
+
   function renderAdminFeedbackList() {
+    renderAdminExtraAnalytics();
     const listEl = document.getElementById("admin-feedback-list");
     if (!listEl) return;
     let items = [];
@@ -1617,6 +1703,74 @@
 
     if (btnCloseAdmin && adminModal) {
       btnCloseAdmin.addEventListener("click", () => adminModal.classList.add("hidden"));
+    }
+
+    // 站長一鍵測試／教學展示工具按鈕
+    function showAdminToolToast(msg) {
+      const t = document.getElementById("admin-tool-toast");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.remove("hidden");
+    }
+    const btnAddCoins = document.getElementById("admin-btn-add-coins");
+    if (btnAddCoins) {
+      btnAddCoins.addEventListener("click", () => {
+        const u = api ? ensureSuperState(api.getUser()) : null;
+        if (!u) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
+        u.coins = (u.coins || 0) + 1000;
+        api.saveStore();
+        api.refreshHome();
+        renderAdminExtraAnalytics();
+        window.SoundFX && window.SoundFX.playFanfare(3);
+        showAdminToolToast(`✅ 已為「${u.name}」增加 +1,000 金幣（目前共 ${u.coins} 金幣）！`);
+      });
+    }
+    const btnAddCookies = document.getElementById("admin-btn-add-cookies");
+    if (btnAddCookies) {
+      btnAddCookies.addEventListener("click", () => {
+        const u = api ? ensureSuperState(api.getUser()) : null;
+        if (!u) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
+        u.pet.cookies = (u.pet.cookies || 0) + 50;
+        api.saveStore();
+        api.refreshHome();
+        renderAdminExtraAnalytics();
+        window.SoundFX && window.SoundFX.playFanfare(3);
+        showAdminToolToast(`✅ 已為「${u.name}」增加 +50 塊寵物餅乾（目前共 ${u.pet.cookies} 塊）！`);
+      });
+    }
+    const btnAddStars = document.getElementById("admin-btn-add-stars");
+    if (btnAddStars) {
+      btnAddStars.addEventListener("click", () => {
+        const u = api ? ensureSuperState(api.getUser()) : null;
+        const bank = api ? api.getBank() : window.GRADE3_MATH_BANK;
+        if (!u || !bank) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
+        if (!u.stageStars) u.stageStars = {};
+        bank.units.slice(0, 3).forEach((unit) => {
+          for (let s = 1; s <= 10; s++) u.stageStars[`${unit.id}-s${s}`] = 3;
+        });
+        api.saveStore();
+        api.refreshHome();
+        renderAdminExtraAnalytics();
+        window.SoundFX && window.SoundFX.playFanfare(3);
+        showAdminToolToast(`✅ 已為「${u.name}」補滿前 3 單元共 90 顆星（5 號島、6 號島皆已解鎖）！`);
+      });
+    }
+    const btnFullClear = document.getElementById("admin-btn-full-clear");
+    if (btnFullClear) {
+      btnFullClear.addEventListener("click", () => {
+        const u = api ? ensureSuperState(api.getUser()) : null;
+        const bank = api ? api.getBank() : window.GRADE3_MATH_BANK;
+        if (!u || !bank) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
+        if (!u.stageStars) u.stageStars = {};
+        bank.units.forEach((unit) => {
+          for (let s = 1; s <= 10; s++) u.stageStars[`${unit.id}-s${s}`] = 3;
+        });
+        api.saveStore();
+        api.refreshHome();
+        renderAdminExtraAnalytics();
+        window.SoundFX && window.SoundFX.playFanfare(3);
+        showAdminToolToast(`👑 已為「${u.name}」開啟 160 關全破滿星（共 480 顆星，所有島嶼與大滿貫獎狀全解鎖）！`);
+      });
     }
 
     try {
