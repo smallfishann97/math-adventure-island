@@ -305,10 +305,12 @@
     glossary: document.getElementById("view-glossary"),
     mistakesHub: document.getElementById("view-mistakes-hub"),
     history: document.getElementById("view-history"),
+    petquest: document.getElementById("view-petquest"),
     sources: document.getElementById("view-sources")
   };
   const navBtns = {
     home: document.getElementById("nav-home"),
+    petquest: document.getElementById("nav-petquest"),
     original: document.getElementById("nav-original"),
     arcade: document.getElementById("nav-arcade"),
     shop: document.getElementById("nav-shop"),
@@ -457,6 +459,7 @@
     refreshArchipelagoTickets(totalStars);
     renderIslandMap(u);
     renderUnitsGrid(u);
+    if (window.MathSuper) window.MathSuper.refreshAll();
   }
 
   function refreshArchipelagoTickets(totalStars) {
@@ -1152,6 +1155,7 @@
       quiz.maxCombo = Math.max(quiz.maxCombo, quiz.combo);
       gained = 100 + Math.min((quiz.combo - 1) * 20, 100);
       quiz.score += gained;
+      if (window.MathSuper) window.MathSuper.recordEvent("correct", 1);
     } else {
       quiz.combo = 0;
     }
@@ -1289,6 +1293,7 @@
     }
 
     // 存入「歷史答題記錄」（最多保留最近 60 筆）
+    if (window.MathSuper) window.MathSuper.recordEvent("stage", 1);
     user.history.unshift({
       id: "h_" + Date.now(),
       date: new Date().toLocaleString("zh-TW", { hour12: false }),
@@ -1739,11 +1744,25 @@
     navBtns.home.addEventListener("click", () => {
       window.SoundFX.playClick(); stopQuizTimer(); refreshAllHomeUI(); showView("home", "home");
     });
+    if (navBtns.petquest) {
+      navBtns.petquest.addEventListener("click", () => {
+        window.SoundFX.playClick(); stopQuizTimer();
+        if (window.MathSuper) window.MathSuper.refreshAll();
+        showView("petquest", "petquest");
+      });
+    }
+    const petBackBtn = document.getElementById("btn-petquest-back");
+    if (petBackBtn) {
+      petBackBtn.addEventListener("click", () => {
+        window.SoundFX.playClick(); refreshAllHomeUI(); showView("home", "home");
+      });
+    }
     navBtns.original.addEventListener("click", () => {
       window.SoundFX.playClick(); stopQuizTimer(); renderOriginalZone(); showView("original", "original");
     });
     navBtns.arcade.addEventListener("click", () => {
       window.SoundFX.playClick(); stopQuizTimer();
+      if (window.MathSuper) window.MathSuper.recordEvent("extra", 1);
       if (window.MathDeluxeRefreshBlitz) window.MathDeluxeRefreshBlitz();
       showView("arcade", "arcade");
     });
@@ -2296,6 +2315,25 @@
     window.MathDeluxe.initCertificateGenerator(currentUser);
     window.MathDeluxe.initBlitzGame(currentUser, saveStore, refreshAllHomeUI);
     window.MathDeluxe.initPkMode();
+  }
+
+  if (window.MathSuper) {
+    window.MathSuper.init({
+      getUser: currentUser,
+      saveStore,
+      refreshHome: refreshAllHomeUI,
+      getBank: () => BANK,
+      getIslandsConfig: () => ISLANDS_CONFIG,
+      getCurrentIsland: () => state.currentIsland || "main",
+      getTheme: () => {
+        const el = document.getElementById("island-map-container");
+        if (!el) return "day";
+        if (el.classList.contains("theme-night")) return "night";
+        if (el.classList.contains("theme-sunset")) return "sunset";
+        if (el.classList.contains("theme-cloudy")) return "cloudy";
+        return "day";
+      }
+    });
   }
 
   if (store.activeUserId && store.users[store.activeUserId]) {

@@ -4633,3 +4633,349 @@ html, body {
   transition: transform 0.08s ease;
   user-select: none;
 }
+
+/* ==================== 五大進階互動模組樣式 (super-features.js) ==================== */
+.petquest-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 20px;
+}
+
+.pet-card,
+.daily-card {
+  background: linear-gradient(180deg, #fffdf8, #fff5e1);
+  border: 2.5px solid #e7c079;
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.pet-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pet-cookie-pill {
+  background: #fff2ce;
+  border: 1.5px solid #e4ad4b;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #6b4827;
+}
+
+.pet-speech-bubble {
+  margin: 12px 0 8px;
+  background: #fffdf9;
+  border: 2px dashed #e5b769;
+  border-radius: 16px;
+  padding: 10px 14px;
+  text-align: center;
+  font-weight: 900;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.pet-avatar-stage {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pet-stage-svg {
+  width: 136px;
+  height: 136px;
+  animation: islandFloatBob 2.2s ease-in-out infinite;
+}
+
+.pet-level-text {
+  text-align: center;
+  font-weight: 900;
+  color: #5a4031;
+  margin-bottom: 8px;
+}
+
+.pet-xp-wrap {
+  height: 14px;
+  background: #f3e2c3;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1.5px solid #d9ad62;
+  margin-bottom: 14px;
+}
+
+.pet-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #74c788, #4ba363);
+  transition: width 0.3s ease;
+}
+
+.pet-action-row,
+.pet-species-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.checkin-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.checkin-day-card {
+  background: #fffdf9;
+  border: 2px solid #e6c994;
+  border-radius: 14px;
+  padding: 8px 4px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.checkin-day-card.is-done {
+  background: #e9f9ee;
+  border-color: #67b97c;
+}
+
+.checkin-day-card.is-today {
+  background: #fff2c6;
+  border-color: #e09624;
+  box-shadow: 0 0 0 3px rgba(242, 164, 59, 0.28);
+}
+
+.ck-day { font-size: 0.72rem; font-weight: 800; color: var(--muted); }
+.ck-icon { font-size: 1.35rem; }
+.ck-reward { font-size: 0.74rem; color: #5a4031; }
+
+.daily-quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.daily-quest-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fffdf9;
+  border: 2px solid #ead1a4;
+  border-radius: 16px;
+  padding: 10px 14px;
+}
+
+.daily-quest-row.is-ready {
+  border-color: #e29b2f;
+  background: #fff8e3;
+}
+
+.daily-quest-row.is-claimed {
+  opacity: 0.68;
+  background: #f2f8f4;
+}
+
+.dq-main { flex: 1; }
+.dq-title { font-weight: 900; font-size: 0.92rem; color: var(--ink); margin-bottom: 5px; }
+.dq-bar-wrap { height: 8px; background: #f2e4cb; border-radius: 99px; overflow: hidden; margin-bottom: 4px; }
+.dq-bar-fill { height: 100%; background: linear-gradient(90deg, #f2a43b, #e07b24); }
+.dq-meta { font-size: 0.78rem; font-weight: 800; color: var(--muted); }
+
+.quiz-pet-cheer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff7e0;
+  border: 1.5px solid #e5b45b;
+  border-radius: 999px;
+  padding: 3px 10px 3px 6px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #5a4031;
+}
+
+.quiz-pet-mini svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+/* 期中／期末模擬考 */
+.exam-dots-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.exam-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 2px solid #e0c391;
+  background: #fffdf8;
+  font-weight: 900;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.exam-dot.done { background: #e6f7ec; border-color: #5eb376; color: #2b7a46; }
+.exam-dot.active { background: #ffd875; border-color: #c98219; }
+
+.exam-q-card {
+  background: #fffdf8;
+  border: 2px solid #e6c68e;
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.exam-q-meta { font-size: 0.84rem; font-weight: 800; color: var(--muted); margin-bottom: 8px; }
+.exam-q-prompt { font-size: 1.12rem; font-weight: 900; color: var(--ink); margin-bottom: 12px; line-height: 1.55; }
+.exam-q-svg { max-width: 360px; margin: 10px auto; }
+
+.exam-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.exam-choice-btn {
+  padding: 12px;
+  border-radius: 14px;
+  border: 2px solid #e2c28b;
+  background: #fff9ec;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.exam-choice-btn.selected {
+  background: #e2f6e8;
+  border-color: #469d61;
+}
+
+.exam-input-row { display: flex; gap: 10px; }
+.exam-footer-nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+.exam-score-hero {
+  text-align: center;
+  background: linear-gradient(180deg, #fffdf5, #ffe9b3);
+  border: 2.5px solid #e3a842;
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.exam-score-num { font-size: 3rem; font-weight: 900; color: #c86419; line-height: 1.1; }
+.exam-score-num span { font-size: 1.2rem; }
+
+.exam-diag-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exam-diag-box {
+  padding: 12px;
+  border-radius: 14px;
+  font-size: 0.86rem;
+}
+.exam-diag-box h4 { margin: 0 0 4px; }
+.exam-diag-box p { margin: 0; font-weight: 800; }
+.exam-diag-box.good { background: #e9f8ee; border: 1.5px solid #75bf8a; }
+.exam-diag-box.warn { background: #fff4e4; border: 1.5px solid #e8ad6b; }
+
+.exam-review-scroll {
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exam-rev-row {
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  background: #fffdf8;
+  border: 1.5px solid #e5cfa8;
+}
+.exam-rev-row.ok { border-left: 5px solid #4ba363; }
+.exam-rev-row.bad { border-left: 5px solid #d95d4a; }
+.exam-rev-row p { margin: 4px 0; }
+
+/* 家長／老師學習週報小卡 */
+.weekly-report-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.weekly-report-head h3 { margin: 0; }
+.weekly-report-head p { margin: 2px 0 0; font-size: 0.84rem; color: var(--muted); font-weight: 800; }
+
+.weekly-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.wk-kpi {
+  background: #fff8e6;
+  border: 1.5px solid #e7c37e;
+  border-radius: 14px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.wk-kpi span { display: block; font-size: 0.78rem; color: var(--muted); font-weight: 800; }
+.wk-kpi strong { font-size: 1.25rem; color: var(--ink); }
+
+.weekly-units-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  margin-bottom: 10px;
+}
+
+.weekly-comment {
+  background: #eaf8ee;
+  border: 1.5px solid #7cc08e;
+  color: #2b6c40;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 900;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 768px) {
+  .petquest-grid,
+  .exam-diag-grid {
+    grid-template-columns: 1fr;
+  }
+  .weekly-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .checkin-strip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .exam-choices {
+    grid-template-columns: 1fr;
+  }
+}

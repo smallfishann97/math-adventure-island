@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261123f" />
+  <link rel="stylesheet" href="styles.css?v=20261123h" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -71,6 +71,10 @@
 
         <nav class="topbar-actions" aria-label="主功能選單">
           <button class="nav-pill active" id="nav-home" type="button">🗺️ 冒險島地圖</button>
+          <button class="nav-pill" id="nav-petquest" type="button">
+            🐾 寵物任務
+            <span class="badge-count hidden" id="pet-quest-badge">0</span>
+          </button>
           <button class="nav-pill" id="nav-original" type="button">✨ 原創挑戰區</button>
           <button class="nav-pill" id="nav-arcade" type="button">⚡ 閃電與PK</button>
           <button class="nav-pill" id="nav-shop" type="button">🛍️ 商店徽章</button>
@@ -225,7 +229,8 @@
                   <span>星空</span>
                 </button>
               </div>
-              <button type="button" class="btn btn-gold btn-sm" id="btn-toggle-decorate" title="自由移動商店購買的島嶼裝飾">✨ 自由佈置小島</button>
+              <button type="button" class="btn btn-gold btn-sm" id="btn-toggle-decorate" title="自由移動島上景觀與商店裝飾">✨ 自由佈置小島</button>
+              <button type="button" class="btn btn-forest btn-sm" id="btn-island-postcard" title="拍下目前小島的專屬明信片">📷 拍小島明信片</button>
               <div class="camera-controls" aria-label="轉動島嶼視角">
                 <button type="button" class="cam-btn" id="btn-cam-left" title="向左轉動島嶼">↺</button>
                 <button type="button" class="cam-btn" id="btn-cam-reset" title="重設視角">⌖</button>
@@ -384,6 +389,7 @@
             <div class="metric-pill score-pill">🏆 <span id="hud-score">0</span></div>
             <div class="metric-pill combo-pill" id="hud-combo-pill">🔥 <span id="hud-combo">0</span> 連擊</div>
             <div class="metric-pill timer-pill">⏱️ <span id="hud-timer">00:00</span></div>
+            <div class="quiz-pet-cheer" id="quiz-pet-cheer"></div>
           </div>
         </div>
 
@@ -589,6 +595,9 @@
 
       <!-- ==================== 視圖 8：歷史答題記錄館 ==================== -->
       <section id="view-history" class="view">
+        <div class="panel-card" style="margin-bottom:20px;">
+          <div id="weekly-report-box" class="weekly-report-box"></div>
+        </div>
         <div class="panel-card">
           <div class="panel-header">
             <button class="btn btn-ghost" id="btn-history-back" type="button">← 返回冒險島地圖</button>
@@ -756,6 +765,23 @@
           </div>
         </div>
 
+        <!-- 📝 期中／期末模擬考卷模式 -->
+        <div class="panel-card" style="margin-top:20px;">
+          <h3 class="section-subtitle">📝 期中／期末綜合模擬考（20 題・每題 5 分・滿分 100 分）</h3>
+          <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
+            隨機抽出跨單元 20 題綜合模擬考卷！線上作答立刻批改評分、診斷強弱項單元並贈送 🪙 +100 金幣，也可一鍵列印 A4 紙本考卷與解答卷！
+          </p>
+          <div class="cert-toolbar">
+            <select id="mock-exam-scope" class="luxury-select">
+              <option value="midterm">📘 期中模擬考（第 01～08 單元・20 題）</option>
+              <option value="final">📗 期末模擬考（第 09～16 單元・20 題）</option>
+              <option value="full">📕 全學年總複習（第 01～16 單元・20 題）</option>
+            </select>
+            <button type="button" class="btn btn-gold" id="btn-start-mock-exam">🖥️ 開始線上模擬考</button>
+            <button type="button" class="btn btn-forest" id="btn-print-mock-exam">🖨️ 列印 A4 紙本考卷</button>
+          </div>
+        </div>
+
         <!-- 個人專屬學習獎狀生成器 -->
         <div class="panel-card" style="margin-top:20px;">
           <h3 class="section-subtitle">🏅 個人專屬「數學榮譽獎狀」產生器（一鍵下載 PNG 或列印！）</h3>
@@ -773,6 +799,54 @@
           <div id="cert-unlock-status" class="island-unlock-toast" style="margin:0 0 14px;">🔒 榮譽獎狀門檻：累計 ⭐ 15 顆星即可解鎖下載與列印！</div>
           <div class="cert-preview-wrap">
             <canvas id="cert-canvas" width="840" height="540" class="cert-canvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 視圖 14：寵物養成 & 每日任務簽到 ==================== -->
+      <section id="view-petquest" class="view">
+        <div class="panel-card" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-petquest-back" type="button">← 返回冒險島地圖</button>
+            <h2>🐾 島嶼電子寵物 & 🎁 每日任務簽到</h2>
+          </div>
+
+          <div class="petquest-grid">
+            <!-- 左欄：島嶼電子寵物養成 -->
+            <div class="pet-card">
+              <div class="pet-top-bar">
+                <span class="ver-tag" id="pet-name-badge">柴犬麻糬</span>
+                <span class="pet-cookie-pill">🍪 寵物餅乾：<strong id="pet-cookie-count">3</strong> 塊</span>
+              </div>
+              <div id="pet-speech-bubble" class="pet-speech-bubble">汪汪！答對數學題就能獲得香噴噴的餅乾喔！</div>
+              <div id="pet-avatar-stage" class="pet-avatar-stage"></div>
+              <div id="pet-level-text" class="pet-level-text">Lv.1 🥚 暖暖神秘蛋</div>
+              <div class="pet-xp-wrap"><div id="pet-xp-fill" class="pet-xp-fill" style="width:0%"></div></div>
+              <div class="pet-action-row">
+                <button type="button" class="btn btn-gold" id="btn-pet-feed">🍪 餵食餅乾 (+6)</button>
+                <button type="button" class="btn btn-forest" id="btn-pet-play">🎾 陪牠玩耍 (+2)</button>
+                <button type="button" class="btn btn-ghost" id="btn-pet-buy-cookie">🪙 15金幣買3餅乾</button>
+              </div>
+              <div class="pet-species-row">
+                <span style="font-size:0.82rem;font-weight:800;color:var(--muted);">切換小夥伴：</span>
+                <button type="button" class="filter-chip active" data-pet-species="shiba">🐶 柴犬麻糬</button>
+                <button type="button" class="filter-chip" data-pet-species="fox">🦊 焦糖小狐狸</button>
+                <button type="button" class="filter-chip" data-pet-species="dino">🦖 抹茶小恐龍</button>
+              </div>
+            </div>
+
+            <!-- 右欄：7 天連續簽到寶箱＋每日任務 -->
+            <div class="daily-card">
+              <h3 class="section-subtitle" style="margin-top:0;">📅 7 天連續簽到寶箱</h3>
+              <p id="checkin-status-text" style="font-size:0.88rem;font-weight:800;color:var(--ink-soft);margin:0 0 10px;"></p>
+              <div id="checkin-strip" class="checkin-strip"></div>
+              <div style="margin:12px 0 18px;">
+                <button type="button" class="btn btn-gold btn-lg" id="btn-daily-checkin" style="width:100%;">🎁 領取今日簽到獎勵</button>
+              </div>
+              <hr class="soft-divider" />
+              <h3 class="section-subtitle">🎯 今日 3 大輕鬆小任務</h3>
+              <div id="daily-quest-list" class="daily-quest-list"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -1066,6 +1140,31 @@
     </div>
   </div>
 
+  <!-- 期中／期末模擬考彈窗 -->
+  <div id="mock-exam-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="exam-modal-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="exam-modal-title">📝 期中／期末模擬考</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-exam">關閉 ✕</button>
+      </div>
+      <div id="exam-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 我的夢幻小島明信片彈窗 -->
+  <div id="postcard-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="postcard-modal-title">
+    <div class="modal-dialog modal-lg" style="text-align:center;">
+      <div class="modal-top">
+        <h3 id="postcard-modal-title">📷 我的夢幻小島專屬明信片</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-postcard">關閉 ✕</button>
+      </div>
+      <div class="cert-preview-wrap" style="margin-bottom:14px;">
+        <canvas id="postcard-canvas" width="1000" height="660" class="cert-canvas"></canvas>
+      </div>
+      <button type="button" class="btn btn-gold btn-lg" id="btn-download-postcard">⬇️ 下載小島明信片 (PNG)</button>
+    </div>
+  </div>
+
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
@@ -1077,6 +1176,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="app.js?v=20261123e"></script>
+  <script src="super-features.js?v=20261123h"></script>
+  <script src="app.js?v=20261123h"></script>
 </body>
 </html>
