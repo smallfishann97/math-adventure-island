@@ -1625,13 +1625,13 @@
       onlineCount = Math.max(1, localTabs, cloudOnline);
       renderCounterDOM();
 
-      // 15 分鐘雲端活躍池（900,000 ms）：每個新連線在每個 15 分鐘區間自動 +1，同區間內查詢最新雲端同時在線人數
+      // 15 分鐘雲端活躍池（900,000 ms）：附帶動態時間戳 ?t= 徹底破除 CDN / 瀏覽器對查詢網址的快取！
       const bucket = Math.floor(Date.now() / 900000);
       const bucketKey = `online15m_${bucket}`;
       const isFirstPingInBucket = lastPingBucket !== bucket;
       const url = isFirstPingInBucket
-        ? `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up`
-        : `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/`;
+        ? `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up?t=${Date.now()}`
+        : `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/?t=${Date.now()}`;
 
       const data = await fetchCounterJson(url, 4000);
       if (data && typeof data.count === "number") {
@@ -1665,14 +1665,14 @@
         cachedVisits = Math.max(1, cachedVisits + 1);
         localStorage.setItem("mai_cached_visits", String(cachedVisits));
         renderCounterDOM();
-        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/up`);
+        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/up?t=${Date.now()}`);
         if (data && typeof data.count === "number") {
           cachedVisits = Math.max(cachedVisits, data.count);
           localStorage.setItem("mai_cached_visits", String(cachedVisits));
           renderCounterDOM();
         }
       } else {
-        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/`);
+        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/?t=${Date.now()}`);
         if (data && typeof data.count === "number") {
           cachedVisits = Math.max(cachedVisits, data.count);
           localStorage.setItem("mai_cached_visits", String(cachedVisits));
@@ -2690,6 +2690,25 @@ ${colsXml}
 
     if (btnCloseLb && lbModal) {
       btnCloseLb.addEventListener("click", () => lbModal.classList.add("hidden"));
+    }
+
+    // 8. ↑ 返回頂部按鈕（頁尾膠囊＋往下捲動時右下角自動浮現）
+    const floatingTopBtn = document.getElementById("floating-back-to-top");
+    document.querySelectorAll("[data-back-to-top]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+    if (floatingTopBtn) {
+      window.addEventListener(
+        "scroll",
+        () => {
+          const y = window.scrollY || document.documentElement.scrollTop || 0;
+          floatingTopBtn.classList.toggle("hidden", y < 260);
+        },
+        { passive: true }
+      );
     }
   }
 

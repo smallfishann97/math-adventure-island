@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124h" />
+  <link rel="stylesheet" href="styles.css?v=20261124i" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -39,7 +39,6 @@
       <div class="site-counter-bar" aria-label="網站人氣統計">
         <span class="site-counter-pill">👣 累計拜訪人次：<strong data-site-visits>1</strong></span>
         <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上：<strong data-site-online>1</strong> 人</span>
-        <button type="button" class="site-counter-pill lb-open-pill" data-open-leaderboard>🏆 冒險者榮譽排行榜</button>
       </div>
 
       <div id="existing-profiles-wrap" class="profiles-section hidden">
@@ -178,6 +177,7 @@
               <strong class="stat-value" id="stat-mistake-count">0 題</strong>
             </div>
             <button type="button" class="btn btn-gold btn-sm" id="btn-open-rules" style="margin-top:4px;width:100%;">📖 星星、金幣與闖關規則說明</button>
+            <button type="button" class="site-counter-pill lb-open-pill" data-open-leaderboard style="margin-top:4px;width:100%;justify-content:center;">🏆 冒險者榮譽排行榜</button>
           </div>
         </div>
 
@@ -905,12 +905,15 @@
       <div class="site-counter-bar footer-counter-bar" aria-label="網站人氣統計">
         <span class="site-counter-pill">👣 累計拜訪人次：<strong data-site-visits>1</strong></span>
         <span class="site-counter-pill online-pill"><i class="online-dot"></i> 目前線上：<strong data-site-online>1</strong> 人</span>
-        <button type="button" class="site-counter-pill lb-open-pill" data-open-leaderboard>🏆 冒險者榮譽排行榜</button>
+        <button type="button" class="site-counter-pill back-top-pill" data-back-to-top>↑ 返回頂部</button>
       </div>
       <p class="footer-brand">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
       <p class="footer-copy" id="footer-secret-trigger" title="Copyright © 2026 Ann Lu">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
     </footer>
   </div>
+
+  <!-- 畫面右下角懸浮「↑ 返回頂部」按鈕（往下捲動時自動浮現） -->
+  <button type="button" id="floating-back-to-top" class="floating-back-to-top hidden" data-back-to-top aria-label="返回頂部">↑ 返回頂部</button>
 
   <!-- ==================== 法律宣告、更版日誌與手機掃碼 4 大彈窗 ==================== -->
   <!-- 彈窗 A：隱私權保護與資安宣告 -->
@@ -1401,7 +1404,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261124h"></script>
+  <script src="super-features.js?v=20261124j"></script>
   <script src="app.js?v=20261124g"></script>
 </body>
 </html>

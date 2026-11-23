@@ -5232,6 +5232,55 @@ html, body {
   color: var(--ink-soft);
 }
 
+/* ==================== ↑ 返回頂部按鈕（頁尾膠囊＋右下角懸浮膠囊） ==================== */
+.back-top-pill {
+  cursor: pointer;
+  font-family: inherit;
+  background: linear-gradient(180deg, #ffebd7, #fbdbbd);
+  border: 1.5px solid #e2bc96;
+  color: #5a4434;
+  font-weight: 800;
+  box-shadow: 0 2px 0 rgba(198, 152, 108, 0.28);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.back-top-pill:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.floating-back-to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 950;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #5a4434;
+  background: linear-gradient(180deg, #ffebd7, #fbdbbd);
+  border: 1.8px solid #e2bc96;
+  border-radius: 999px;
+  padding: 9px 18px;
+  box-shadow: 0 6px 18px rgba(124, 86, 52, 0.22), 0 2px 0 rgba(198, 152, 108, 0.35);
+  transition: transform 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+}
+
+.floating-back-to-top:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.03);
+}
+
+@media (max-width: 640px) {
+  .floating-back-to-top {
+    right: 14px;
+    bottom: 14px;
+    padding: 8px 14px;
+    font-size: 0.84rem;
+  }
+}
+
 @media (max-width: 700px) {
   .lb-podium-grid {
     grid-template-columns: 1fr;
