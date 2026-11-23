@@ -1521,39 +1521,42 @@
   }
 
   async function initSiteCounters() {
-    // 0. 公開線上人數（真實統計目前開啟中的活躍連線／分頁數，1 人在線就顯示 1 人，絕不超過累計拜訪人次）
-    const tabId = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-    function pulseOnlinePresence() {
+    // 0. 全網跨裝置「目前線上人數」（每 2 分鐘時間窗全網心跳統計：全球有幾台手機/電腦正開著網站，就真實顯示幾人！）
+    let lastPingBucket = -1;
+    async function syncGlobalOnlinePresence() {
+      const bucket = Math.floor(Date.now() / 120000);
+      const bucketKey = `online_${bucket}`;
       try {
-        const now = Date.now();
-        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
-        raw[tabId] = now;
-        Object.keys(raw).forEach((k) => {
-          if (now - raw[k] > 12000) delete raw[k];
-        });
-        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
-        const activeCnt = Math.max(1, Object.keys(raw).length);
-        const maxAllowed = Math.max(1, cachedVisits);
-        onlineCount = Math.min(activeCnt, maxAllowed);
+        if (lastPingBucket !== bucket) {
+          lastPingBucket = bucket;
+          const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && typeof data.count === "number") {
+              onlineCount = Math.max(1, Math.min(data.count, Math.max(1, cachedVisits)));
+            }
+          }
+        } else {
+          const res = await fetch(`https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && typeof data.count === "number") {
+              onlineCount = Math.max(1, Math.min(data.count, Math.max(1, cachedVisits)));
+            }
+          }
+        }
       } catch (_) {
-        onlineCount = 1;
+        onlineCount = Math.max(1, onlineCount);
       }
+      renderCounterDOM();
     }
-    pulseOnlinePresence();
-    window.addEventListener("beforeunload", () => {
-      try {
-        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
-        delete raw[tabId];
-        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
-      } catch (_) {}
-    });
-    renderCounterDOM();
+    syncGlobalOnlinePresence();
+    setInterval(syncGlobalOnlinePresence, 30000);
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
       const curSec = Math.max(1, Math.floor((Date.now() - sessionStartMs) / 1000));
       localStorage.setItem("mai_total_stay_sec", String(priorTotalStaySec + curSec));
-      pulseOnlinePresence();
       renderCounterDOM();
     }, 1000);
 
