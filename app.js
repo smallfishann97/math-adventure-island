@@ -1924,7 +1924,7 @@
           window.SoundFX.playWrong();
           if (unlockToast) {
             const need = req - totalStars;
-            unlockToast.textContent = `🔒 「${cfg.title}」需要累計 ⭐ ${req} 顆星才能解鎖（目前 ⭐ ${totalStars} 顆，再集 ${need} 顆星就能開船登島囉！）`;
+            unlockToast.textContent = `🔒 「${cfg.title}」需要累計 ⭐ ${req} 顆星才能解鎖（目前 ⭐ ${totalStars} 顆，再集 ${need} 顆星就能登島探險囉！）`;
             unlockToast.classList.remove("hidden");
             clearTimeout(unlockToastTimer);
             unlockToastTimer = setTimeout(() => unlockToast.classList.add("hidden"), 4500);

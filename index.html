@@ -245,9 +245,9 @@
               </div>
             </div>
           </div>
-          <!-- 群島切換船票（全部 4 座主題島直接開放！） -->
-          <div id="archipelago-bar" class="archipelago-bar" role="tablist" aria-label="群島切換船票">
-            <span class="archipelago-label">🎫 群島切換船票：</span>
+          <!-- 切換冒險群島（1~4 座主題島直接開放，5~6 座收集星星解鎖！） -->
+          <div id="archipelago-bar" class="archipelago-bar" role="tablist" aria-label="切換冒險群島">
+            <span class="archipelago-label">🏝️ 切換冒險群島：</span>
             <button type="button" class="island-ticket-btn active" data-island-tab="main" role="tab" aria-selected="true">
               <span class="ticket-num">1號島・01~04</span>
               <strong>🌲 陽光森林島</strong>
@@ -1234,8 +1234,8 @@
       <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
         對題目內容有指正建議、功能許願或任何想對設計者 Ann Lu 說的話，歡迎直接留言給我們（免公開信箱，保護雙方隱私）：
       </p>
-      <form id="site-contact-form" class="print-form">
-        <label class="form-row">
+      <form id="site-contact-form" class="print-form" style="display:flex;flex-direction:column;gap:12px;">
+        <label class="form-row" style="display:flex;align-items:center;gap:10px;width:100%;">
           <span>回饋類別：</span>
           <select id="contact-category" class="luxury-select">
             <option value="題目指正建議">📘 題目或詳解指正建議</option>
@@ -1244,15 +1244,15 @@
             <option value="其他合作或聯繫">📩 其他聯繫事項</option>
           </select>
         </label>
-        <label class="form-row">
+        <label class="form-row" style="display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%;">
           <span>您的稱呼：</span>
           <input type="text" id="contact-sender" class="luxury-input" placeholder="例：王老師 ／ 小安媽媽 ／ 三年級小宇" maxlength="30" required />
         </label>
-        <label class="form-row">
+        <label class="form-row" style="display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%;">
           <span>回覆聯絡方式（選填，若需我們回信可填）：</span>
           <input type="text" id="contact-reply-to" class="luxury-input" placeholder="可選填您的信箱或留空" maxlength="60" />
         </label>
-        <label class="form-row" style="flex-direction:column;align-items:stretch;gap:6px;">
+        <label class="form-row" style="display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%;">
           <span>留言內容：</span>
           <textarea id="contact-message" class="luxury-input" rows="4" placeholder="請輸入您的寶貴建議或指正內容…" maxlength="600" required style="resize:vertical;min-height:90px;padding:10px;"></textarea>
         </label>
@@ -1310,9 +1310,37 @@
           <button type="button" class="btn btn-forest btn-sm" id="admin-btn-add-cookies">🍪 +50 塊寵物餅乾</button>
           <button type="button" class="btn btn-burgundy btn-sm" id="admin-btn-add-stars">⭐ 集滿 90 星（解鎖 5、6 號島）</button>
           <button type="button" class="btn btn-gold btn-sm" id="admin-btn-full-clear">👑 160 關全破滿星</button>
+          <button type="button" class="btn btn-forest btn-sm" id="admin-btn-unlock-all-items">🛍️ 112款裝飾＋9徽章＋8隻滿級寵物全解鎖</button>
           <button type="button" class="btn btn-ghost btn-sm" id="admin-btn-reset-user">↺ 重置目前角色歸零</button>
         </div>
         <div id="admin-tool-toast" class="island-unlock-toast hidden" style="margin:0 0 14px;background:#e8f9ee;border-color:#5bb876;color:#276b3d;"></div>
+
+        <!-- 2. 🎮 20 款過關小遊戲「版主免過關直接試玩區」 -->
+        <h4 style="margin:0 0 6px;color:var(--ink);">🎮 20 款過關小遊戲・版主免過關直接試玩區（點一下立即啟動）</h4>
+        <div id="admin-minigame-buttons" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
+        <div id="admin-minigame-stage-wrap" class="hidden" style="background:#fffdf7;border:2px dashed #e2c99d;border-radius:16px;padding:12px;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong id="admin-minigame-playing-title" style="color:var(--ink);">🎮 版主小遊戲試玩舞台</strong>
+            <button type="button" class="btn btn-ghost btn-sm" id="admin-btn-stop-minigame">⏹️ 結束試玩並收合舞台</button>
+          </div>
+          <div id="admin-minigame-stage"></div>
+        </div>
+
+        <!-- 1. 📚 960 題全題庫「版主快速查題＆解答總覽器」（含匯出 960 題 Excel 題庫檔） -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;">
+          <h4 style="margin:0;color:var(--ink);">📚 960 題全題庫・版主快速查題＆解答總覽器</h4>
+          <button type="button" class="btn btn-gold btn-sm" id="admin-btn-export-960-xlsx">⬇️ 一鍵匯出 960 題完整題庫 (Excel .xlsx)</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <select id="admin-qbank-unit" class="luxury-select" style="flex:1;min-width:210px;"></select>
+          <input type="text" id="admin-qbank-search" class="luxury-input" placeholder="🔍 輸入關鍵字、題號或課綱代碼搜尋（例：分數、周長、u01-q05）…" style="flex:1.4;min-width:220px;padding:8px 12px;" />
+        </div>
+        <div id="admin-qbank-count" style="font-size:0.83rem;font-weight:800;color:var(--muted);margin-bottom:6px;"></div>
+        <div id="admin-qbank-list" class="exam-review-scroll" style="max-height:240px;margin-bottom:16px;"></div>
+
+        <!-- 4. 💻 系統儲存空間與語音引擎狀態檢測 -->
+        <h4 style="margin:0 0 8px;color:var(--ink);">💻 系統儲存空間與語音引擎狀態檢測</h4>
+        <div id="admin-system-diagnostics" class="weekly-kpi-grid" style="margin-bottom:16px;"></div>
 
         <h4 style="margin:0 0 8px;color:var(--ink);">🏆 本機所有冒險者成績總覽表</h4>
         <div id="admin-profiles-table" class="exam-review-scroll" style="max-height:190px;margin-bottom:16px;"></div>
@@ -1373,7 +1401,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261124e"></script>
-  <script src="app.js?v=20261123t"></script>
+  <script src="super-features.js?v=20261124g"></script>
+  <script src="app.js?v=20261124g"></script>
 </body>
 </html>

@@ -1785,6 +1785,7 @@
       if (forceUnlock) adminUnlocked = true;
       renderCounterDOM();
       renderAdminFeedbackList();
+      if (typeof renderAdminPowerTools === "function") renderAdminPowerTools();
       syncAdminLockUI();
       if (pwdInput) pwdInput.value = "";
       adminModal.classList.remove("hidden");
@@ -1831,6 +1832,7 @@
           syncAdminLockUI();
           renderCounterDOM();
           renderAdminFeedbackList();
+          if (typeof renderAdminPowerTools === "function") renderAdminPowerTools();
         } else {
           window.SoundFX && window.SoundFX.playWrong();
           if (pwdErr) pwdErr.classList.remove("hidden");
@@ -1839,7 +1841,10 @@
     }
 
     if (btnCloseAdmin && adminModal) {
-      btnCloseAdmin.addEventListener("click", () => adminModal.classList.add("hidden"));
+      btnCloseAdmin.addEventListener("click", () => {
+        if (window.MiniGames && typeof window.MiniGames.stop === "function") window.MiniGames.stop();
+        adminModal.classList.add("hidden");
+      });
     }
 
     // 版主一鍵測試／教學展示工具按鈕
@@ -1909,6 +1914,36 @@
         showAdminToolToast(`👑 已為「${u.name}」開啟 160 關全破滿星（共 480 顆星，所有島嶼與大滿貫獎狀全解鎖）！`);
       });
     }
+
+    // 3. 🛍️ 112 款商店裝飾＋9 枚徽章＋8 隻滿級寵物「版主一鍵全解鎖」
+    const btnUnlockAllItems = document.getElementById("admin-btn-unlock-all-items");
+    if (btnUnlockAllItems) {
+      btnUnlockAllItems.addEventListener("click", () => {
+        const u = api ? ensureSuperState(api.getUser()) : null;
+        if (!u) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
+        const shopList = (window.MathExtras && window.MathExtras.SHOP_ITEMS) || [];
+        const badgeList = (window.MathExtras && window.MathExtras.BADGES) || [];
+        u.ownedItems = shopList.map((it) => it.id);
+        u.unlockedBadges = badgeList.map((b) => b.id);
+        u.pet.xpMap = {};
+        Object.keys(PET_SPECIES).forEach((spId) => {
+          u.pet.xpMap[spId] = 100;
+        });
+        u.pet.xp = 100;
+        u.pet.cookies = Math.max(99, u.pet.cookies || 0);
+        if ((u.blitzBest || 0) < 350) u.blitzBest = 350;
+        if (!u.checkin) u.checkin = { streak: 7, lastDate: todayStr() };
+        else u.checkin.streak = Math.max(7, u.checkin.streak || 0);
+        api.saveStore();
+        api.refreshHome();
+        renderPetPanel();
+        renderPetQuizCheer();
+        renderAdminExtraAnalytics();
+        window.SoundFX && window.SoundFX.playFanfare(3);
+        showAdminToolToast(`🛍️ 已為「${u.name}」一鍵全解鎖：${u.ownedItems.length} 款商店裝飾（含 20 位說話 Q 版人物）＋ 9 枚榮譽徽章 ＋ 8 隻 100 滿級皇冠電子寵物！`);
+      });
+    }
+
     const btnResetUser = document.getElementById("admin-btn-reset-user");
     if (btnResetUser) {
       btnResetUser.addEventListener("click", () => {
@@ -1916,19 +1951,25 @@
         if (!u) return showAdminToolToast("⚠️ 請先登入一位冒險者角色再使用喔！");
         u.stageStars = {};
         u.originalStars = {};
+        u.ownedItems = [];
+        u.placedItems = [];
+        u.customPositions = {};
+        u.unlockedBadges = [];
         u.coins = 0;
         u.grandSlamClaimed = false;
-        u.pet = { species: u.pet ? u.pet.species : "shiba", name: "柴犬麻糬", xp: 0, cookies: 3, mood: 100, sleeping: false };
+        u.pet = { species: u.pet ? u.pet.species : "shiba", name: "柴犬麻糬", xp: 0, xpMap: { shiba: 0 }, cookies: 3, mood: 100, sleeping: false };
         api.saveStore();
         api.refreshHome();
+        renderPetPanel();
+        renderPetQuizCheer();
         renderAdminExtraAnalytics();
         window.SoundFX && window.SoundFX.playClick();
-        showAdminToolToast(`↺ 已將「${u.name}」的星星、金幣與寵物進度恢復為初始歸零狀態！`);
+        showAdminToolToast(`↺ 已將「${u.name}」的星星、金幣、商店裝飾與寵物進度恢復為初始歸零狀態！`);
       });
     }
 
-    // 僅匯出「站內聯絡我們收到的意見回饋留言」（原生 OpenXML .xlsx 格式：Excel 直接開啟零警告彈窗、預設超寬欄寬不出現 ########）
-    function buildTrueXlsxBlob(rows) {
+    // 原生 OpenXML .xlsx 產生器（支援自訂工作表名稱與欄寬陣列，Excel 直接開啟零警告彈窗、預設超寬欄寬不出現 ########）
+    function buildTrueXlsxBlob(rows, customWidths, sheetTitle) {
       const enc = new TextEncoder();
       const crcTable = new Uint32Array(256);
       for (let n = 0; n < 256; n++) {
@@ -1949,13 +1990,20 @@
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&apos;");
       }
-      const colLetters = ["A", "B", "C", "D", "E", "F"];
+      const colLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
+      const widths = Array.isArray(customWidths) && customWidths.length
+        ? customWidths
+        : [10, 24, 22, 20, 26, 54];
+      const colsXml = widths
+        .map((w, idx) => `    <col min="${idx + 1}" max="${idx + 1}" width="${w}" customWidth="1"/>`)
+        .join("\n");
+      const safeSheetName = xmlEsc(sheetTitle || "意見回饋留言");
       const sheetRowsXml = rows
         .map((r, rIdx) => {
           const rowNum = rIdx + 1;
           const styleId = rIdx === 0 ? 1 : 2;
           const cells = r
-            .map((val, cIdx) => `<c r="${colLetters[cIdx]}${rowNum}" s="${styleId}" t="inlineStr"><is><t>${xmlEsc(val)}</t></is></c>`)
+            .map((val, cIdx) => `<c r="${colLetters[cIdx] || "A"}${rowNum}" s="${styleId}" t="inlineStr"><is><t>${xmlEsc(val)}</t></is></c>`)
             .join("");
           return `<row r="${rowNum}" ht="${rIdx === 0 ? 24 : 20}" customHeight="1">${cells}</row>`;
         })
@@ -1984,7 +2032,7 @@
           name: "xl/workbook.xml",
           content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <sheets><sheet name="意見回饋留言" sheetId="1" r:id="rId1"/></sheets>
+  <sheets><sheet name="${safeSheetName}" sheetId="1" r:id="rId1"/></sheets>
 </workbook>`,
         },
         {
@@ -2031,12 +2079,7 @@
           content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <cols>
-    <col min="1" max="1" width="10" customWidth="1"/>
-    <col min="2" max="2" width="24" customWidth="1"/>
-    <col min="3" max="3" width="22" customWidth="1"/>
-    <col min="4" max="4" width="20" customWidth="1"/>
-    <col min="5" max="5" width="26" customWidth="1"/>
-    <col min="6" max="6" width="54" customWidth="1"/>
+${colsXml}
   </cols>
   <sheetData>${sheetRowsXml}</sheetData>
 </worksheet>`,
@@ -2139,6 +2182,280 @@
         localStorage.setItem("mai_site_feedback_inbox", "[]");
         renderAdminFeedbackList();
       });
+    }
+
+    // ==================== 版主專屬 4 大私密神器（20款小遊戲直通試玩、960題查題＆匯出Excel、系統空間與語音檢測） ====================
+    const ADMIN_MINIGAMES_LIST = [
+      { id: "catcher", label: "🌟 金幣接接樂" },
+      { id: "memory", label: "🃏 甜點記憶翻牌" },
+      { id: "whack", label: "🔨 寶箱敲敲樂" },
+      { id: "wheel", label: "🎡 幸運大轉盤" },
+      { id: "bubble", label: "🫧 泡泡戳戳樂" },
+      { id: "make10", label: "🔟 湊十消消樂" },
+      { id: "dice", label: "🎲 骰子比大小" },
+      { id: "chest", label: "🗝️ 神秘寶箱三選一" },
+      { id: "fishing", label: "🎣 池塘釣金魚" },
+      { id: "color", label: "🎨 色彩快手王" },
+      { id: "simon", label: "🎹 旋律記憶燈" },
+      { id: "racing", label: "🏎️ 冒險島賽車" },
+      { id: "plane", label: "✈️ 雲端開飛機" },
+      { id: "scratch", label: "🎫 幸運刮刮樂" },
+      { id: "slot", label: "🎰 水果拉霸機" },
+      { id: "order", label: "🔢 數字點點看" },
+      { id: "reaction", label: "⚡ 閃電反應王" },
+      { id: "apple", label: "🍎 蘋果神射手" },
+      { id: "emoji", label: "🔍 眼力找不同" },
+      { id: "balloon", label: "🎈 充氣大氣球" },
+    ];
+
+    let all960QuestionsCache = null;
+    function getAll960Questions() {
+      if (all960QuestionsCache) return all960QuestionsCache;
+      const list = [];
+      const bank = (api && api.getBank && api.getBank()) || window.GRADE3_MATH_BANK;
+      if (bank && Array.isArray(bank.units)) {
+        bank.units.forEach((u) => {
+          (u.questions || []).forEach((q, idx) => {
+            list.push({
+              seq: list.length + 1,
+              groupId: u.id,
+              groupTitle: `第 ${String(u.order).padStart(2, "0")} 單元：${u.title}`,
+              id: q.id || `${u.id}-q${idx + 1}`,
+              stage: q.stage ? `第 ${q.stage} 關` : "-",
+              difficulty: q.difficulty || "基礎",
+              code: q.curriculumCode || (u.curriculumCodes && u.curriculumCodes[0]) || "108課綱",
+              type: q.type === "choice" ? "選擇題" : "填充題",
+              question: q.question || "",
+              options: Array.isArray(q.options) ? q.options.join(" ／ ") : "（填充題直接輸入答案）",
+              answer: String(q.answer ?? ""),
+              explanation: q.explanation || (Array.isArray(q.kidSteps) ? q.kidSteps.join(" ") : ""),
+            });
+          });
+        });
+      }
+      const orig = window.ORIGINAL_MATH_CHALLENGES;
+      if (Array.isArray(orig)) {
+        orig.forEach((theme) => {
+          (theme.questions || []).forEach((q, idx) => {
+            list.push({
+              seq: list.length + 1,
+              groupId: theme.id,
+              groupTitle: `原創主題 ${String(theme.order).padStart(2, "0")}：${theme.title}`,
+              id: q.id || `${theme.id}-q${idx + 1}`,
+              stage: `主題第 ${idx + 1} 題`,
+              difficulty: q.difficulty || "基礎",
+              code: q.curriculumCode || "素養挑戰",
+              type: q.type === "choice" ? "選擇題" : "填充題",
+              question: q.question || "",
+              options: Array.isArray(q.options) ? q.options.join(" ／ ") : "（填充題直接輸入答案）",
+              answer: String(q.answer ?? ""),
+              explanation: q.explanation || (Array.isArray(q.kidSteps) ? q.kidSteps.join(" ") : ""),
+            });
+          });
+        });
+      }
+      all960QuestionsCache = list;
+      return list;
+    }
+
+    function renderAdminQuestionBrowser() {
+      const unitSel = document.getElementById("admin-qbank-unit");
+      const searchIn = document.getElementById("admin-qbank-search");
+      const countEl = document.getElementById("admin-qbank-count");
+      const listEl = document.getElementById("admin-qbank-list");
+      if (!unitSel || !listEl) return;
+
+      const allQs = getAll960Questions();
+      if (!unitSel.dataset.populated) {
+        const bank = (api && api.getBank && api.getBank()) || window.GRADE3_MATH_BANK;
+        const orig = window.ORIGINAL_MATH_CHALLENGES || [];
+        let optsHtml = `<option value="ALL">📚 全部 960 題（16 個課綱單元 800 題 ＋ 8 大原創挑戰 160 題）</option>`;
+        if (bank && Array.isArray(bank.units)) {
+          bank.units.forEach((u) => {
+            optsHtml += `<option value="${esc(u.id)}">📘 第 ${String(u.order).padStart(2, "0")} 單元：${esc(u.title)}（50 題）</option>`;
+          });
+        }
+        orig.forEach((t) => {
+          optsHtml += `<option value="${esc(t.id)}">✨ 原創主題 ${String(t.order).padStart(2, "0")}：${esc(t.title)}（20 題）</option>`;
+        });
+        unitSel.innerHTML = optsHtml;
+        unitSel.dataset.populated = "1";
+      }
+
+      const selUnit = unitSel.value || "ALL";
+      const kw = (searchIn ? searchIn.value : "").trim().toLowerCase();
+      const filtered = allQs.filter((q) => {
+        if (selUnit !== "ALL" && q.groupId !== selUnit) return false;
+        if (!kw) return true;
+        return (
+          q.id.toLowerCase().includes(kw) ||
+          q.question.toLowerCase().includes(kw) ||
+          q.answer.toLowerCase().includes(kw) ||
+          q.explanation.toLowerCase().includes(kw) ||
+          q.code.toLowerCase().includes(kw) ||
+          q.groupTitle.toLowerCase().includes(kw)
+        );
+      });
+
+      const displaySlice = filtered.slice(0, 120);
+      if (countEl) {
+        countEl.textContent = `📊 符合條件共 ${filtered.length} 題（總題庫 ${allQs.length} 題${filtered.length > 120 ? "・畫面預覽前 120 題，選取特定單元或匯出 Excel 可查看全部" : ""}）`;
+      }
+
+      if (!displaySlice.length) {
+        listEl.innerHTML = `<div style="padding:14px;text-align:center;color:var(--muted);font-weight:800;">找不到符合關鍵字「${esc(kw)}」的題目喔！</div>`;
+        return;
+      }
+
+      listEl.innerHTML = displaySlice
+        .map(
+          (q) => `
+          <div class="exam-review-row ok" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <div style="display:flex;justify-content:space-between;width:100%;gap:8px;flex-wrap:wrap;font-size:0.79rem;color:var(--muted);font-weight:800;">
+              <span>#${q.seq}｜<code>${esc(q.id)}</code>｜${esc(q.groupTitle)}（${esc(q.stage)}）</span>
+              <span>[${esc(q.difficulty)}] [${esc(q.type)}] 課綱：${esc(q.code)}</span>
+            </div>
+            <div style="font-weight:900;color:var(--ink);font-size:0.92rem;">Q：${esc(q.question)}</div>
+            ${q.type === "選擇題" ? `<div style="font-size:0.82rem;color:var(--ink-soft);">選項：${esc(q.options)}</div>` : ""}
+            <div style="font-size:0.84rem;color:#2b7a48;font-weight:900;">✅ 標準答案：${esc(q.answer)}　<span style="color:var(--muted);font-weight:700;">｜💡 詳解：${esc(q.explanation)}</span></div>
+          </div>`
+        )
+        .join("");
+    }
+
+    function renderAdminSystemDiagnostics() {
+      const diagEl = document.getElementById("admin-system-diagnostics");
+      if (!diagEl) return;
+
+      let usedBytes = 0;
+      let keyCount = 0;
+      try {
+        keyCount = localStorage.length;
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i) || "";
+          const v = localStorage.getItem(k) || "";
+          usedBytes += (k.length + v.length) * 2;
+        }
+      } catch (_) {}
+      const usedKb = (usedBytes / 1024).toFixed(1);
+      const pct = Math.min(100, ((usedBytes / (5 * 1024 * 1024)) * 100)).toFixed(1);
+
+      let voiceStatus = "🔇 瀏覽器不支援";
+      try {
+        if ("speechSynthesis" in window) {
+          const voices = window.speechSynthesis.getVoices() || [];
+          const zhVoice = voices.find((v) => /zh[-_]?TW/i.test(v.lang)) || voices.find((v) => /zh/i.test(v.lang));
+          voiceStatus = zhVoice
+            ? `🟢 就緒（${zhVoice.name.slice(0, 18)}）`
+            : voices.length > 0
+            ? `🟢 就緒（共 ${voices.length} 組語音）`
+            : "🟢 語音引擎待機中";
+        }
+      } catch (_) {}
+
+      const audioState = window.MathDeluxe && window.MathDeluxe.bgm && window.MathDeluxe.bgm.playing
+        ? "🎵 BGM 播放中"
+        : "⏸️ BGM 待命中";
+      const netState = navigator.onLine ? "🟢 雲端連線正常" : "🟠 離線單機模式";
+
+      diagEl.innerHTML = `
+        <div class="wk-kpi"><span>💾 存檔空間使用量</span><strong>${usedKb} KB / 5,120 KB (${pct}%)</strong></div>
+        <div class="wk-kpi"><span>🗂️ 本機資料表鍵數</span><strong>${keyCount} 組存檔區塊</strong></div>
+        <div class="wk-kpi"><span>🗣️ 中文語音朗讀引擎</span><strong style="font-size:0.88rem;">${esc(voiceStatus)}</strong></div>
+        <div class="wk-kpi"><span>🌐 網路與音效引擎</span><strong style="font-size:0.88rem;">${netState}｜${audioState}</strong></div>
+      `;
+    }
+
+    function renderAdminPowerTools() {
+      // 1. 初始化 20 款過關小遊戲免過關試玩按鈕
+      const mgBtnsWrap = document.getElementById("admin-minigame-buttons");
+      const mgStageWrap = document.getElementById("admin-minigame-stage-wrap");
+      const mgStage = document.getElementById("admin-minigame-stage");
+      const mgTitle = document.getElementById("admin-minigame-playing-title");
+      if (mgBtnsWrap && !mgBtnsWrap.dataset.populated) {
+        mgBtnsWrap.innerHTML = ADMIN_MINIGAMES_LIST.map(
+          (g) => `<button type="button" class="btn btn-ghost btn-sm" data-admin-play-mg="${g.id}" data-admin-mg-label="${esc(g.label)}">${esc(g.label)}</button>`
+        ).join("");
+        mgBtnsWrap.dataset.populated = "1";
+
+        mgBtnsWrap.addEventListener("click", (ev) => {
+          const btn = ev.target.closest("[data-admin-play-mg]");
+          if (!btn || !mgStage || !mgStageWrap) return;
+          const gameId = btn.dataset.adminPlayMg;
+          const gameLabel = btn.dataset.adminMgLabel || gameId;
+          window.SoundFX && window.SoundFX.playClick();
+          mgStageWrap.classList.remove("hidden");
+          if (mgTitle) mgTitle.textContent = `🎮 正在試玩：${gameLabel}（版主免過關直通模式）`;
+          if (window.MiniGames && typeof window.MiniGames.start === "function") {
+            window.MiniGames.start(gameId, mgStage, (bonusCoins) => {
+              const u = api ? ensureSuperState(api.getUser()) : null;
+              if (u && bonusCoins > 0) {
+                u.coins = (u.coins || 0) + bonusCoins;
+                api.saveStore();
+                api.refreshHome();
+              }
+              showAdminToolToast(`🎉 小遊戲「${gameLabel}」試玩完成！獲得獎勵 +${bonusCoins || 0} 金幣！`);
+            });
+          }
+        });
+      }
+
+      renderAdminQuestionBrowser();
+      renderAdminSystemDiagnostics();
+    }
+
+    const btnStopAdminMg = document.getElementById("admin-btn-stop-minigame");
+    if (btnStopAdminMg) {
+      btnStopAdminMg.addEventListener("click", () => {
+        if (window.MiniGames && typeof window.MiniGames.stop === "function") window.MiniGames.stop();
+        const wrap = document.getElementById("admin-minigame-stage-wrap");
+        const stage = document.getElementById("admin-minigame-stage");
+        if (stage) stage.innerHTML = "";
+        if (wrap) wrap.classList.add("hidden");
+      });
+    }
+
+    const qbankUnitSel = document.getElementById("admin-qbank-unit");
+    const qbankSearchIn = document.getElementById("admin-qbank-search");
+    if (qbankUnitSel) qbankUnitSel.addEventListener("change", renderAdminQuestionBrowser);
+    if (qbankSearchIn) qbankSearchIn.addEventListener("input", renderAdminQuestionBrowser);
+
+    const btnExport960 = document.getElementById("admin-btn-export-960-xlsx");
+    if (btnExport960) {
+      btnExport960.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        const allQs = getAll960Questions();
+        const rows = [["總題號", "題目代碼", "所屬單元／主題", "關卡", "難度", "題型", "108課綱條目", "題目內容", "選項內容", "標準答案", "詳細解析"]];
+        allQs.forEach((q) => {
+          rows.push([
+            String(q.seq),
+            q.id,
+            q.groupTitle,
+            q.stage,
+            q.difficulty,
+            q.type,
+            q.code,
+            q.question,
+            q.options,
+            q.answer,
+            q.explanation,
+          ]);
+        });
+        const colWidths = [10, 14, 28, 12, 10, 10, 14, 52, 38, 18, 56];
+        const blob = buildTrueXlsxBlob(rows, colWidths, "960題完整題庫與詳解");
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `數學遊戲冒險島-960題完整題庫與詳解-${todayStr()}.xlsx`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1200);
+        showAdminToolToast(`📚 已成功匯出全站 ${allQs.length} 題完整題庫與詳解 Excel (.xlsx) 檔案！`);
+      });
+    }
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        if (adminUnlocked) renderAdminSystemDiagnostics();
+      };
     }
 
     // 6. 📢 更版日誌「進版自動偵測與版本號自動更新」機制（連線 GitHub Repo 自動抓取最新進版次數與日期）
