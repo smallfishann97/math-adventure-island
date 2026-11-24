@@ -11,7 +11,7 @@
   "lang": "zh-Hant",
   "icons": [
     {
-      "src": "favicon.svg",
+      "src": "favicon.svg?v=20261124w",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
