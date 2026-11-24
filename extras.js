@@ -274,19 +274,42 @@
       }
     }
 
-    // 榮譽徽章牆
+    // 榮譽徽章牆（每點亮 1 枚徽章可額外領取一次 🪙 +30 金幣獎勵！）
+    if (!Array.isArray(user.claimedBadges)) user.claimedBadges = [];
     const badgeGrid = document.getElementById("badges-grid");
     if (badgeGrid) {
       badgeGrid.innerHTML = BADGES.map((b) => {
-        const unlocked = b.check(user);
+        const unlocked = b.check(user) || (Array.isArray(user.unlockedBadges) && user.unlockedBadges.includes(b.id));
+        const claimed = user.claimedBadges.includes(b.id);
+        let actionHtml = `<span style="margin-top:6px;font-size:0.76rem;font-weight:800;color:var(--muted);">🔒 達成可領 +30 金幣</span>`;
+        if (unlocked && !claimed) {
+          actionHtml = `<button type="button" class="btn btn-gold btn-sm" data-claim-badge="${b.id}" style="margin-top:8px;">🎁 領取 +30 金幣</button>`;
+        } else if (unlocked && claimed) {
+          actionHtml = `<span style="margin-top:6px;font-size:0.78rem;font-weight:900;color:#257a42;">✅ 已領取 +30 金幣</span>`;
+        }
         return `
           <div class="badge-card ${unlocked ? "unlocked" : "locked"}">
             <div class="badge-emoji">${window.MathIcons ? window.MathIcons.renderIcon(unlocked ? "badge_" + b.id : "locked", "svg-badge-icon") : (unlocked ? b.icon : "🔒")}</div>
             <strong>${b.name}</strong>
             <span>${b.desc}</span>
+            ${actionHtml}
           </div>
         `;
       }).join("");
+
+      badgeGrid.onclick = (ev) => {
+        const claimBtn = ev.target.closest("button[data-claim-badge]");
+        if (!claimBtn) return;
+        const bid = claimBtn.dataset.claimBadge;
+        if (user.claimedBadges.includes(bid)) return;
+        user.claimedBadges.push(bid);
+        user.coins = (user.coins || 0) + 30;
+        saveCb();
+        refreshHomeCb();
+        window.SoundFX.playFanfare(3);
+        window.VisualFX.burstConfetti();
+        renderShopAndBadges(user, saveCb, refreshHomeCb);
+      };
     }
 
     // 商店分類篩選列
