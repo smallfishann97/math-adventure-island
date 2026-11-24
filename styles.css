@@ -6058,3 +6058,331 @@ html, body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ==================== 四大實用進階模組 (pro-features.js) — 零藍色暖金森綠系 ==================== */
+.scratchpad-canvas.grid-on {
+  background-color: #fffdf6;
+  background-image:
+    linear-gradient(to right, rgba(210, 178, 126, 0.28) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(210, 178, 126, 0.28) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.exam-top-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.exam-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #fff6df;
+  border: 1.5px solid #e6b85c;
+  color: #6b4412;
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.exam-timer-pill.timer-urgent {
+  background: #ffece8;
+  border-color: #e0614f;
+  color: #b83322;
+}
+
+.exam-exp-note {
+  margin-top: 6px;
+  font-size: 0.84rem;
+  color: #6b4e34;
+  background: #fffaf0;
+  border-left: 3px solid #e6a23c;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.custom-exam-units-wrap {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #fffaf0;
+  border: 1.5px dashed #e2c590;
+}
+
+.custom-exam-presets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.custom-exam-units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 8px;
+}
+
+.custom-unit-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1.5px solid #eadcc6;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.custom-unit-chip:has(input:checked) {
+  background: #fff4d6;
+  border-color: #e3a23b;
+  color: #5c370c;
+}
+
+.transfer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.transfer-card {
+  background: #fffdf7;
+  border: 1.5px solid #eadcc6;
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.transfer-card h4 {
+  margin: 0 0 8px;
+  font-size: 0.94rem;
+  color: var(--ink);
+}
+
+.transfer-textarea {
+  width: 100%;
+  resize: vertical;
+  border-radius: 14px !important;
+  padding: 10px 12px !important;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.78rem !important;
+  line-height: 1.45;
+  word-break: break-all;
+}
+
+.parent-rewards-panel {
+  background: linear-gradient(180deg, #fffdf8 0%, #fff7e6 100%);
+  border: 2px solid #f0d29c;
+}
+
+.parent-rewards-manage {
+  background: #fff;
+  border: 1.5px dashed #e3b868;
+  border-radius: 16px;
+  padding: 12px;
+  margin: 10px 0 14px;
+}
+
+.rw-add-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rw-add-form input[type="text"] {
+  flex: 1;
+  min-width: 190px;
+}
+
+.parent-rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.reward-ticket-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #fff;
+  border: 2px dashed #e6b65c;
+  box-shadow: 0 4px 12px rgba(155, 108, 34, 0.08);
+}
+
+.reward-ticket-card.is-locked {
+  opacity: 0.82;
+  border-color: #dfd2be;
+}
+
+.rt-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.rt-title {
+  margin: 0 0 4px;
+  font-size: 0.96rem;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.rt-cost {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #b86a12;
+}
+
+.rt-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rt-actions .btn:first-child {
+  flex: 1;
+}
+
+.vouchers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vouchers-empty {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px dashed #e2d5bf;
+}
+
+.voucher-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1.5px solid #eadcc6;
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.voucher-history-row.is-used {
+  opacity: 0.72;
+  background: #faf7f0;
+}
+
+.vh-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vh-icon {
+  font-size: 1.6rem;
+}
+
+.vh-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.vh-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.golden-voucher-card {
+  position: relative;
+  background: linear-gradient(135deg, #fffdf5 0%, #ffefc7 100%);
+  border: 3px dashed #db9024;
+  border-radius: 22px;
+  padding: 20px 16px;
+  box-shadow: 0 10px 26px rgba(178, 114, 24, 0.16);
+}
+
+.gv-ribbon {
+  display: inline-block;
+  background: linear-gradient(135deg, #e8962e, #d47919);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.gv-icon {
+  font-size: 3rem;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.gv-title {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  color: #4a3320;
+}
+
+.gv-owner {
+  font-size: 0.96rem;
+  color: #6b4b2a;
+  margin-bottom: 10px;
+}
+
+.gv-meta-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #846445;
+  margin-bottom: 10px;
+}
+
+.gv-hint {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #b46110;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.gv-stamp-used {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 18px;
+  border: 3px solid #388d5c;
+  border-radius: 12px;
+  color: #2f7a4f;
+  font-weight: 900;
+  transform: rotate(-4deg);
+}
+
+@media (max-width: 720px) {
+  .transfer-grid {
+    grid-template-columns: 1fr;
+  }
+}

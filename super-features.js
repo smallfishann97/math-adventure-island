@@ -1304,7 +1304,11 @@
     if (btnStartExam && examScopeSel) {
       btnStartExam.addEventListener("click", () => {
         window.SoundFX && window.SoundFX.playClick();
-        startOnlineExam(examScopeSel.value);
+        if (window.MathPro && window.MathPro.startProMockExam) {
+          window.MathPro.startProMockExam();
+        } else {
+          startOnlineExam(examScopeSel.value);
+        }
       });
     }
     if (btnPrintExam && examScopeSel) {

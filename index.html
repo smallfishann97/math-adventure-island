@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125e" />
+  <link rel="stylesheet" href="styles.css?v=20261125f" />
 </head>
 <body>
   <!-- 🔥 連續答對即時連勝火苗橫幅 -->
@@ -64,7 +64,8 @@
         </div>
       </form>
 
-      <div style="margin:14px 0 6px;text-align:center;">
+      <div style="margin:14px 0 6px;text-align:center;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="site-counter-pill" data-open-transfer="import" style="cursor:pointer;">🔄 換機搬家／還原備份</button>
         <button type="button" class="site-counter-pill back-top-pill" data-back-to-top>↑ 返回頂部</button>
       </div>
       <p class="footer-brand" style="margin:10px 0 4px;">✦ 數學遊戲冒險島｜國小數學互動闖關學習平台 ✦</p>
@@ -485,6 +486,8 @@
                   <small class="size-end">大</small>
                   <em id="eraser-size-val">20</em>
                 </label>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-scratchpad-grid" title="切換直式計算方格底紙">⊞ 格線：關</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-scratchpad-undo" title="復原上一筆">↩ 上一步</button>
                 <button type="button" class="btn btn-ghost btn-sm" id="btn-expand-scratchpad" title="放大手寫計算空間">⤢ 展開畫布</button>
                 <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-scratchpad">🗑️ 清空</button>
               </div>
@@ -709,6 +712,45 @@
           <div id="badges-grid" class="badges-grid"></div>
         </div>
 
+        <!-- 🎟️ 家長真實獎勵兌換券（生活集點卡） -->
+        <div class="panel-card parent-rewards-panel" style="margin-bottom:20px;">
+          <div class="section-divider-row" style="margin-bottom:8px;">
+            <div>
+              <h3 class="section-subtitle" style="margin:0;">🎟️ 家長真實獎勵兌換券（用金幣換生活小獎勵！）</h3>
+              <p style="font-size:0.86rem;color:var(--muted);margin:4px 0 0;">小朋友存夠金幣按下兌換，會跳出專屬金券拿給爸爸媽媽核銷使用！家長也可自訂獎勵項目與金幣門檻。</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span id="parent-rewards-my-coins" class="ver-tag" style="font-size:0.88rem;padding:6px 12px;background:#fff4cc;">🪙 目前持有：0 金幣</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-toggle-manage-rewards">👨‍👩‍👧 家長自訂獎勵項目</button>
+            </div>
+          </div>
+
+          <div id="parent-rewards-manage-panel" class="parent-rewards-manage hidden">
+            <form id="parent-reward-add-form" class="rw-add-form">
+              <select id="rw-new-icon" class="luxury-select" aria-label="選擇獎勵圖示">
+                <option value="🎁">🎁 禮物</option>
+                <option value="🍦">🍦 點心</option>
+                <option value="📺">📺 休閒</option>
+                <option value="🎡">🎡 出遊</option>
+                <option value="🍕">🍕 美食</option>
+                <option value="📚">📚 故事書</option>
+                <option value="⭐">⭐ 特權</option>
+              </select>
+              <input type="text" id="rw-new-title" class="luxury-input" placeholder="輸入生活獎勵內容（例：週末去買一本漫畫）" maxlength="32" required />
+              <input type="number" id="rw-new-cost" class="luxury-input" placeholder="所需金幣" min="50" max="99999" step="50" value="500" style="max-width:130px;" required />
+              <button type="submit" class="btn btn-gold btn-sm">➕ 新增獎勵</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-default-rewards">↺ 恢復預設 4 項</button>
+            </form>
+          </div>
+
+          <div id="parent-rewards-grid" class="parent-rewards-grid"></div>
+
+          <div class="vouchers-section">
+            <h4 style="margin:14px 0 8px;color:var(--ink);font-size:0.95rem;">📋 已兌換的獎勵券清單（家長可按核銷）</h4>
+            <div id="parent-vouchers-list" class="vouchers-list"></div>
+          </div>
+        </div>
+
         <div class="panel-card">
           <div class="section-divider-row">
             <h3 class="section-subtitle" style="margin:0;">🏝️ 佈置我的冒險群島（共 112 款動態裝飾：含 Q 版小人物、交通工具、多種房型、樹花草與動物，可自由擺放到 6 座小島！）</h3>
@@ -793,11 +835,12 @@
 
             <hr class="soft-divider" />
 
-            <h3 class="section-subtitle">💾 學習記錄匯出／匯入備份</h3>
-            <p style="font-size:0.86rem;color:var(--muted);margin:0 0 12px;">換電腦或平板時，可以將所有帳號的星星、金幣、裝飾與答題記錄匯出成檔案帶著走！</p>
+            <h3 class="section-subtitle">💾 學習記錄匯出／換機搬家備份</h3>
+            <p style="font-size:0.86rem;color:var(--muted);margin:0 0 12px;">換手機、平板或電腦時，可用「搬家代碼（可直接貼 LINE 傳送）」或 JSON 備份檔，3 秒把所有冒險者的星星、金幣與小島完整搬過去！</p>
             <div class="backup-btn-row">
-              <button type="button" class="btn btn-gold" id="btn-export-backup">⬇️ 匯出備份檔 (.json)</button>
-              <button type="button" class="btn btn-ghost" id="btn-import-backup">⬆️ 匯入還原記錄</button>
+              <button type="button" class="btn btn-forest" data-open-transfer="export">🔄 換機搬家代碼（LINE 可傳）</button>
+              <button type="button" class="btn btn-gold" id="btn-export-backup">⬇️ 下載備份檔 (.json)</button>
+              <button type="button" class="btn btn-ghost" id="btn-import-backup">⬆️ 匯入 JSON 檔</button>
               <input type="file" id="input-import-backup" accept=".json,application/json" class="hidden" />
             </div>
           </div>
@@ -805,18 +848,41 @@
 
         <!-- 📝 期中／期末模擬考卷模式 -->
         <div class="panel-card" style="margin-top:20px;">
-          <h3 class="section-subtitle">📝 期中／期末綜合模擬考（20 題・每題 5 分・滿分 100 分）</h3>
+          <h3 class="section-subtitle">📝 線上模擬段考模式（自選單元・限時倒數・滿分 100 分）</h3>
           <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
-            隨機抽出跨單元 20 題綜合模擬考卷！線上作答立刻批改評分、診斷強弱項單元並贈送 🪙 +100 金幣，也可一鍵列印 A4 紙本考卷與解答卷！
+            支援自選單元範圍、題數與限時倒數，作答時內建「✏️ 電子計算紙」，交卷立刻評分、診斷強弱項，<strong>錯題自動收進錯題特訓</strong>，完考還送 🪙 +60～100 金幣！
           </p>
           <div class="cert-toolbar">
             <select id="mock-exam-scope" class="luxury-select">
-              <option value="midterm">📘 期中模擬考（第 01～08 單元・20 題）</option>
-              <option value="final">📗 期末模擬考（第 09～16 單元・20 題）</option>
-              <option value="full">📕 全學年總複習（第 01～16 單元・20 題）</option>
+              <option value="midterm">📘 期中模擬考（第 01～08 單元）</option>
+              <option value="final">📗 期末模擬考（第 09～16 單元）</option>
+              <option value="full">📕 全學年總複習（第 01～16 單元）</option>
+              <option value="custom">🎯 自選單元範圍（自由勾選）</option>
+            </select>
+            <select id="mock-exam-count" class="luxury-select" aria-label="模擬考題數">
+              <option value="20" selected>20 題（每題 5 分）</option>
+              <option value="10">10 題（每題 10 分）</option>
+            </select>
+            <select id="mock-exam-minutes" class="luxury-select" aria-label="模擬考限時">
+              <option value="15" selected>⏱️ 限時 15 分鐘</option>
+              <option value="10">⏱️ 限時 10 分鐘</option>
+              <option value="20">⏱️ 限時 20 分鐘</option>
+              <option value="0">⏱️ 不限時練習</option>
             </select>
             <button type="button" class="btn btn-gold" id="btn-start-mock-exam">🖥️ 開始線上模擬考</button>
             <button type="button" class="btn btn-forest" id="btn-print-mock-exam">🖨️ 列印 A4 紙本考卷</button>
+          </div>
+          <div id="custom-exam-units-wrap" class="custom-exam-units-wrap hidden">
+            <div class="custom-exam-presets">
+              <span style="font-size:0.84rem;font-weight:900;color:var(--ink-soft);">快速勾選：</span>
+              <button type="button" class="filter-chip" data-exam-preset="1-4">1～4 單元</button>
+              <button type="button" class="filter-chip" data-exam-preset="5-8">5～8 單元</button>
+              <button type="button" class="filter-chip" data-exam-preset="9-12">9～12 單元</button>
+              <button type="button" class="filter-chip" data-exam-preset="13-16">13～16 單元</button>
+              <button type="button" class="filter-chip" data-exam-preset="all">全選</button>
+              <button type="button" class="filter-chip" data-exam-preset="none">清空</button>
+            </div>
+            <div id="custom-exam-units-grid" class="custom-exam-units-grid"></div>
           </div>
         </div>
 
@@ -935,7 +1001,10 @@
               <h3 class="section-subtitle" style="margin:0;">🗓️ 「每日一題」頭腦體操・月曆蓋章打卡牆</h3>
               <p style="font-size:0.86rem;color:var(--muted);margin:4px 0 0;">每天全站精選 1 題限定腦力題，答對就在月曆蓋上可愛印章＋領 <strong>🪙 +40 雙倍金幣 & 🍪 +2 餅乾</strong>！</p>
             </div>
-            <div class="dq-milestones" id="dq-milestones"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <button type="button" class="fc-speak-btn" data-open-scratchpad>✏️ 打開計算紙</button>
+              <div class="dq-milestones" id="dq-milestones"></div>
+            </div>
           </div>
           <div class="dq-grid">
             <div class="dq-question-box" id="dq-question-box"></div>
@@ -1515,6 +1584,77 @@
     </div>
   </div>
 
+  <!-- ✏️ 全站隨身電子計算草稿紙彈窗（直式格線＋上一步） -->
+  <div id="global-scratchpad-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="gpad-modal-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="gpad-modal-title">✏️ 隨身電子計算草稿紙（手指／滑鼠手寫直式）</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-global-scratchpad">關閉 ✕</button>
+      </div>
+      <div class="scratchpad-tools" style="margin-bottom:10px;justify-content:flex-start;">
+        <button type="button" class="pen-dot active" data-gpad-color="#4a3320" style="background:#4a3320;" title="深棕筆"></button>
+        <button type="button" class="pen-dot" data-gpad-color="#388d5c" style="background:#388d5c;" title="森綠筆"></button>
+        <button type="button" class="pen-dot" data-gpad-color="#e8635e" style="background:#e8635e;" title="珊瑚紅筆"></button>
+        <button type="button" class="pen-dot" data-gpad-color="#d97706" style="background:#d97706;" title="琥珀橘筆"></button>
+        <button type="button" class="btn btn-ghost btn-sm" data-gpad-color="ERASER">🧽 橡皮擦</button>
+        <label class="pad-size-ctrl" title="調整筆尖粗細">
+          <span>筆尖</span>
+          <input type="range" id="gpad-size-range" min="2" max="14" step="1" value="4" />
+          <em id="gpad-size-val">4</em>
+        </label>
+        <button type="button" class="btn btn-ghost btn-sm active" id="btn-gpad-grid">⊞ 直式格線：開</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-gpad-undo">↩ 上一步</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-gpad-clear">🗑️ 清空</button>
+      </div>
+      <canvas id="global-scratchpad-canvas" width="840" height="380" class="scratchpad-canvas grid-on" style="height:340px;touch-action:none;"></canvas>
+    </div>
+  </div>
+
+  <!-- 🔄 學習進度一鍵備份／換機搬家彈窗（LINE 搬家代碼＋JSON 檔案） -->
+  <div id="transfer-backup-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="transfer-modal-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top">
+        <h3 id="transfer-modal-title">🔄 學習進度一鍵備份／換機搬家</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-transfer-modal">關閉 ✕</button>
+      </div>
+      <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
+        想把媽媽手機裡的星星、金幣、寵物與小島搬到平板或新手機嗎？只要複製下方「搬家代碼」傳到 LINE，再貼到新裝置按下還原就完成了！
+      </p>
+      <div id="transfer-toast" class="island-unlock-toast hidden" style="margin:0 0 12px;"></div>
+
+      <div class="transfer-grid">
+        <div class="transfer-card">
+          <h4>📤 步驟一：在舊手機／舊電腦產生搬家代碼</h4>
+          <textarea id="transfer-code-output" class="luxury-input transfer-textarea" rows="4" readonly></textarea>
+          <button type="button" class="btn btn-gold" id="btn-gen-copy-transfer" style="width:100%;margin-top:8px;">📋 一鍵複製搬家代碼（可貼到 LINE 傳送）</button>
+        </div>
+        <div class="transfer-card">
+          <h4>📥 步驟二：在新手機／平板貼上代碼還原</h4>
+          <textarea id="transfer-code-input" class="luxury-input transfer-textarea" rows="4" placeholder="請在這裡貼上 MAI-BACKUP-V1:... 搬家代碼"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            <button type="button" class="btn btn-forest" id="btn-apply-transfer-code" style="flex:1;">✅ 立刻還原搬家代碼</button>
+            <button type="button" class="btn btn-ghost" id="btn-transfer-pick-file">📂 改選 JSON 檔</button>
+            <input type="file" id="input-transfer-file" accept=".json,application/json" class="hidden" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎟️ 家長真實獎勵專屬兌換券彈窗 -->
+  <div id="voucher-ticket-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="voucher-modal-title">
+    <div class="modal-dialog" style="text-align:center;">
+      <div class="modal-top">
+        <h3 id="voucher-modal-title">🎟️ 專屬生活獎勵兌換券</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-voucher-modal">關閉 ✕</button>
+      </div>
+      <div id="voucher-ticket-preview"></div>
+      <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button type="button" class="btn btn-gold btn-lg" id="btn-download-voucher-png">⬇️ 下載兌換券圖片 (PNG)</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
@@ -1526,8 +1666,9 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js?v=20261124r"></script>
   <script src="deluxe-features.js?v=20261124t"></script>
-  <script src="super-features.js?v=20261124v"></script>
+  <script src="super-features.js?v=20261125f"></script>
   <script src="plus-features.js?v=20261125d"></script>
-  <script src="app.js?v=20261124s"></script>
+  <script src="pro-features.js?v=20261125f"></script>
+  <script src="app.js?v=20261125f"></script>
 </body>
 </html>

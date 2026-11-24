@@ -1795,6 +1795,7 @@
     navBtns.shop.addEventListener("click", () => {
       window.SoundFX.playClick(); stopQuizTimer();
       if (window.MathExtras) window.MathExtras.renderShopAndBadges(currentUser(), saveStore, refreshAllHomeUI);
+      if (window.MathPro) window.MathPro.refreshAll();
       showView("shop", "shop");
     });
     navBtns.tools.addEventListener("click", () => {
@@ -2380,9 +2381,29 @@
     });
   }
 
+  if (window.MathPro) {
+    window.MathPro.init({
+      getUser: currentUser,
+      getStore: () => store,
+      setStore: (newStore) => {
+        store = newStore;
+        saveStore();
+        if (store.activeUserId && store.users[store.activeUserId]) {
+          loginAs(store.activeUserId);
+        } else {
+          renderLoginScreen();
+        }
+      },
+      saveStore,
+      refreshHome: refreshAllHomeUI,
+      getBank: () => BANK
+    });
+  }
+
   if (store.activeUserId && store.users[store.activeUserId]) {
     loginAs(store.activeUserId);
     if (window.MathPlus) window.MathPlus.refreshAll();
+    if (window.MathPro) window.MathPro.refreshAll();
   } else {
     renderLoginScreen();
   }

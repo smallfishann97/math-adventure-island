@@ -1,4 +1,4 @@
-const CACHE_NAME = "math-adventure-island-v20261124";
+const CACHE_NAME = "math-adventure-island-v20261125";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const CORE_ASSETS = [
   "./deluxe-features.js",
   "./super-features.js",
   "./plus-features.js",
+  "./pro-features.js",
   "./data/grade3-math-bank.js",
   "./data/original-challenges.js",
   "./data/math-glossary.js"
