@@ -5120,6 +5120,29 @@ html, body {
   transform: translateY(-2px);
 }
 
+.lb-rule-banner {
+  background: #fff9ec;
+  border: 1.5px solid #e4c58a;
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 0.84rem;
+  color: var(--ink);
+  text-align: center;
+}
+
+.lb-rule-all {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #e5cfa3;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 .lb-podium-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

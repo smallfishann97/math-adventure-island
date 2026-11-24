@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124m" />
+  <link rel="stylesheet" href="styles.css?v=20261124n" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -1446,11 +1446,21 @@
         </div>
       </div>
 
-      <div class="review-filter" id="lb-sort-tabs" style="margin-bottom:14px;justify-content:center;flex-wrap:wrap;">
+      <div class="review-filter" id="lb-sort-tabs" style="margin-bottom:10px;justify-content:center;flex-wrap:wrap;">
         <button type="button" class="filter-chip active" data-lb-sort="stars">⭐ 總星光闖關榜</button>
         <button type="button" class="filter-chip" data-lb-sort="coins">🪙 金幣富豪榜</button>
         <button type="button" class="filter-chip" data-lb-sort="accuracy">🎯 答題神準學霸榜</button>
         <button type="button" class="filter-chip" data-lb-sort="pets">🐾 寵物養成大師榜</button>
+      </div>
+
+      <div id="lb-rule-banner" class="lb-rule-banner">
+        <strong>📌 目前榜單規則：</strong><span id="lb-rule-text">依「累計闖關總星光數」排名（同星數比通關數與金幣）！</span>
+        <div class="lb-rule-all">
+          <span>⭐ <b>總星光榜</b>：闖關收集星星</span>
+          <span>🪙 <b>金幣榜</b>：闖關／小遊戲／簽到賺金幣</span>
+          <span>🎯 <b>學霸榜</b>：累計答對題數與正確率</span>
+          <span>🐾 <b>寵物榜</b>：8 隻寵物總成長值（最高 800）</span>
+        </div>
       </div>
 
       <div id="leaderboard-podium" class="lb-podium-grid"></div>
@@ -1494,7 +1504,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
-  <script src="super-features.js?v=20261124k"></script>
+  <script src="super-features.js?v=20261124n"></script>
   <script src="plus-features.js?v=20261124c"></script>
   <script src="app.js?v=20261124i"></script>
 </body>

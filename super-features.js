@@ -1358,7 +1358,7 @@
 
   function getLocalMemberIds() {
     try {
-      const raw = localStorage.getItem("grade3_math_luxury_store_v1");
+      const raw = localStorage.getItem("grade3_math_atelier_accounts_v2");
       if (!raw) return [];
       const parsed = JSON.parse(raw);
       return Object.keys((parsed && parsed.users) || {});
@@ -1412,7 +1412,7 @@
     const bank = api ? api.getBank() : window.GRADE3_MATH_BANK;
     let usersMap = {};
     try {
-      const raw = localStorage.getItem("grade3_math_luxury_store_v1");
+      const raw = localStorage.getItem("grade3_math_atelier_accounts_v2");
       if (raw) {
         const parsed = JSON.parse(raw);
         usersMap = (parsed && parsed.users) || {};
@@ -2506,12 +2506,23 @@ ${colsXml}
     function renderPublicLeaderboard() {
       const podiumEl = document.getElementById("leaderboard-podium");
       const listEl = document.getElementById("leaderboard-list");
+      const ruleTextEl = document.getElementById("lb-rule-text");
       if (!podiumEl || !listEl) return;
+
+      const ruleMap = {
+        stars: "依「累計闖關總星光數」排名（同星數比通關關卡數與金幣）；闖關拿星星就能衝上冠軍寶座！",
+        coins: "依「目前持有金幣總數」排名（同金幣比商店收藏裝飾數）；闖關、玩小遊戲、每日簽到與實驗台都能賺金幣！",
+        accuracy: "依「累計答對總題數與答題正確率」排名；多挑戰單元關卡就能成為答題神準學霸！",
+        pets: "依「8 隻 Q 版電子寵物累計總成長值」排名（每隻滿級 100 點，8 隻全養滿最高 800 點）！",
+      };
+      if (ruleTextEl) {
+        ruleTextEl.textContent = ruleMap[currentLbSort] || ruleMap.stars;
+      }
 
       let usersMap = {};
       let activeUid = null;
       try {
-        const raw = localStorage.getItem("grade3_math_luxury_store_v1");
+        const raw = localStorage.getItem("grade3_math_atelier_accounts_v2");
         if (raw) {
           const parsed = JSON.parse(raw);
           usersMap = (parsed && parsed.users) || {};
