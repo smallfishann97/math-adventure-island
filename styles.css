@@ -821,17 +821,17 @@ h1, h2, h3, .serif {
   to { transform: translateX(1250px); }
 }
 
-/* 旋轉舞台主體（含柔和上下浮動效果） */
+/* 旋轉舞台主體（強化 2.5D 浮空島：平滑傾斜視差＋厚實浮空岩底＋柔和上下浮動） */
 .island-stage {
   position: absolute;
   left: 50%;
-  top: 63%;
+  top: 61%;
   width: 920px;
   height: 500px;
   transform-style: preserve-3d;
-  transform: translate(-50%, -50%) rotateX(46deg) rotateZ(var(--rot-z, -3deg)) scale(var(--stage-scale, 0.94));
-  transition: transform 0.25s cubic-bezier(0.22, 0.85, 0.32, 1);
-  animation: islandFloatBob 2.4s ease-in-out infinite;
+  transform: translate(-50%, -50%) rotateX(var(--rot-x, 48deg)) rotateZ(var(--rot-z, -3deg)) scale(var(--stage-scale, 0.94));
+  transition: transform 0.28s cubic-bezier(0.22, 0.85, 0.32, 1);
+  animation: islandFloatBob 3.2s ease-in-out infinite;
   will-change: transform, translate;
 }
 
@@ -841,16 +841,17 @@ h1, h2, h3, .serif {
 }
 
 .island-map-container.decorate-mode .island-stage,
-.island-map-container.decorate-mode .island-layer-shadow {
+.island-map-container.decorate-mode .island-layer-shadow,
+.island-map-container.decorate-mode .floating-pebble {
   animation-play-state: paused;
 }
 
 @keyframes islandFloatBob {
   0%, 100% { translate: 0 0; }
-  50% { translate: 0 -15px; }
+  50% { translate: 0 -16px; }
 }
 
-/* 浮空島嶼多層立體厚度 */
+/* 浮空島嶼多層立體厚度（4 層漸縮浮空岩底＋柔和呼吸深層投影） */
 .island-layer {
   position: absolute;
   inset: 0;
@@ -858,48 +859,158 @@ h1, h2, h3, .serif {
 }
 
 .island-layer-shadow {
-  transform: translateZ(-48px) translateY(22px);
-  filter: blur(18px);
-  opacity: 0.34;
-  animation: islandShadowBreathe 2.4s ease-in-out infinite;
+  transform: translateZ(-96px) translateY(36px) scale(0.92);
+  filter: blur(22px);
+  opacity: 0.36;
+  animation: islandShadowBreathe 3.2s ease-in-out infinite;
 }
 
 @keyframes islandShadowBreathe {
-  0%, 100% { transform: translateZ(-48px) translateY(22px) scale(1); opacity: 0.36; }
-  50% { transform: translateZ(-48px) translateY(30px) scale(0.94); opacity: 0.22; }
+  0%, 100% { transform: translateZ(-96px) translateY(34px) scale(0.93); opacity: 0.38; }
+  50% { transform: translateZ(-96px) translateY(44px) scale(0.84); opacity: 0.22; }
+}
+
+.island-layer-cliff-tip {
+  transform: translateZ(-70px) scale(0.66);
+  filter: drop-shadow(0 12px 14px rgba(42, 24, 10, 0.32));
+}
+
+.island-layer-cliff-core {
+  transform: translateZ(-50px) scale(0.84);
 }
 
 .island-layer-cliff-deep {
-  transform: translateZ(-34px);
+  transform: translateZ(-32px) scale(0.95);
 }
 
 .island-layer-cliff-mid {
-  transform: translateZ(-18px);
+  transform: translateZ(-16px);
 }
 
 .island-layer-beach {
-  transform: translateZ(-6px);
+  transform: translateZ(-5px);
 }
 
 .island-layer-grass {
-  transform: translateZ(2px);
+  transform: translateZ(3px);
 }
 
 .island-layer-hill {
   transform: translateZ(16px);
 }
 
-/* 立體站立於島面上的可愛樹與小屋（以底部為軸心站立，絕不插入地面） */
+/* 浮空衛星小碎岩（隨浮空島緩緩上下漂浮，營造夢幻空島感） */
+.floating-pebble {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 44% 56% 52% 48% / 58% 46% 54% 42%;
+  background: linear-gradient(155deg, #a67c52 0%, #6d492b 62%, #4a2e18 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(164, 212, 134, 0.85),
+    0 18px 18px rgba(23, 64, 48, 0.28);
+  animation: pebbleFloat 3.8s ease-in-out infinite;
+}
+
+.floating-pebble.p1 {
+  width: 44px;
+  height: 28px;
+  left: 3%;
+  top: 76%;
+  transform: translateZ(-26px);
+  animation-delay: -0.6s;
+}
+
+.floating-pebble.p2 {
+  width: 34px;
+  height: 22px;
+  right: 4%;
+  top: 70%;
+  transform: translateZ(-34px);
+  animation-delay: -1.8s;
+}
+
+.floating-pebble.p3 {
+  width: 26px;
+  height: 18px;
+  left: 88%;
+  top: 22%;
+  transform: translateZ(-22px);
+  animation-delay: -2.7s;
+}
+
+@keyframes pebbleFloat {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -12px; }
+}
+
+/* 前景柔和浮雲（飄過浮空島前緣，大幅拉開前後景深） */
+.island-cloud-fg {
+  position: absolute;
+  pointer-events: none;
+  z-index: 16;
+  opacity: 0.56;
+  filter: blur(0.4px) drop-shadow(0 10px 18px rgba(44, 97, 66, 0.14));
+  animation: cloudDriftFg 36s linear infinite;
+  translate: calc(var(--px, 0px) * -1.1) calc(var(--py, 0px) * -0.9);
+  transition: translate 0.35s ease-out;
+}
+
+.island-cloud-fg .svg-cloud-icon {
+  width: 112px;
+  height: auto;
+}
+
+.island-cloud-fg.fg1 { bottom: 18px; left: -16%; animation-duration: 38s; }
+.island-cloud-fg.fg2 { bottom: 62px; left: -20%; animation-duration: 48s; animation-delay: -19s; opacity: 0.42; }
+.island-cloud-fg.fg3 { bottom: 6px; left: -12%; animation-duration: 56s; animation-delay: -34s; opacity: 0.5; }
+
+@keyframes cloudDriftFg {
+  from { transform: translateX(0); }
+  to { transform: translateX(1320px); }
+}
+
+.island-map-container.theme-night .island-cloud-fg {
+  opacity: 0.24;
+}
+
+.island-map-container.theme-sunset .island-cloud-fg {
+  opacity: 0.48;
+  filter: sepia(0.25) saturate(1.2) drop-shadow(0 10px 16px rgba(176, 86, 48, 0.2));
+}
+
+/* 背景雲層微幅視差 */
+.island-cloud {
+  translate: calc(var(--px, 0px) * 0.7) calc(var(--py, 0px) * 0.5);
+  transition: translate 0.35s ease-out;
+}
+
+/* 立體站立於島面上的可愛樹與小屋（以底部為軸心站立＋柔和橢圓地面投影） */
 .island-prop {
   position: absolute;
   transform-style: preserve-3d;
   transform-origin: 50% 100%;
-  transform: translate(-50%, -100%) translateZ(10px) rotateZ(calc(var(--rot-z, -3deg) * -1)) rotateX(-46deg);
+  transform: translate(-50%, -100%) translateZ(10px) rotateZ(calc(var(--rot-z, -3deg) * -1)) rotateX(calc(var(--rot-x, 48deg) * -1));
   pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  filter: drop-shadow(0 6px 6px rgba(44, 67, 48, 0.26));
+  filter: drop-shadow(0 8px 8px rgba(44, 67, 48, 0.28));
+}
+
+.island-prop::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 72%;
+  min-width: 26px;
+  max-width: 68px;
+  height: 11px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(42, 72, 46, 0.34) 0%, rgba(42, 72, 46, 0) 72%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .prop-emoji {
@@ -920,7 +1031,7 @@ h1, h2, h3, .serif {
   pointer-events: none;
   transform-style: preserve-3d;
   transform-origin: 50% 100%;
-  transform: translate(-50%, -100%) translateZ(14px) rotateZ(calc(var(--rot-z, -3deg) * -1)) rotateX(-46deg);
+  transform: translate(-50%, -100%) translateZ(14px) rotateZ(calc(var(--rot-z, -3deg) * -1)) rotateX(calc(var(--rot-x, 48deg) * -1));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3825,7 +3936,7 @@ html, body {
   position: absolute;
   left: 50%;
   top: 22px;
-  transform: translateX(-50%) rotateX(-46deg) translateZ(24px);
+  transform: translateX(-50%) rotateX(calc(var(--rot-x, 48deg) * -1)) translateZ(24px);
   background: rgba(255, 253, 247, 0.94);
   border: 2px solid var(--border-gold);
   color: var(--ink);

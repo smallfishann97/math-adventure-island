@@ -40,6 +40,7 @@
   ];
 
   let islandRotZ = -3;
+  let islandRotX = 48;
 
   // 1~4 號島每座島均分 4 個數學單元，寬敞零重疊！
   const QUAD_COORDS = [
@@ -492,6 +493,7 @@
     }
     const scale = Math.min(1.06, Math.max(0.32, (container.clientWidth - 16) / 920));
     stage.style.setProperty("--rot-z", `${islandRotZ}deg`);
+    stage.style.setProperty("--rot-x", `${islandRotX}deg`);
     stage.style.setProperty("--stage-scale", String(scale));
   }
 
@@ -650,17 +652,25 @@
       <div class="island-cloud c6">${window.MathIcons ? window.MathIcons.renderIcon("cloud", "svg-cloud-icon") : ""}</div>
 
       <div class="island-stage">
-        <!-- 海底陰影層 -->
+        <!-- 浮空深層投影（隨小島浮動柔和呼吸） -->
         <svg viewBox="0 0 920 500" class="island-layer island-layer-shadow">
-          <path d="${islandShape}" fill="#1d4d3a" />
+          <path d="${islandShape}" fill="#174030" />
+        </svg>
+        <!-- 浮空島底部錐形岩尖（最深層） -->
+        <svg viewBox="0 0 920 500" class="island-layer island-layer-cliff-tip">
+          <path d="${islandShape}" fill="#4d311c" />
+        </svg>
+        <!-- 浮空島核心岩盤層（帶暖琥珀岩脈感） -->
+        <svg viewBox="0 0 920 500" class="island-layer island-layer-cliff-core">
+          <path d="${islandShape}" fill="#664428" stroke="#855a36" stroke-width="4" />
         </svg>
         <!-- 深層崖壁厚度 -->
         <svg viewBox="0 0 920 500" class="island-layer island-layer-cliff-deep">
-          <path d="${islandShape}" fill="#7f5b3b" />
+          <path d="${islandShape}" fill="#825c3a" />
         </svg>
         <!-- 中層暖土崖壁 -->
         <svg viewBox="0 0 920 500" class="island-layer island-layer-cliff-mid">
-          <path d="${islandShape}" fill="#a67c52" />
+          <path d="${islandShape}" fill="#ab8054" />
         </svg>
         <!-- 奶油金沙灘層 -->
         <svg viewBox="0 0 920 500" class="island-layer island-layer-beach">
@@ -684,13 +694,23 @@
           }
         </svg>
 
-        <!-- 佈置模式點擊感應層（3D 島面精準座標） -->
+        <!-- 浮空衛星小碎岩（增加浮空島懸浮立體層次） -->
+        <span class="floating-pebble p1" aria-hidden="true"></span>
+        <span class="floating-pebble p2" aria-hidden="true"></span>
+        <span class="floating-pebble p3" aria-hidden="true"></span>
+
+        <!-- 佈置模式點擊感應層（島面精準座標） -->
         <div class="island-drop-plane" title="點選這裡擺放已選擇的裝飾"></div>
         <!-- 立體站立於島上的可愛樹與小屋 -->
         ${propsHtml}
         <!-- 16 座立體單元地標 -->
         ${pinsHtml}
       </div>
+
+      <!-- 前景柔和浮雲（從浮空島前緣輕柔飄過，大幅強化景深立體感） -->
+      <div class="island-cloud-fg fg1" aria-hidden="true">${window.MathIcons ? window.MathIcons.renderIcon("cloud", "svg-cloud-icon") : ""}</div>
+      <div class="island-cloud-fg fg2" aria-hidden="true">${window.MathIcons ? window.MathIcons.renderIcon("cloud", "svg-cloud-icon") : ""}</div>
+      <div class="island-cloud-fg fg3" aria-hidden="true">${window.MathIcons ? window.MathIcons.renderIcon("cloud", "svg-cloud-icon") : ""}</div>
     `;
 
     updateIslandStageTransform();
@@ -1864,6 +1884,27 @@
       setTimeout(() => { dragMoved = false; }, 0);
     });
 
+    // 滑鼠微幅傾斜視差（桌機滑過浮空島時呈現絲滑景深感；佈置模式與手機不干擾操作）
+    islandContainer.addEventListener("pointermove", (ev) => {
+      if (ev.pointerType !== "mouse" || isDraggingIsland || state.decorateMode) return;
+      const r = islandContainer.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const nx = (ev.clientX - r.left) / r.width - 0.5;
+      const ny = (ev.clientY - r.top) / r.height - 0.5;
+      islandRotX = Number((48 - ny * 10).toFixed(2));
+      islandContainer.style.setProperty("--px", `${(nx * -18).toFixed(1)}px`);
+      islandContainer.style.setProperty("--py", `${(ny * -10).toFixed(1)}px`);
+      updateIslandStageTransform();
+    });
+
+    islandContainer.addEventListener("pointerleave", () => {
+      if (isDraggingIsland) return;
+      islandRotX = 48;
+      islandContainer.style.setProperty("--px", "0px");
+      islandContainer.style.setProperty("--py", "0px");
+      updateIslandStageTransform();
+    });
+
     islandContainer.addEventListener("click", (ev) => {
       // 自由佈置模式：點選裝飾拿起、點選島面任何位置放下！
       if (state.decorateMode) {
@@ -2054,6 +2095,7 @@
     document.getElementById("btn-cam-reset").addEventListener("click", () => {
       window.SoundFX.playClick();
       islandRotZ = -3;
+      islandRotX = 48;
       updateIslandStageTransform();
     });
     window.addEventListener("resize", updateIslandStageTransform);
