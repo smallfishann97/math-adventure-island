@@ -76,8 +76,9 @@
 
         <nav class="topbar-actions" aria-label="主功能選單">
           <button class="nav-pill active" id="nav-home" type="button">🗺️ 冒險島地圖</button>
-          <button class="nav-pill" id="nav-petquest" type="button">
-            🐾 寵物任務
+          <button class="nav-pill" id="nav-pet" type="button">🐾 養寵物</button>
+          <button class="nav-pill" id="nav-daily" type="button">
+            🎁 每日任務
             <span class="badge-count hidden" id="pet-quest-badge">0</span>
           </button>
           <button class="nav-pill" id="nav-leaderboard" type="button" data-open-leaderboard>🏆 榮譽排行榜</button>
@@ -851,56 +852,62 @@
         </div>
       </section>
 
-      <!-- ==================== 視圖 14：寵物養成 & 每日任務簽到 ==================== -->
-      <section id="view-petquest" class="view">
+      <!-- ==================== 視圖 14A：養寵物 ==================== -->
+      <section id="view-pet" class="view">
         <div class="panel-card" style="margin-bottom:20px;">
           <div class="panel-header">
-            <button class="btn btn-ghost" id="btn-petquest-back" type="button">← 返回冒險島地圖</button>
-            <h2>🐾 島嶼電子寵物 & 🎁 每日任務簽到</h2>
+            <button class="btn btn-ghost" id="btn-pet-back" type="button">← 返回冒險島地圖</button>
+            <h2>🐾 島嶼電子寵物養成</h2>
           </div>
 
-          <div class="petquest-grid">
-            <!-- 左欄：島嶼電子寵物養成 -->
-            <div class="pet-card">
-              <div class="pet-top-bar">
-                <span class="ver-tag" id="pet-name-badge">柴犬麻糬</span>
-                <span class="pet-cookie-pill">🍪 寵物餅乾：<strong id="pet-cookie-count">3</strong> 塊</span>
-              </div>
-              <div id="pet-speech-bubble" class="pet-speech-bubble">汪汪！答對數學題就能獲得香噴噴的餅乾喔！</div>
-              <div id="pet-avatar-stage" class="pet-avatar-stage"></div>
-              <div id="pet-level-text" class="pet-level-text">Lv.1 🥚 暖暖神秘蛋</div>
-              <div class="pet-xp-wrap"><div id="pet-xp-fill" class="pet-xp-fill" style="width:0%"></div></div>
-              <div class="pet-action-row">
-                <button type="button" class="btn btn-gold" id="btn-pet-feed">🍪 餵餅乾（成長+6）</button>
-                <button type="button" class="btn btn-forest" id="btn-pet-play">🎾 陪牠玩耍</button>
-                <button type="button" class="btn btn-burgundy" id="btn-pet-sleep">😴 哄牠睡覺</button>
-                <button type="button" class="btn btn-ghost" id="btn-pet-buy-cookie">🪙 15金幣買3餅乾</button>
-              </div>
-              <div class="pet-species-row">
-                <span style="font-size:0.82rem;font-weight:800;color:var(--muted);width:100%;text-align:center;">切換 8 種 Q 版小夥伴：</span>
-                <button type="button" class="filter-chip active" data-pet-species="shiba">🐶 柴犬麻糬</button>
-                <button type="button" class="filter-chip" data-pet-species="fox">🦊 焦糖小狐狸</button>
-                <button type="button" class="filter-chip" data-pet-species="dino">🦖 抹茶小恐龍</button>
-                <button type="button" class="filter-chip" data-pet-species="bunny">🐰 草莓垂耳兔</button>
-                <button type="button" class="filter-chip" data-pet-species="panda">🐼 奶茶小熊貓</button>
-                <button type="button" class="filter-chip" data-pet-species="unicorn">🦄 夢幻獨角獸</button>
-                <button type="button" class="filter-chip" data-pet-species="cat">🐱 奶油小橘貓</button>
-                <button type="button" class="filter-chip" data-pet-species="penguin">🐧 企鵝小圓滾</button>
-              </div>
+          <div class="pet-card" style="max-width:680px;margin:0 auto;">
+            <div class="pet-top-bar">
+              <span class="ver-tag" id="pet-name-badge">柴犬麻糬</span>
+              <span class="pet-cookie-pill">🍪 寵物餅乾：<strong id="pet-cookie-count">3</strong> 塊</span>
             </div>
+            <div id="pet-speech-bubble" class="pet-speech-bubble">汪汪！答對數學題就能獲得香噴噴的餅乾喔！</div>
+            <div id="pet-avatar-stage" class="pet-avatar-stage"></div>
+            <div id="pet-level-text" class="pet-level-text">Lv.1 🥚 暖暖神秘蛋</div>
+            <div class="pet-xp-wrap"><div id="pet-xp-fill" class="pet-xp-fill" style="width:0%"></div></div>
+            <div class="pet-action-row">
+              <button type="button" class="btn btn-gold" id="btn-pet-feed">🍪 餵餅乾（成長+6）</button>
+              <button type="button" class="btn btn-forest" id="btn-pet-play">🎾 陪牠玩耍</button>
+              <button type="button" class="btn btn-burgundy" id="btn-pet-sleep">😴 哄牠睡覺</button>
+              <button type="button" class="btn btn-ghost" id="btn-pet-buy-cookie">🪙 15金幣買3餅乾</button>
+            </div>
+            <div class="pet-species-row">
+              <span style="font-size:0.82rem;font-weight:800;color:var(--muted);width:100%;text-align:center;">切換 8 種 Q 版小夥伴：</span>
+              <button type="button" class="filter-chip active" data-pet-species="shiba">🐶 柴犬麻糬</button>
+              <button type="button" class="filter-chip" data-pet-species="fox">🦊 焦糖小狐狸</button>
+              <button type="button" class="filter-chip" data-pet-species="dino">🦖 抹茶小恐龍</button>
+              <button type="button" class="filter-chip" data-pet-species="bunny">🐰 草莓垂耳兔</button>
+              <button type="button" class="filter-chip" data-pet-species="panda">🐼 奶茶小熊貓</button>
+              <button type="button" class="filter-chip" data-pet-species="unicorn">🦄 夢幻獨角獸</button>
+              <button type="button" class="filter-chip" data-pet-species="cat">🐱 奶油小橘貓</button>
+              <button type="button" class="filter-chip" data-pet-species="penguin">🐧 企鵝小圓滾</button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <!-- 右欄：7 天連續簽到寶箱＋每日任務 -->
-            <div class="daily-card">
-              <h3 class="section-subtitle" style="margin-top:0;">📅 7 天連續簽到寶箱</h3>
-              <p id="checkin-status-text" style="font-size:0.88rem;font-weight:800;color:var(--ink-soft);margin:0 0 10px;"></p>
-              <div id="checkin-strip" class="checkin-strip"></div>
-              <div style="margin:12px 0 18px;">
-                <button type="button" class="btn btn-gold btn-lg" id="btn-daily-checkin" style="width:100%;">🎁 領取今日簽到獎勵</button>
-              </div>
-              <hr class="soft-divider" />
-              <h3 class="section-subtitle">🎯 今日 3 大輕鬆小任務</h3>
-              <div id="daily-quest-list" class="daily-quest-list"></div>
+      <!-- ==================== 視圖 14B：每日任務＆每日一題打卡 ==================== -->
+      <section id="view-daily" class="view">
+        <div class="panel-card" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <button class="btn btn-ghost" id="btn-daily-back" type="button">← 返回冒險島地圖</button>
+            <h2>🎁 每日任務簽到 & 🗓️ 每日一題打卡</h2>
+          </div>
+
+          <div class="daily-card" style="max-width:760px;margin:0 auto;">
+            <h3 class="section-subtitle" style="margin-top:0;">📅 7 天連續簽到寶箱</h3>
+            <p id="checkin-status-text" style="font-size:0.88rem;font-weight:800;color:var(--ink-soft);margin:0 0 10px;"></p>
+            <div id="checkin-strip" class="checkin-strip"></div>
+            <div style="margin:12px 0 18px;">
+              <button type="button" class="btn btn-gold btn-lg" id="btn-daily-checkin" style="width:100%;">🎁 領取今日簽到獎勵</button>
             </div>
+            <hr class="soft-divider" />
+            <h3 class="section-subtitle">🎯 今日 3 大輕鬆小任務</h3>
+            <div id="daily-quest-list" class="daily-quest-list"></div>
           </div>
         </div>
 
@@ -1489,6 +1496,6 @@
   <script src="deluxe-features.js?v=20261123d"></script>
   <script src="super-features.js?v=20261124k"></script>
   <script src="plus-features.js?v=20261124c"></script>
-  <script src="app.js?v=20261124h"></script>
+  <script src="app.js?v=20261124i"></script>
 </body>
 </html>

@@ -305,12 +305,14 @@
     glossary: document.getElementById("view-glossary"),
     mistakesHub: document.getElementById("view-mistakes-hub"),
     history: document.getElementById("view-history"),
-    petquest: document.getElementById("view-petquest"),
+    pet: document.getElementById("view-pet"),
+    daily: document.getElementById("view-daily"),
     sources: document.getElementById("view-sources")
   };
   const navBtns = {
     home: document.getElementById("nav-home"),
-    petquest: document.getElementById("nav-petquest"),
+    pet: document.getElementById("nav-pet"),
+    daily: document.getElementById("nav-daily"),
     original: document.getElementById("nav-original"),
     arcade: document.getElementById("nav-arcade"),
     shop: document.getElementById("nav-shop"),
@@ -1749,17 +1751,30 @@
     navBtns.home.addEventListener("click", () => {
       window.SoundFX.playClick(); stopQuizTimer(); refreshAllHomeUI(); showView("home", "home");
     });
-    if (navBtns.petquest) {
-      navBtns.petquest.addEventListener("click", () => {
+    if (navBtns.pet) {
+      navBtns.pet.addEventListener("click", () => {
+        window.SoundFX.playClick(); stopQuizTimer();
+        if (window.MathSuper) window.MathSuper.refreshAll();
+        showView("pet", "pet");
+      });
+    }
+    if (navBtns.daily) {
+      navBtns.daily.addEventListener("click", () => {
         window.SoundFX.playClick(); stopQuizTimer();
         if (window.MathSuper) window.MathSuper.refreshAll();
         if (window.MathPlus) window.MathPlus.refreshAll();
-        showView("petquest", "petquest");
+        showView("daily", "daily");
       });
     }
-    const petBackBtn = document.getElementById("btn-petquest-back");
+    const petBackBtn = document.getElementById("btn-pet-back");
     if (petBackBtn) {
       petBackBtn.addEventListener("click", () => {
+        window.SoundFX.playClick(); refreshAllHomeUI(); showView("home", "home");
+      });
+    }
+    const dailyBackBtn = document.getElementById("btn-daily-back");
+    if (dailyBackBtn) {
+      dailyBackBtn.addEventListener("click", () => {
         window.SoundFX.playClick(); refreshAllHomeUI(); showView("home", "home");
       });
     }
@@ -2351,7 +2366,8 @@
       openPetQuest: () => {
         stopQuizTimer();
         if (window.MathSuper) window.MathSuper.refreshAll();
-        showView("petquest", "petquest");
+        if (window.MathPlus) window.MathPlus.refreshAll();
+        showView("daily", "daily");
       }
     });
   }
