@@ -1744,6 +1744,8 @@
       soundBtn.setAttribute("aria-pressed", String(next));
       window.SoundFX.setEnabled(next);
       document.getElementById("sound-icon").textContent = next ? "🔊" : "🔇";
+      const sLbl = document.getElementById("sound-label");
+      if (sLbl) sLbl.textContent = next ? "音效開" : "音效關";
       if (next) window.SoundFX.playClick();
     });
 
