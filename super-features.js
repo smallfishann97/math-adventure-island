@@ -1349,6 +1349,8 @@
   // ==================== 6. 公開線上人數 & 版主專屬隱藏後台（訪客／會員／停留時間） & 站內聯絡我們 ====================
   const COUNTER_NS = "smallfishann97-math-adventure-island";
   let cachedVisits = Number(localStorage.getItem("mai_cached_visits") || 0);
+  let cachedTodayDate = localStorage.getItem("mai_cached_today_date") || "";
+  let cachedTodayVisits = cachedTodayDate === todayStr() ? Number(localStorage.getItem("mai_cached_today_visits") || 0) : 0;
   let cachedMembers = Number(localStorage.getItem("mai_cached_members") || 0);
   let sessionStartMs = Date.now();
   let priorTotalStaySec = Number(localStorage.getItem("mai_total_stay_sec") || 0);
@@ -1373,13 +1375,17 @@
 
   function renderCounterDOM() {
     const localIds = getLocalMemberIds();
-    const v = Math.max(1, cachedVisits, localIds.length);
+    const tv = Math.max(1, cachedTodayVisits);
+    const v = Math.max(1, cachedVisits, tv, localIds.length);
     const m = Math.max(localIds.length, cachedMembers, 1);
     const curSec = Math.max(1, Math.floor((Date.now() - sessionStartMs) / 1000));
     const totalSec = priorTotalStaySec + curSec;
     const totalMin = Math.max(1, Math.round(totalSec / 60));
     const avgMin = Math.max(1, Math.round(totalSec / 60 / Math.max(1, localIds.length || 1)));
 
+    document.querySelectorAll("[data-site-today-visits]").forEach((el) => {
+      el.textContent = tv.toLocaleString("zh-TW");
+    });
     document.querySelectorAll("[data-site-online]").forEach((el) => {
       el.textContent = onlineCount.toLocaleString("zh-TW");
     });
@@ -1551,105 +1557,45 @@
   }
 
   async function initSiteCounters() {
-    // 0. 全網跨裝置＋多視窗「目前線上人數」（每 10 秒即時同步：BroadcastChannel 跨分頁即時心跳 + localStorage + 15 分鐘雲端活躍池）
-    const tabId = "tab_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-    let lastPingBucket = Number(sessionStorage.getItem("mai_online_bucket") || -1);
-    let cloudOnline = Number(sessionStorage.getItem("mai_cloud_online") || 1);
-    const activePeers = new Map();
-
-    // BroadcastChannel：同一台電腦開啟多個分頁或視窗時，0 延遲即時互通線上人數
-    let bc = null;
-    try {
-      if (typeof BroadcastChannel !== "undefined") {
-        bc = new BroadcastChannel("mai_online_presence_channel");
-        bc.onmessage = (ev) => {
-          const d = ev && ev.data;
-          if (!d || !d.tabId) return;
-          if (d.type === "bye") {
-            activePeers.delete(d.tabId);
-          } else {
-            activePeers.set(d.tabId, Date.now());
-            if (d.type === "hello" && bc) {
-              try { bc.postMessage({ type: "ack", tabId }); } catch (_) {}
-            }
-          }
-          onlineCount = Math.max(1, getLocalActiveTabsCount(), cloudOnline);
-          renderCounterDOM();
-        };
-        bc.postMessage({ type: "hello", tabId });
+    // 0. 📅 今日來訪人次（依當日日期獨立累計，每天 00:00 自動歸零重算，每 30 秒同步雲端最新數字）
+    async function syncTodayVisits(allowBump) {
+      const todayKey = todayStr();
+      const compactDate = todayKey.replace(/-/g, "");
+      if (cachedTodayDate !== todayKey) {
+        cachedTodayDate = todayKey;
+        cachedTodayVisits = 0;
+        localStorage.setItem("mai_cached_today_date", todayKey);
+        localStorage.setItem("mai_cached_today_visits", "0");
       }
-    } catch (_) {}
-
-    function getLocalActiveTabsCount() {
-      const now = Date.now();
-      activePeers.set(tabId, now);
-      for (const [k, ts] of activePeers.entries()) {
-        if (now - ts > 25000) activePeers.delete(k);
-      }
-      let lsCount = 1;
-      try {
-        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
-        raw[tabId] = now;
-        Object.keys(raw).forEach((k) => {
-          if (now - raw[k] > 25000) delete raw[k];
-        });
-        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
-        lsCount = Object.keys(raw).length;
-      } catch (_) {}
-      return Math.max(1, activePeers.size, lsCount);
-    }
-
-    window.addEventListener("storage", (ev) => {
-      if (ev.key === "mai_active_tabs") {
-        onlineCount = Math.max(1, getLocalActiveTabsCount(), cloudOnline);
+      const bumpFlagKey = `mai_today_visit_bumped_${compactDate}`;
+      const shouldBump = allowBump && !sessionStorage.getItem(bumpFlagKey);
+      if (shouldBump) {
+        sessionStorage.setItem(bumpFlagKey, "1");
+        cachedTodayVisits = Math.max(1, cachedTodayVisits + 1);
+        localStorage.setItem("mai_cached_today_date", todayKey);
+        localStorage.setItem("mai_cached_today_visits", String(cachedTodayVisits));
+        renderCounterDOM();
+      } else if (cachedTodayVisits < 1) {
+        cachedTodayVisits = 1;
         renderCounterDOM();
       }
-    });
-
-    window.addEventListener("beforeunload", () => {
-      try {
-        if (bc) bc.postMessage({ type: "bye", tabId });
-        const raw = JSON.parse(localStorage.getItem("mai_active_tabs") || "{}");
-        delete raw[tabId];
-        localStorage.setItem("mai_active_tabs", JSON.stringify(raw));
-      } catch (_) {}
-    });
-
-    async function syncGlobalOnlinePresence() {
-      const localTabs = getLocalActiveTabsCount();
-      try {
-        if (bc) bc.postMessage({ type: "ping", tabId });
-      } catch (_) {}
-
-      // 先立刻用本機與已知狀態更新畫面（絕不被網路卡住）
-      onlineCount = Math.max(1, localTabs, cloudOnline);
-      renderCounterDOM();
-
-      // 15 分鐘雲端活躍池（900,000 ms）：附帶動態時間戳 ?t= 徹底破除 CDN / 瀏覽器對查詢網址的快取！
-      const bucket = Math.floor(Date.now() / 900000);
-      const bucketKey = `online15m_${bucket}`;
-      const isFirstPingInBucket = lastPingBucket !== bucket;
-      const url = isFirstPingInBucket
-        ? `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/up?t=${Date.now()}`
-        : `https://api.counterapi.dev/v1/${COUNTER_NS}/${bucketKey}/?t=${Date.now()}`;
-
+      const url = shouldBump
+        ? `https://api.counterapi.dev/v1/${COUNTER_NS}/visits_${compactDate}/up?t=${Date.now()}`
+        : `https://api.counterapi.dev/v1/${COUNTER_NS}/visits_${compactDate}/?t=${Date.now()}`;
       const data = await fetchCounterJson(url, 4000);
       if (data && typeof data.count === "number") {
-        lastPingBucket = bucket;
-        sessionStorage.setItem("mai_online_bucket", String(bucket));
-        cloudOnline = Math.max(1, data.count);
-        sessionStorage.setItem("mai_cloud_online", String(cloudOnline));
+        cachedTodayVisits = Math.max(1, cachedTodayVisits, data.count);
+        localStorage.setItem("mai_cached_today_date", todayKey);
+        localStorage.setItem("mai_cached_today_visits", String(cachedTodayVisits));
+        if (cachedTodayVisits > cachedVisits) {
+          cachedVisits = cachedTodayVisits;
+          localStorage.setItem("mai_cached_visits", String(cachedVisits));
+        }
+        renderCounterDOM();
       }
-
-      onlineCount = Math.max(1, getLocalActiveTabsCount(), cloudOnline);
-      if (onlineCount > cachedVisits) {
-        cachedVisits = onlineCount;
-        localStorage.setItem("mai_cached_visits", String(cachedVisits));
-      }
-      renderCounterDOM();
     }
-    syncGlobalOnlinePresence();
-    setInterval(syncGlobalOnlinePresence, 10000);
+    syncTodayVisits(true);
+    setInterval(() => syncTodayVisits(false), 30000);
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
