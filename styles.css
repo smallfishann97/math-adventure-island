@@ -205,6 +205,8 @@ h1, h2, h3, .serif {
   margin-bottom: 14px;
 }
 
+.sub-br-mobile { display: none; }
+
 .login-title {
   margin: 0 0 8px;
   font-size: 2.2rem;
@@ -3249,6 +3251,9 @@ html, body {
     white-space: nowrap;
     max-width: 100%;
   }
+
+  .sub-dot-desktop { display: none; }
+  .sub-br-mobile { display: inline; }
 
   .avatar-picker {
     grid-template-columns: repeat(5, minmax(0, 1fr));
