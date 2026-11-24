@@ -279,7 +279,7 @@
       let theme = {
         bgA: "#fffdf6", bgB: "#fff5dc", outer: "#d4943a", inner: "#f0c975",
         accent: "#f2a43b", nameColor: "#388d5c", pillBg: "#fff3d6",
-        corner: "✦", sealEmoji: "🏆", subtitle: "MATH ADVENTURE ISLAND・金獎證書"
+        corner: "✦", sealEmoji: "🏆", subtitle: "MATH GAME ADVENTURE ISLAND・金獎證書"
       };
       if (awardTitle.includes("閃電")) {
         theme = {
