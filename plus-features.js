@@ -1282,6 +1282,18 @@
       });
     }
 
+    // 📱 手機版頂部工具列收合開關（預設收合，點擊展開音樂／護眼／字體／音效／語速）
+    const btnMobTools = document.getElementById("btn-mobile-tools-toggle");
+    const toolsPanel = document.getElementById("topbar-tools-panel");
+    if (btnMobTools && toolsPanel) {
+      btnMobTools.addEventListener("click", () => {
+        const open = toolsPanel.classList.toggle("mobile-open");
+        btnMobTools.setAttribute("aria-expanded", String(open));
+        btnMobTools.textContent = open ? "⚙️ 收合工具設定 ▴" : "⚙️ 音樂・護眼・字體・音效 ▾";
+        window.SoundFX && window.SoundFX.playClick();
+      });
+    }
+
     // 📱 PWA Service Worker 註冊（支援手機加入主畫面與離線快取）
     if ("serviceWorker" in navigator && /^https?:$/.test(window.location.protocol)) {
       window.addEventListener("load", () => {

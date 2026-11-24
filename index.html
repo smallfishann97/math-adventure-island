@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125c" />
+  <link rel="stylesheet" href="styles.css?v=20261125d" />
 </head>
 <body>
   <!-- 🔥 連續答對即時連勝火苗橫幅 -->
@@ -104,7 +104,12 @@
           <button class="nav-pill" id="nav-history" type="button">📜 答題記錄</button>
         </nav>
 
-        <div class="topbar-tools">
+        <!-- 手機版精簡工具列開關（桌機版隱藏，手機版預設收合讓版面超清爽！） -->
+        <div class="mobile-tools-bar">
+          <button type="button" class="mobile-tools-toggle" id="btn-mobile-tools-toggle" aria-expanded="false">⚙️ 音樂・護眼・字體・音效 ▾</button>
+        </div>
+
+        <div class="topbar-tools" id="topbar-tools-panel">
           <!-- 即時日期、星期與時間顯示 -->
           <div id="live-clock-pill" class="live-clock-pill" aria-live="off" title="現在日期與時間">
             <span>📅 載入中…</span>
@@ -993,7 +998,7 @@
         <span class="site-counter-pill online-pill">📅 今日來訪人次：<strong data-site-today-visits>1</strong></span>
         <button type="button" class="site-counter-pill back-top-pill" data-back-to-top>↑ 返回頂部</button>
       </div>
-      <p class="footer-brand">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
+      <p class="footer-brand">✦ 數學遊戲冒險島｜國小數學互動闖關學習平台 ✦</p>
       <p class="footer-copy" id="footer-secret-trigger" title="Copyright © 2026 Ann Lu">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
     </footer>
   </div>
@@ -1522,7 +1527,7 @@
   <script src="extras.js?v=20261124r"></script>
   <script src="deluxe-features.js?v=20261124t"></script>
   <script src="super-features.js?v=20261124v"></script>
-  <script src="plus-features.js?v=20261124p"></script>
+  <script src="plus-features.js?v=20261125d"></script>
   <script src="app.js?v=20261124s"></script>
 </body>
 </html>
