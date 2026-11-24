@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124k" />
+  <link rel="stylesheet" href="styles.css?v=20261124m" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -856,6 +856,20 @@
           <div id="life-lab-stage" class="life-lab-stage"></div>
         </div>
 
+        <!-- 🧮 三年級核心「九九乘法＆有餘數除法」互動練功房 -->
+        <div class="panel-card" style="margin-top:20px;" id="muldiv-dojo-card">
+          <h3 class="section-subtitle">🧮 三年級核心「九九乘法＆有餘數除法」互動練功房</h3>
+          <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
+            點擊表格任一格立即語音朗讀口訣、顯示對應除法算式並亮起<strong>格點陣列圖</strong>；也可切換「30 秒特訓模式」把乘除與餘數練到反射動作！
+          </p>
+          <div class="review-filter" id="dojo-mode-tabs" style="margin-bottom:14px;">
+            <button type="button" class="filter-chip active" data-dojo-tab="table">🎵 互動九九乘法表＆格點陣列</button>
+            <button type="button" class="filter-chip" data-dojo-tab="mul30">⚡ 30 秒乘法倍數特訓</button>
+            <button type="button" class="filter-chip" data-dojo-tab="div30">➗ 30 秒有餘數除法特訓</button>
+          </div>
+          <div id="dojo-stage" class="life-lab-stage"></div>
+        </div>
+
         <!-- 個人專屬學習獎狀生成器 -->
         <div class="panel-card" style="margin-top:20px;">
           <h3 class="section-subtitle">🏅 個人專屬「數學榮譽獎狀」產生器（一鍵下載 PNG 或列印！）</h3>
@@ -1528,7 +1542,7 @@
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
   <script src="super-features.js?v=20261124k"></script>
-  <script src="plus-features.js?v=20261124a"></script>
+  <script src="plus-features.js?v=20261124b"></script>
   <script src="app.js?v=20261124h"></script>
 </body>
 </html>

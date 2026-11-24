@@ -980,6 +980,265 @@
     renderActiveLab();
   }
 
+  // ==================== 5. 🧮 三年級核心「九九乘法＆有餘數除法」互動練功房 ====================
+  function initMulDivDojo() {
+    const tabsWrap = document.getElementById("dojo-mode-tabs");
+    const stage = document.getElementById("dojo-stage");
+    if (!tabsWrap || !stage) return;
+
+    const zhDigits = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+    function toMulChant(a, b) {
+      const p = a * b;
+      const aZh = zhDigits[a] || String(a);
+      const bZh = zhDigits[b] || String(b);
+      if (p < 10) return `${aZh}${bZh}得${zhDigits[p]}`;
+      const tens = Math.floor(p / 10);
+      const ones = p % 10;
+      const tensStr = tens === 1 ? "十" : `${zhDigits[tens]}十`;
+      const onesStr = ones === 0 ? "" : zhDigits[ones];
+      return `${aZh}${bZh}${tensStr}${onesStr}`;
+    }
+
+    let currentTab = "table";
+    let selR = 7;
+    let selC = 8;
+    let dojoTimer = null;
+
+    function stopDojoTimer() {
+      if (dojoTimer) {
+        clearInterval(dojoTimer);
+        dojoTimer = null;
+      }
+    }
+
+    function speakText(txt) {
+      if (window.SpeechFX && window.SoundFX && window.SoundFX.enabled) {
+        window.SpeechFX.speak(txt);
+      }
+    }
+
+    function renderDotArray(r, c) {
+      const rowColors = ["#e87a64", "#f0a03e", "#e2b832", "#68b878", "#4da684", "#d98296", "#c28666", "#d99a4e", "#76a85c"];
+      let rowsHtml = "";
+      for (let i = 0; i < r; i++) {
+        const col = rowColors[i % rowColors.length];
+        let dots = "";
+        for (let j = 0; j < c; j++) {
+          dots += `<span class="dojo-dot" style="background:${col};"></span>`;
+        }
+        rowsHtml += `<div class="dojo-dot-row"><span class="dojo-row-idx">${i + 1}</span>${dots}</div>`;
+      }
+      return rowsHtml;
+    }
+
+    function renderTableTab() {
+      stopDojoTimer();
+      const prod = selR * selC;
+      const chant = toMulChant(selR, selC);
+
+      let headerCells = `<div class="dojo-cell dojo-head">×</div>`;
+      for (let c = 1; c <= 9; c++) {
+        headerCells += `<div class="dojo-cell dojo-head ${c === selC ? "hi-axis" : ""}">${c}</div>`;
+      }
+      let bodyCells = "";
+      for (let r = 1; r <= 9; r++) {
+        bodyCells += `<div class="dojo-cell dojo-head ${r === selR ? "hi-axis" : ""}">${r}</div>`;
+        for (let c = 1; c <= 9; c++) {
+          const isSel = r === selR && c === selC;
+          const inRect = r <= selR && c <= selC;
+          bodyCells += `<button type="button" class="dojo-cell dojo-num ${inRect ? "in-rect" : ""} ${isSel ? "is-sel" : ""}" data-r="${r}" data-c="${c}" title="${r} × ${c} = ${r * c}">${r * c}</button>`;
+        }
+      }
+
+      stage.innerHTML = `
+        <div class="dojo-table-layout">
+          <div class="dojo-matrix" role="grid" aria-label="互動九九乘法表">
+            ${headerCells}
+            ${bodyCells}
+          </div>
+          <div class="dojo-inspect-panel">
+            <div class="dojo-formula-big">${selR} × ${selC} = <span>${prod}</span></div>
+            <div class="dojo-chant-pill">🎵 口訣：<strong>${chant}</strong>
+              <button type="button" class="btn btn-gold btn-sm" id="btn-dojo-speak" style="margin-left:8px;">🔊 再唸一次</button>
+            </div>
+            <div class="dojo-related-div">
+              ➗ 延伸除法思考：<strong>${prod} ÷ ${selR} = ${selC}</strong>　｜　<strong>${prod} ÷ ${selC} = ${selR}</strong>
+            </div>
+            <div class="dojo-dots-card">
+              <div style="font-size:0.82rem;font-weight:800;color:var(--muted);margin-bottom:6px;">
+                ✨ 格點陣列圖：<strong>${selR} 排 × 每排 ${selC} 顆 ＝ 共 ${prod} 顆</strong>
+              </div>
+              <div class="dojo-dots-grid">${renderDotArray(selR, selC)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      stage.querySelectorAll(".dojo-num").forEach((b) => {
+        b.addEventListener("click", () => {
+          selR = Number(b.dataset.r);
+          selC = Number(b.dataset.c);
+          window.SoundFX && window.SoundFX.playClick();
+          renderTableTab();
+          speakText(`${selR}乘以${selC}等於${selR * selC}，${toMulChant(selR, selC)}`);
+        });
+      });
+
+      document.getElementById("btn-dojo-speak")?.addEventListener("click", () => {
+        speakText(`${selR}乘以${selC}等於${prod}，${chant}`);
+      });
+    }
+
+    function makeDrillQuestion(mode) {
+      if (mode === "mul30") {
+        const a = 2 + Math.floor(Math.random() * 8);
+        const b = 2 + Math.floor(Math.random() * 8);
+        const ans = a * b;
+        const set = new Set([ans]);
+        const offsets = [-a, a, -b, b, -2, 2, -1, 1, 3, -3];
+        while (set.size < 4) {
+          const cand = ans + offsets[Math.floor(Math.random() * offsets.length)];
+          if (cand > 0) set.add(cand);
+        }
+        return {
+          text: `${a} × ${b} = ？`,
+          answer: String(ans),
+          options: Array.from(set).sort(() => Math.random() - 0.5).map(String),
+          hint: `${toMulChant(a, b)}，答案是 ${ans}！`,
+        };
+      } else {
+        // 有餘數除法特訓（除數 3~9，商 2~9，餘數 1 ~ divisor-1）
+        const divisor = 3 + Math.floor(Math.random() * 7);
+        const quotient = 2 + Math.floor(Math.random() * 8);
+        const rem = 1 + Math.floor(Math.random() * (divisor - 1));
+        const dividend = divisor * quotient + rem;
+        const ansLabel = `${quotient} 餘 ${rem}`;
+        const set = new Set([ansLabel]);
+        let guard = 0;
+        while (set.size < 4 && guard < 30) {
+          guard += 1;
+          const dq = Math.max(1, quotient + (Math.random() < 0.5 ? -1 : 1) * (Math.random() < 0.6 ? 0 : 1));
+          const dr = 1 + Math.floor(Math.random() * (divisor + 1));
+          const cand = `${dq} 餘 ${dr}`;
+          if (cand !== ansLabel) set.add(cand);
+        }
+        return {
+          text: `${dividend} ÷ ${divisor} = ？`,
+          answer: ansLabel,
+          options: Array.from(set).sort(() => Math.random() - 0.5),
+          hint: `${divisor} × ${quotient} = ${divisor * quotient}，${dividend} − ${divisor * quotient} = ${rem}（餘數 ${rem} < 除數 ${divisor}）！`,
+        };
+      }
+    }
+
+    function renderDrillTab(mode) {
+      stopDojoTimer();
+      const isMul = mode === "mul30";
+      stage.innerHTML = `
+        <div style="text-align:center;padding:14px 8px;">
+          <h4 style="margin:0 0 8px;font-size:1.15rem;color:var(--ink);">
+            ${isMul ? "⚡ 30 秒九九乘法倍數反射特訓" : "➗ 30 秒有餘數除法特訓（小心餘數要小於除數！）"}
+          </h4>
+          <p style="margin:0 0 14px;color:var(--muted);font-weight:700;">
+            限時 30 秒連續搶答，每答對 1 題加分＋連擊獎勵，結束即贈送 <strong>🪙 閃亮金幣</strong>！
+          </p>
+          <button type="button" class="btn btn-gold btn-lg" id="btn-dojo-start-drill">🚀 開始 30 秒計時特訓！</button>
+        </div>
+      `;
+
+      document.getElementById("btn-dojo-start-drill")?.addEventListener("click", () => {
+        let timeLeft = 30;
+        let score = 0;
+        let combo = 0;
+        let maxCombo = 0;
+        let solved = 0;
+        let curQ = null;
+        let lastHint = "";
+
+        function showNext() {
+          curQ = makeDrillQuestion(mode);
+          stage.innerHTML = `
+            <div class="blitz-hud">
+              <span>⏱️ 剩餘 <strong id="dojo-t">${timeLeft}</strong> 秒</span>
+              <span>🏆 得分 <strong>${score}</strong></span>
+              <span>🔥 連擊 <strong>${combo}</strong></span>
+            </div>
+            <div class="blitz-q" style="margin:12px 0;">${curQ.text}</div>
+            <div class="dq-options">
+              ${curQ.options.map((o) => `<button type="button" class="btn btn-ghost btn-lg dojo-drill-opt" data-val="${esc(o)}" style="justify-content:center;font-weight:900;">${esc(o)}</button>`).join("")}
+            </div>
+            ${lastHint ? `<div class="lab-msg bad" style="margin-top:10px;">💡 上題提醒：${esc(lastHint)}</div>` : ""}
+          `;
+
+          stage.querySelectorAll(".dojo-drill-opt").forEach((b) => {
+            b.addEventListener("click", () => {
+              if (b.dataset.val === curQ.answer) {
+                combo += 1;
+                if (combo > maxCombo) maxCombo = combo;
+                solved += 1;
+                score += 10 + Math.min(combo * 2, 16);
+                lastHint = "";
+                window.SoundFX && window.SoundFX.playCorrect(combo);
+              } else {
+                combo = 0;
+                score = Math.max(0, score - 5);
+                lastHint = curQ.hint;
+                window.SoundFX && window.SoundFX.playWrong();
+              }
+              showNext();
+            });
+          });
+        }
+
+        window.SoundFX && window.SoundFX.playCorrect(2);
+        showNext();
+        dojoTimer = setInterval(() => {
+          timeLeft -= 1;
+          const tEl = document.getElementById("dojo-t");
+          if (tEl) tEl.textContent = String(Math.max(0, timeLeft));
+          if (timeLeft <= 0) {
+            stopDojoTimer();
+            const earnedCoins = Math.max(10, Math.round(score / 4));
+            const u = api ? api.getUser() : null;
+            if (u) {
+              u.coins = (u.coins || 0) + earnedCoins;
+              api.saveStore();
+              api.refreshHome();
+            }
+            window.SoundFX && window.SoundFX.playFanfare(3);
+            window.VisualFX && window.VisualFX.celebrationRain();
+            stage.innerHTML = `
+              <div style="text-align:center;padding:16px 8px;">
+                <h3 style="margin:0 0 8px;color:var(--ink);">🎉 30 秒特訓完成！</h3>
+                <p style="font-size:1.02rem;font-weight:800;color:var(--ink-soft);margin:0 0 14px;">
+                  共答對 <strong>${solved} 題</strong> ｜ 最高連擊 <strong>🔥 ${maxCombo}</strong> ｜ 最終得分 <strong>${score} 分</strong> ｜ 獲得 <strong>🪙 +${earnedCoins} 金幣</strong>！
+                </p>
+                <button type="button" class="btn btn-gold btn-lg" id="btn-dojo-retry">🔄 再挑戰一次 30 秒！</button>
+              </div>
+            `;
+            document.getElementById("btn-dojo-retry")?.addEventListener("click", () => renderDrillTab(mode));
+          }
+        }, 1000);
+      });
+    }
+
+    function renderActiveDojo() {
+      if (currentTab === "mul30" || currentTab === "div30") return renderDrillTab(currentTab);
+      return renderTableTab();
+    }
+
+    tabsWrap.addEventListener("click", (ev) => {
+      const b = ev.target.closest("button[data-dojo-tab]");
+      if (!b) return;
+      window.SoundFX && window.SoundFX.playClick();
+      currentTab = b.dataset.dojoTab;
+      tabsWrap.querySelectorAll("button[data-dojo-tab]").forEach((el) => el.classList.toggle("active", el === b));
+      renderActiveDojo();
+    });
+
+    renderActiveDojo();
+  }
+
   // ==================== 初始化入口 ====================
   window.MathPlus = {
     init(hooks) {
@@ -987,6 +1246,7 @@
       initEyeCareAlarm();
       initHomeworkBuilderAndRunner();
       initLifeUnitsLab();
+      initMulDivDojo();
 
       const heroDailyBtn = document.getElementById("btn-hero-daily-q");
       if (heroDailyBtn) {
