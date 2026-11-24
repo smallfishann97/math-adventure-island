@@ -1187,6 +1187,9 @@
       card.classList.add("fx-correct");
       window.SoundFX.playCorrect(quiz.combo);
       window.VisualFX.burstConfetti(fxX, fxY, quiz.combo >= 3 ? 58 : 36);
+      if (window.MathPlus && typeof window.MathPlus.showStreakBanner === "function") {
+        window.MathPlus.showStreakBanner(quiz.combo);
+      }
       window.VisualFX.spawnFloatingText(
         quiz.combo >= 2 ? `答對！+${gained} 🔥${quiz.combo}連擊` : `答對！+${gained}`,
         "#2d5a4c", fxX, Math.max(110, fxY - 18)

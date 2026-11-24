@@ -207,6 +207,19 @@
     constructor() {
       this.synth = window.speechSynthesis || null;
       this.activeBtn = null;
+      this.slowMode = localStorage.getItem("mai_speech_mode") === "slow";
+    }
+
+    setSlowMode(isSlow) {
+      this.slowMode = Boolean(isSlow);
+      try {
+        localStorage.setItem("mai_speech_mode", this.slowMode ? "slow" : "normal");
+      } catch (_) {}
+      return this.slowMode;
+    }
+
+    isSlowMode() {
+      return Boolean(this.slowMode);
     }
 
     formatForSpeech(rawText) {
@@ -272,7 +285,7 @@
 
       const utter = new SpeechSynthesisUtterance(this.formatForSpeech(text));
       utter.lang = "zh-TW";
-      utter.rate = 0.9;
+      utter.rate = this.slowMode ? 0.72 : 0.92;
       utter.pitch = 1.0;
       utter.volume = 1.0;
       const v = this.pickVoice();
@@ -309,7 +322,7 @@
       this.stop();
       const utter = new SpeechSynthesisUtterance(this.formatForSpeech(text));
       utter.lang = "zh-TW";
-      utter.rate = rate;
+      utter.rate = this.slowMode ? Math.max(0.65, rate * 0.76) : rate;
       utter.pitch = pitch;
       utter.volume = 1.0;
       const v = this.pickVoice();

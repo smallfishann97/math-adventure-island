@@ -1239,6 +1239,57 @@
     renderActiveDojo();
   }
 
+  // ==================== 6. 🐢 語音朗讀語速切換 & 🔥 連勝火苗橫幅 & 📱 PWA 離線註冊 ====================
+  let streakBannerTimer = null;
+  function showStreakBanner(combo) {
+    const el = document.getElementById("streak-toast-banner");
+    if (!el || !combo || combo < 3) return;
+    if (combo !== 3 && combo !== 5 && combo !== 8 && combo % 5 !== 0) return;
+
+    let msg = `🔥 連續答對 ${combo} 題！手感超順！`;
+    if (combo === 5) msg = "🔥🔥 連勝 5 題！你是數學小天才！";
+    else if (combo === 8) msg = "🔥🔥🔥 連勝 8 題！勢不可擋太神啦！";
+    else if (combo >= 10) msg = `👑🔥 傳說級 ${combo} 連勝！全島都在為你歡呼！`;
+
+    el.textContent = msg;
+    el.classList.remove("hidden");
+    el.classList.add("show");
+    clearTimeout(streakBannerTimer);
+    streakBannerTimer = setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(() => el.classList.add("hidden"), 280);
+    }, 2300);
+  }
+
+  function initSpeechRateAndPWA() {
+    // 🐢 / 🐇 語音朗讀語速切換
+    const btnRate = document.getElementById("btn-speech-rate");
+    if (btnRate && window.SpeechFX) {
+      const syncRateBtn = () => {
+        const slow = window.SpeechFX.isSlowMode();
+        btnRate.textContent = slow ? "🐢 慢速朗讀" : "🐇 正常語速";
+        btnRate.classList.toggle("is-slow", slow);
+      };
+      syncRateBtn();
+      btnRate.addEventListener("click", () => {
+        const nextSlow = !window.SpeechFX.isSlowMode();
+        window.SpeechFX.setSlowMode(nextSlow);
+        syncRateBtn();
+        window.SoundFX && window.SoundFX.playClick();
+        if (window.SoundFX && window.SoundFX.enabled) {
+          window.SpeechFX.speak(nextSlow ? "慢速朗讀已開啟" : "正常語速已開啟");
+        }
+      });
+    }
+
+    // 📱 PWA Service Worker 註冊（支援手機加入主畫面與離線快取）
+    if ("serviceWorker" in navigator && /^https?:$/.test(window.location.protocol)) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  }
+
   // ==================== 初始化入口 ====================
   window.MathPlus = {
     init(hooks) {
@@ -1246,6 +1297,7 @@
       initEyeCareAlarm();
       initLifeUnitsLab();
       initMulDivDojo();
+      initSpeechRateAndPWA();
 
       const heroDailyBtn = document.getElementById("btn-hero-daily-q");
       if (heroDailyBtn) {
@@ -1266,5 +1318,6 @@
     refreshAll() {
       renderDailyQuestionWall();
     },
+    showStreakBanner,
   };
 })();

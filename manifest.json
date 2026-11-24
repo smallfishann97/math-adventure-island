@@ -1,0 +1,20 @@
+{
+  "name": "數學遊戲冒險島｜108課綱互動闖關與教學題庫",
+  "short_name": "數學冒險島",
+  "description": "台灣國小三年級 108 課綱不分版本互動數學闖關、960 題圖解題庫、電子寵物與生活實作學習平台",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff8ea",
+  "theme_color": "#f2a43b",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

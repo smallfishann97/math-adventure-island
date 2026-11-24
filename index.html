@@ -4,13 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>數學遊戲冒險島｜108課綱互動闖關與教學題庫</title>
+  <meta name="theme-color" content="#f2a43b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="數學冒險島" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="favicon.svg?v=20261123b" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=20261123b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124n" />
+  <link rel="stylesheet" href="styles.css?v=20261124p" />
 </head>
 <body>
+  <!-- 🔥 連續答對即時連勝火苗橫幅 -->
+  <div id="streak-toast-banner" class="streak-toast-banner hidden" role="status" aria-live="polite"></div>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
   <div id="inapp-browser-banner" class="inapp-browser-banner hidden" role="status">
     <span>💡 偵測到您正使用 App 內建瀏覽器，建議點選單改用 <strong>Chrome / Safari</strong> 開啟，語音朗讀與音效最順暢喔！</span>
@@ -56,7 +64,10 @@
         </div>
       </form>
 
-      <p class="footer-brand" style="margin:18px 0 4px;">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
+      <div style="margin:14px 0 6px;text-align:center;">
+        <button type="button" class="site-counter-pill back-top-pill" data-back-to-top>↑ 返回頂部</button>
+      </div>
+      <p class="footer-brand" style="margin:10px 0 4px;">✦ 數學遊戲冒險島｜108 課綱國小數學互動闖關學習平台 ✦</p>
       <p class="login-copyright" style="margin-top:0;">Copyright © 2026 Ann Lu. All Rights Reserved.</p>
     </div>
   </section>
@@ -146,6 +157,8 @@
           <button class="icon-toggle" id="btn-sound-toggle" type="button" aria-pressed="true" title="切換答題音效">
             <span id="sound-icon">🔊</span>
           </button>
+
+          <button class="speech-rate-btn" id="btn-speech-rate" type="button" title="切換語音朗讀語速（慢速／正常）">🐇 正常語速</button>
 
           <button class="user-chip" id="btn-switch-user" type="button" title="切換冒險者帳號">
             <span id="user-avatar">🦊</span>
@@ -1498,13 +1511,13 @@
   <script src="data/math-glossary.js?v=20261124e"></script>
   <script src="avatars.js?v=20261123w"></script>
   <script src="svg-icons.js"></script>
-  <script src="audio-fx.js"></script>
+  <script src="audio-fx.js?v=20261124p"></script>
   <script src="visual-explainer.js"></script>
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
   <script src="super-features.js?v=20261124n"></script>
-  <script src="plus-features.js?v=20261124c"></script>
-  <script src="app.js?v=20261124i"></script>
+  <script src="plus-features.js?v=20261124p"></script>
+  <script src="app.js?v=20261124p"></script>
 </body>
 </html>

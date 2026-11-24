@@ -5883,6 +5883,56 @@ html, body {
   }
 }
 
+/* 6. 🐢 語音朗讀語速切換鈕 & 🔥 連勝火苗即時鼓勵橫幅 */
+.speech-rate-btn {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #6b451c;
+  background: linear-gradient(180deg, #fffdf7, #fceac4);
+  border: 1.8px solid #dfb260;
+  border-radius: 999px;
+  padding: 5px 11px;
+  white-space: nowrap;
+  transition: transform 0.14s ease, background 0.14s ease;
+}
+
+.speech-rate-btn:hover {
+  transform: translateY(-1px);
+}
+
+.speech-rate-btn.is-slow {
+  background: linear-gradient(180deg, #f1fbf4, #d2f0dc);
+  border-color: #5bb876;
+  color: #1f6b3a;
+}
+
+.streak-toast-banner {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translate(-50%, -140%);
+  z-index: 2500;
+  background: linear-gradient(135deg, #ffcf4d 0%, #f5942d 55%, #e8624a 100%);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 1.05rem;
+  padding: 11px 24px;
+  border-radius: 999px;
+  border: 2.5px solid #fff8e2;
+  box-shadow: 0 10px 26px rgba(214, 98, 42, 0.36);
+  pointer-events: none;
+  white-space: nowrap;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+  opacity: 0;
+}
+
+.streak-toast-banner.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
 @media (max-width: 700px) {
   .lb-podium-grid {
     grid-template-columns: 1fr;
