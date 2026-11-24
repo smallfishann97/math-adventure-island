@@ -5281,6 +5281,428 @@ html, body {
   }
 }
 
+/* ==================== 四大進階模組樣式（零藍色溫暖風格） ==================== */
+/* 1. 👀 護眼小鬧鐘 */
+.eyecare-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(180deg, #f3fcf6, #ddf5e5);
+  border: 2px solid #63b87b;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #255c37;
+}
+
+.eyecare-select {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #255c37;
+  cursor: pointer;
+  outline: none;
+}
+
+.eyecare-timer-badge {
+  background: #ffffff;
+  border: 1.5px solid #8bd09f;
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: #1f6b3a;
+  font-variant-numeric: tabular-nums;
+}
+
+.eyecare-pet-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: #fff9ec;
+  border: 2px solid #e6c27c;
+  border-radius: 20px;
+  padding: 12px 22px;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.eyecare-rest-countdown {
+  width: 72px;
+  height: 72px;
+  margin: 8px auto;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #e7f9ee, #c2efd2);
+  border: 3px solid #48a868;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #1f6b3a;
+}
+
+/* 2. 🗓️ 每日一題・月曆蓋章打卡牆 */
+.dq-milestones {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dq-ms-pill {
+  background: #fff8e8;
+  border: 1.5px solid #e5c485;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #7c5634;
+}
+
+.dq-ms-pill.done {
+  background: #e5f8ec;
+  border-color: #5bb876;
+  color: #1f6b3a;
+}
+
+.dq-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.dq-question-box {
+  background: #fffdf8;
+  border: 2px solid #ebd2a7;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.dq-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+  margin-bottom: 8px;
+}
+
+.dq-q-text {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.dq-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dq-opt-btn,
+.hw-opt-btn {
+  text-align: left;
+  justify-content: flex-start;
+  padding: 10px 14px;
+}
+
+.dq-feedback {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff2ed;
+  border: 1.5px solid #e89b88;
+  color: #a63d2b;
+  font-weight: 800;
+  font-size: 0.88rem;
+}
+
+.dq-done-banner {
+  background: #e7f9ee;
+  border: 2px solid #5bb876;
+  border-radius: 14px;
+  padding: 10px 14px;
+  color: #1f6b3a;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.dq-exp-box {
+  background: #fff8e6;
+  border: 1.5px dashed #dfb86c;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+.dq-calendar-box {
+  background: #fffdf8;
+  border: 2px solid #ebd2a7;
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.dq-cal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.dq-cal-weekdays,
+.dq-cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+}
+
+.dq-cal-weekdays span {
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+
+.dq-day {
+  position: relative;
+  min-height: 36px;
+  border-radius: 10px;
+  background: #fff9ee;
+  border: 1.5px solid #efe0c4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+
+.dq-day.empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.dq-day.is-today {
+  border-color: #e69524;
+  box-shadow: 0 0 0 2px rgba(230, 149, 36, 0.25);
+  font-weight: 900;
+  color: #b85d19;
+}
+
+.dq-day.is-stamped {
+  background: linear-gradient(180deg, #fff4cc, #ffe08a);
+  border-color: #d9931e;
+}
+
+.dq-stamp-mark {
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+/* 3. 🏫 老師／家長指定作業連結產生器 */
+.hw-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hw-unit-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffdf8;
+  border: 1.5px solid #e6cfa6;
+  border-radius: 12px;
+  padding: 7px 10px;
+  font-size: 0.83rem;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.hw-unit-chip:hover {
+  border-color: var(--gold);
+  background: #fff8e8;
+}
+
+.hw-result-box {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #f3fcf6;
+  border: 2px solid #63b87b;
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+.hw-result-left {
+  flex: 1;
+  min-width: 240px;
+}
+
+.hw-result-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: #ffffff;
+  border: 1.5px solid #cde8d5;
+  border-radius: 12px;
+  padding: 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #256b3b;
+}
+
+/* 4. ⚖️ 生活單位實作小實驗台 */
+.life-lab-stage {
+  background: #fffdf8;
+  border: 2px solid #ebd2a7;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.lab-task-banner {
+  background: linear-gradient(180deg, #fff8e4, #ffefc2);
+  border: 2px solid #e4b660;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+
+.lab-money-palette {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lab-money-btn {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 0.86rem;
+  border-radius: 12px;
+  padding: 8px 13px;
+  border: 2px solid #d4a65a;
+  transition: transform 0.12s ease;
+}
+
+.lab-money-btn:hover { transform: translateY(-2px); }
+.lab-money-btn.bill-500 { background: #f9e0cc; border-color: #c97f4d; color: #6e3b17; }
+.lab-money-btn.bill-100 { background: #fde2e4; border-color: #d97a82; color: #8c2f39; }
+.lab-money-btn.coin-50 { background: #fff0b3; border-color: #d49b1a; color: #6e4c00; }
+.lab-money-btn.coin-10 { background: #efeae2; border-color: #a89b8c; color: #4d4338; }
+.lab-money-btn.coin-5 { background: #f5ece0; border-color: #bfa588; color: #5c4630; }
+.lab-money-btn.coin-1 { background: #f8e4d4; border-color: #c78b5e; color: #6b3f1d; }
+
+.lab-tray-box {
+  background: #fff9ee;
+  border: 2px dashed #dfb86c;
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.lab-tray-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.lab-tray-items {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-height: 30px;
+  align-items: center;
+}
+
+.lab-chip {
+  display: inline-block;
+  background: #ffe8a8;
+  border: 1.5px solid #d99b26;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #6b4300;
+}
+
+.lab-visual-split {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.lab-svg-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fffaf0;
+  border: 1.5px solid #ead3a7;
+  border-radius: 16px;
+  padding: 10px 14px;
+}
+
+.lab-readout {
+  margin-top: 6px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.lab-msg {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.lab-msg.ok {
+  background: #e7f9ee;
+  border: 2px solid #5bb876;
+  color: #1f6b3a;
+}
+
+.lab-msg.bad {
+  background: #fff2ed;
+  border: 2px solid #e89b88;
+  color: #a63d2b;
+}
+
+@media (max-width: 820px) {
+  .dq-grid {
+    grid-template-columns: 1fr;
+  }
+  .dq-options {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 700px) {
   .lb-podium-grid {
     grid-template-columns: 1fr;

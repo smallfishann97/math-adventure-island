@@ -1001,7 +1001,7 @@
       </div>
       <div class="weekly-units-row">
         <div><strong>🏆 目前最擅長：</strong>${st.strongest.length ? st.strongest.map((u) => `${u.title}（★${u.stars}）`).join("、") : "尚待累積闖關星等"}</div>
-        <div><strong>💡 建議加強單元：</strong>${st.weakest.map((u) => u.title).join("、")}</div>
+        <div><strong>💡 建議加強單元：</strong>${st.weakest.map((u) => u.title).join("、")} ｜ <strong>👀 護眼休息達成：</strong>${user.eyeCareRestCount || 0} 次</div>
       </div>
       <div class="weekly-comment">💬 學習小評語：${st.comment}</div>
     `;
@@ -1060,7 +1060,7 @@
     ctx.font = "800 18px 'Microsoft JhengHei', sans-serif";
     ctx.fillText(`🏆 目前最擅長：${st.strongest.length ? st.strongest.map((u) => `${u.title}(★${u.stars})`).join("、") : "持續累積中"}`, 40, 282);
     ctx.fillText(`💡 建議優先複習：${st.weakest.map((u) => u.title).join("、")}`, 40, 320);
-    ctx.fillText(`🛠️ 待清零錯題數：${st.mistakeCnt} 題`, 40, 358);
+    ctx.fillText(`🛠️ 待清零錯題數：${st.mistakeCnt} 題　｜　👀 護眼休息達成：${user.eyeCareRestCount || 0} 次`, 40, 358);
 
     ctx.fillStyle = "#eaf8ee";
     ctx.strokeStyle = "#79be8d";

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261124i" />
+  <link rel="stylesheet" href="styles.css?v=20261124k" />
 </head>
 <body>
   <!-- LINE / FB / IG 內建瀏覽器偵測提醒橫幅（僅在 App 內建瀏覽器顯示） -->
@@ -131,6 +131,18 @@
             <div id="bgm-hint-bubble" class="bgm-hint-bubble hidden" role="status">👆 點這裡有 4 種可愛音樂可切換喔！</div>
           </div>
 
+          <!-- 👀 護眼定時提醒小鬧鐘 -->
+          <div class="eyecare-pill" title="設定護眼定時提醒，時間到由電子寵物溫柔提醒休息">
+            <span>👀</span>
+            <select id="eyecare-interval-select" class="eyecare-select" aria-label="護眼定時提醒分鐘數">
+              <option value="20" selected>護眼 20 分</option>
+              <option value="15">護眼 15 分</option>
+              <option value="30">護眼 30 分</option>
+              <option value="0">護眼關閉</option>
+            </select>
+            <span id="eyecare-timer-badge" class="eyecare-timer-badge">20:00</span>
+          </div>
+
           <button class="icon-toggle" id="btn-sound-toggle" type="button" aria-pressed="true" title="切換答題音效">
             <span id="sound-icon">🔊</span>
           </button>
@@ -157,6 +169,7 @@
               <select id="quick-unit-select" class="quick-unit-select" aria-label="快速選擇數學單元"></select>
               <button class="btn btn-gold btn-lg" id="btn-quick-enter-stages" type="button">🗺️ 進入此單元闖關</button>
               <button class="btn btn-outline-light btn-lg" id="btn-quick-lesson-unit" type="button">📘 先看教學講義</button>
+              <button class="btn btn-outline-light btn-lg" id="btn-hero-daily-q" type="button">🗓️ 今日一題打卡</button>
             </div>
           </div>
           <div class="hero-stats-card">
@@ -789,6 +802,60 @@
           </div>
         </div>
 
+        <!-- 🏫 老師／家長：一鍵派發指定作業連結（免伺服器） -->
+        <div class="panel-card" style="margin-top:20px;" id="hw-builder-card">
+          <h3 class="section-subtitle">🏫 老師／家長・一鍵派發指定作業連結（免伺服器！）</h3>
+          <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
+            勾選想讓孩子練習的單元與題數，系統自動將作業設定編碼進專屬連結與 QR 碼！貼到班級 LINE 群組，孩子點開就能直接作答、即時評分並領取獎勵金幣！
+          </p>
+          <div class="cert-toolbar" style="margin-bottom:10px;">
+            <input type="text" id="hw-title-input" class="luxury-input" placeholder="作業名稱（例：三年二班週五數學作業）" maxlength="30" style="flex:1;min-width:210px;" />
+            <select id="hw-count-select" class="luxury-select">
+              <option value="5">5 題（輕鬆小練）</option>
+              <option value="10" selected>10 題（標準作業）</option>
+              <option value="15">15 題（進階特訓）</option>
+              <option value="20">20 題（綜合測驗）</option>
+            </select>
+            <button type="button" class="btn btn-gold" id="btn-hw-generate">🔗 產生作業連結與 QR 碼</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
+            <span style="font-size:0.84rem;font-weight:800;color:var(--ink-soft);">📌 請勾選出題單元（可複選）：</span>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-hw-select-all">全選</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-hw-select-none">清除</button>
+            </div>
+          </div>
+          <div id="hw-unit-checkboxes" class="hw-unit-grid"></div>
+          <div id="hw-result-box" class="hw-result-box hidden">
+            <div class="hw-result-left">
+              <strong style="color:var(--ink);">✅ 專屬作業連結已產生！直接複製傳給學生或家長：</strong>
+              <input type="text" id="hw-link-output" class="luxury-input" readonly style="width:100%;margin:8px 0;font-size:0.84rem;" />
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-gold btn-sm" id="btn-hw-copy">📋 一鍵複製作業連結</button>
+                <button type="button" class="btn btn-forest btn-sm" id="btn-hw-preview">🖥️ 立即試寫這份作業</button>
+              </div>
+            </div>
+            <div class="hw-result-qr">
+              <img id="hw-qr-img" alt="作業連結 QR Code" width="128" height="128" />
+              <span>手機掃碼直接作答</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⚖️ 生活單位實作小實驗台（找錢機／電子秤／量杯倒水） -->
+        <div class="panel-card" style="margin-top:20px;" id="life-lab-card">
+          <h3 class="section-subtitle">⚖️ 生活單位實作小實驗台（動手操作學找零、公斤公克與公升毫升！）</h3>
+          <p style="font-size:0.88rem;color:var(--muted);margin:0 0 12px;">
+            每次完成挑戰就送 <strong>🪙 +15 金幣</strong>！用點選鈔票硬幣、放砝碼秤重、倒果汁量杯的方式，把三年級最容易搞混的生活單位變成超好玩的互動實驗！
+          </p>
+          <div class="review-filter" id="life-lab-tabs" style="margin-bottom:14px;">
+            <button type="button" class="filter-chip active" data-lab-tab="change">💵 商店找零機</button>
+            <button type="button" class="filter-chip" data-lab-tab="scale">⚖️ 公斤公克電子秤</button>
+            <button type="button" class="filter-chip" data-lab-tab="beaker">🧪 公升毫升量杯倒水</button>
+          </div>
+          <div id="life-lab-stage" class="life-lab-stage"></div>
+        </div>
+
         <!-- 個人專屬學習獎狀生成器 -->
         <div class="panel-card" style="margin-top:20px;">
           <h3 class="section-subtitle">🏅 個人專屬「數學榮譽獎狀」產生器（一鍵下載 PNG 或列印！）</h3>
@@ -859,6 +926,30 @@
               <hr class="soft-divider" />
               <h3 class="section-subtitle">🎯 今日 3 大輕鬆小任務</h3>
               <div id="daily-quest-list" class="daily-quest-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🗓️ 「每日一題」月曆蓋章打卡牆 -->
+        <div class="panel-card" id="daily-q-card" style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+            <div>
+              <h3 class="section-subtitle" style="margin:0;">🗓️ 「每日一題」頭腦體操・月曆蓋章打卡牆</h3>
+              <p style="font-size:0.86rem;color:var(--muted);margin:4px 0 0;">每天全站精選 1 題限定腦力題，答對就在月曆蓋上可愛印章＋領 <strong>🪙 +40 雙倍金幣 & 🍪 +2 餅乾</strong>！</p>
+            </div>
+            <div class="dq-milestones" id="dq-milestones"></div>
+          </div>
+          <div class="dq-grid">
+            <div class="dq-question-box" id="dq-question-box"></div>
+            <div class="dq-calendar-box">
+              <div class="dq-cal-head">
+                <strong id="dq-cal-month-title">2026 年 11 月</strong>
+                <span id="dq-cal-count-badge" class="ver-tag">本月已蓋章 0 天</span>
+              </div>
+              <div class="dq-cal-weekdays">
+                <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+              </div>
+              <div id="dq-cal-days" class="dq-cal-days"></div>
             </div>
           </div>
         </div>
@@ -1390,6 +1481,41 @@
     </div>
   </div>
 
+  <!-- 👀 護眼小鬧鐘・電子寵物休息提醒彈窗 -->
+  <div id="eye-care-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="eyecare-modal-title">
+    <div class="modal-dialog" style="text-align:center;">
+      <div class="modal-top" style="justify-content:center;">
+        <h3 id="eyecare-modal-title">👀 護眼小鬧鐘・起來休息一下吧！</h3>
+      </div>
+      <div id="eyecare-pet-wrap" style="margin:6px auto 10px;"></div>
+      <p id="eyecare-pet-msg" style="font-size:1.02rem;font-weight:900;color:var(--ink);margin:0 0 8px;">
+        你已經專心學習了好一陣子囉！站起來喝口水、看看遠方綠色植物，讓眼睛放鬆一下吧！
+      </p>
+      <p style="font-size:0.86rem;color:var(--muted);margin:0 0 14px;">
+        點擊下方「開始 20 秒護眼休息」，倒數結束還可獲得 <strong>🪙 +10 護眼好寶寶金幣</strong>！
+      </p>
+      <div id="eyecare-rest-countdown" class="eyecare-rest-countdown hidden">20</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
+        <button type="button" class="btn btn-forest btn-lg" id="btn-eyecare-start-rest">🌿 開始 20 秒護眼休息（+10金幣）</button>
+        <button type="button" class="btn btn-ghost" id="btn-eyecare-dismiss">稍後再休息</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🏫 老師／家長指定作業闖關彈窗 -->
+  <div id="homework-runner-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="hw-runner-title">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-top" style="justify-content:space-between;align-items:center;">
+        <div>
+          <h3 id="hw-runner-title">🏫 指定數學作業</h3>
+          <p id="hw-runner-sub" style="margin:2px 0 0;font-size:0.84rem;color:var(--muted);"></p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-hw-runner-close">關閉離開</button>
+      </div>
+      <div id="hw-runner-body"></div>
+    </div>
+  </div>
+
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
@@ -1402,6 +1528,7 @@
   <script src="extras.js"></script>
   <script src="deluxe-features.js?v=20261123d"></script>
   <script src="super-features.js?v=20261124k"></script>
-  <script src="app.js?v=20261124g"></script>
+  <script src="plus-features.js?v=20261124a"></script>
+  <script src="app.js?v=20261124h"></script>
 </body>
 </html>

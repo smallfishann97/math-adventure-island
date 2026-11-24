@@ -1753,6 +1753,7 @@
       navBtns.petquest.addEventListener("click", () => {
         window.SoundFX.playClick(); stopQuizTimer();
         if (window.MathSuper) window.MathSuper.refreshAll();
+        if (window.MathPlus) window.MathPlus.refreshAll();
         showView("petquest", "petquest");
       });
     }
@@ -2341,8 +2342,23 @@
     });
   }
 
+  if (window.MathPlus) {
+    window.MathPlus.init({
+      getUser: currentUser,
+      saveStore,
+      refreshHome: refreshAllHomeUI,
+      getBank: () => BANK,
+      openPetQuest: () => {
+        stopQuizTimer();
+        if (window.MathSuper) window.MathSuper.refreshAll();
+        showView("petquest", "petquest");
+      }
+    });
+  }
+
   if (store.activeUserId && store.users[store.activeUserId]) {
     loginAs(store.activeUserId);
+    if (window.MathPlus) window.MathPlus.refreshAll();
   } else {
     renderLoginScreen();
   }
