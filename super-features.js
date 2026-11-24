@@ -1534,15 +1534,21 @@
     });
   }
 
-  // 幫免費雲端計數器 API 加上 4 秒超時保護，並同時支援主備雙雲端節點
-  async function fetchCounterJson(url, timeoutMs = 4200) {
+  // 免費雲端計數器 API（實測 HTTP 200 + CORS:* 穩定運作）
+  const CLOUD_COUNTER_BASE = "https://countapi.mileshilliard.com/api/v1";
+  const CLOUD_KEY_PREFIX = "smallfishann97_mai";
+
+  async function fetchCounterVal(action, keySuffix, timeoutMs = 4500) {
     const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
     const t = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
+    const url = `${CLOUD_COUNTER_BASE}/${action}/${CLOUD_KEY_PREFIX}_${keySuffix}?t=${Date.now()}`;
     try {
       const res = await fetch(url, ctrl ? { signal: ctrl.signal, cache: "no-store" } : { cache: "no-store" });
       if (t) clearTimeout(t);
       if (!res.ok) return null;
-      return await res.json();
+      const data = await res.json();
+      const num = data && data.value !== undefined ? Number(data.value) : NaN;
+      return Number.isFinite(num) ? num : null;
     } catch (_) {
       if (t) clearTimeout(t);
       return null;
@@ -1551,9 +1557,9 @@
 
   async function bumpGlobalMemberCount(times = 1) {
     for (let i = 0; i < times; i++) {
-      const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/up`);
-      if (data && typeof data.count === "number") {
-        cachedMembers = Math.max(cachedMembers, data.count);
+      const val = await fetchCounterVal("hit", "members");
+      if (val !== null) {
+        cachedMembers = Math.max(cachedMembers, val);
         localStorage.setItem("mai_cached_members", String(cachedMembers));
       }
     }
@@ -1561,7 +1567,7 @@
   }
 
   async function initSiteCounters() {
-    // 0. 📅 今日來訪人次（依當日日期獨立累計，每天 00:00 自動歸零重算，每 30 秒同步雲端最新數字）
+    // 0. 📅 今日來訪人次（依當日日期獨立累計，每天 00:00 自動歸零重算，每 20 秒同步雲端最新數字）
     async function syncTodayVisits(allowBump) {
       const todayKey = todayStr();
       const compactDate = todayKey.replace(/-/g, "");
@@ -1571,7 +1577,7 @@
         localStorage.setItem("mai_cached_today_date", todayKey);
         localStorage.setItem("mai_cached_today_visits", "0");
       }
-      const bumpFlagKey = `mai_today_visit_bumped_${compactDate}`;
+      const bumpFlagKey = `mai_today_v2_bumped_${compactDate}`;
       const shouldBump = allowBump && !sessionStorage.getItem(bumpFlagKey);
       if (shouldBump) {
         sessionStorage.setItem(bumpFlagKey, "1");
@@ -1583,12 +1589,9 @@
         cachedTodayVisits = 1;
         renderCounterDOM();
       }
-      const url = shouldBump
-        ? `https://api.counterapi.dev/v1/${COUNTER_NS}/visits_${compactDate}/up?t=${Date.now()}`
-        : `https://api.counterapi.dev/v1/${COUNTER_NS}/visits_${compactDate}/?t=${Date.now()}`;
-      const data = await fetchCounterJson(url, 4000);
-      if (data && typeof data.count === "number") {
-        cachedTodayVisits = Math.max(1, cachedTodayVisits, data.count);
+      const val = await fetchCounterVal(shouldBump ? "hit" : "get", `visits_${compactDate}`, 4500);
+      if (val !== null) {
+        cachedTodayVisits = Math.max(1, cachedTodayVisits, val);
         localStorage.setItem("mai_cached_today_date", todayKey);
         localStorage.setItem("mai_cached_today_visits", String(cachedTodayVisits));
         if (cachedTodayVisits > cachedVisits) {
@@ -1599,7 +1602,7 @@
       }
     }
     syncTodayVisits(true);
-    setInterval(() => syncTodayVisits(false), 30000);
+    setInterval(() => syncTodayVisits(false), 20000);
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
@@ -1608,28 +1611,24 @@
       renderCounterDOM();
     }, 1000);
 
-    // 1. 累計拜訪人次（背景非阻塞更新）
-    (async () => {
-      if (!sessionStorage.getItem("mai_visit_bumped")) {
-        sessionStorage.setItem("mai_visit_bumped", "1");
+    // 1. 開站累計拜訪人次（背景非阻塞更新，每 20 秒同步最新全站累計）
+    async function syncAllVisits(allowBump) {
+      const shouldBump = allowBump && !sessionStorage.getItem("mai_visit_v2_bumped");
+      if (shouldBump) {
+        sessionStorage.setItem("mai_visit_v2_bumped", "1");
         cachedVisits = Math.max(1, cachedVisits + 1);
         localStorage.setItem("mai_cached_visits", String(cachedVisits));
         renderCounterDOM();
-        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/up?t=${Date.now()}`);
-        if (data && typeof data.count === "number") {
-          cachedVisits = Math.max(cachedVisits, data.count);
-          localStorage.setItem("mai_cached_visits", String(cachedVisits));
-          renderCounterDOM();
-        }
-      } else {
-        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/visits/?t=${Date.now()}`);
-        if (data && typeof data.count === "number") {
-          cachedVisits = Math.max(cachedVisits, data.count);
-          localStorage.setItem("mai_cached_visits", String(cachedVisits));
-          renderCounterDOM();
-        }
       }
-    })();
+      const val = await fetchCounterVal(shouldBump ? "hit" : "get", "visits", 4500);
+      if (val !== null) {
+        cachedVisits = Math.max(cachedVisits, val);
+        localStorage.setItem("mai_cached_visits", String(cachedVisits));
+        renderCounterDOM();
+      }
+    }
+    syncAllVisits(true);
+    setInterval(() => syncAllVisits(false), 20000);
 
     // 2. 已建立冒險者人數（背景非阻塞更新）
     (async () => {
@@ -1643,9 +1642,9 @@
         localStorage.setItem("mai_synced_member_ids", JSON.stringify([...syncedIds, ...unsynced]));
         await bumpGlobalMemberCount(unsynced.length);
       } else {
-        const data = await fetchCounterJson(`https://api.counterapi.dev/v1/${COUNTER_NS}/members/`);
-        if (data && typeof data.count === "number") {
-          cachedMembers = Math.max(cachedMembers, data.count);
+        const val = await fetchCounterVal("get", "members", 4500);
+        if (val !== null) {
+          cachedMembers = Math.max(cachedMembers, val);
           localStorage.setItem("mai_cached_members", String(cachedMembers));
           renderCounterDOM();
         }
