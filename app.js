@@ -1812,9 +1812,12 @@
     navBtns.history.addEventListener("click", () => {
       window.SoundFX.playClick(); stopQuizTimer(); renderHistoryView(); showView("history", "history");
     });
-    navBtns.sources.addEventListener("click", () => {
-      window.SoundFX.playClick(); stopQuizTimer(); showView("sources", "sources");
-    });
+    if (navBtns.sources) {
+      navBtns.sources.addEventListener("click", () => {
+        window.SoundFX.playClick(); stopQuizTimer(); showView("sources", "sources");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
 
     // Hero 快速選擇
     document.getElementById("btn-quick-enter-stages").addEventListener("click", () => {
