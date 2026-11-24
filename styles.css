@@ -3175,22 +3175,38 @@ html, body {
   }
 
   .topbar-actions {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
     width: 100%;
-    padding: 2px 2px 4px;
-  }
-  .topbar-actions::-webkit-scrollbar {
-    display: none;
+    padding: 2px 0;
+    overflow: visible;
   }
   .topbar-actions .nav-pill {
-    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+    padding: 6px 2px;
+    border-radius: 13px;
+    font-size: 0.62rem;
+    line-height: 1.25;
     white-space: nowrap;
+    letter-spacing: -0.02em;
+    min-width: 0;
+  }
+  .topbar-actions .nav-pill .badge-count {
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    font-size: 0.62rem;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    line-height: 16px;
   }
 
   .mobile-tools-bar {
@@ -3372,13 +3388,12 @@ html, body {
   .hero-tag {
     display: inline-block;
     max-width: 100%;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.45;
-    font-size: 0.74rem;
-    padding: 5px 12px;
+    white-space: nowrap;
+    line-height: 1.4;
+    font-size: 0.65rem;
+    padding: 5px 9px;
     border-radius: 14px;
-    letter-spacing: 0.02em;
+    letter-spacing: -0.02em;
   }
 
   .hero-content h2 {
