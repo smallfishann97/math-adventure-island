@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125i" />
+  <link rel="stylesheet" href="styles.css?v=20261125j" />
 </head>
 <body>
   <!-- 🔥 連續答對即時連勝火苗橫幅 -->
@@ -740,6 +740,7 @@
               <input type="number" id="rw-new-cost" class="luxury-input" placeholder="所需金幣" min="50" max="99999" step="50" value="500" style="max-width:130px;" required />
               <button type="submit" class="btn btn-gold btn-sm">➕ 新增獎勵</button>
               <button type="button" class="btn btn-ghost btn-sm" id="btn-reset-default-rewards">↺ 恢復預設 4 項</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-change-parent-pin">🔑 修改家長密碼</button>
             </form>
           </div>
 
@@ -1655,6 +1656,44 @@
     </div>
   </div>
 
+  <!-- 🔐 家長 4 位數專屬 PIN 碼鎖彈窗（保護獎勵管理與兌換券核銷） -->
+  <div id="parent-pin-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="parent-pin-title">
+    <div class="modal-dialog" style="max-width:440px;text-align:center;">
+      <div class="modal-top">
+        <h3 id="parent-pin-title">🔐 請輸入家長 4 位數密碼</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-close-parent-pin">關閉 ✕</button>
+      </div>
+      <p id="parent-pin-desc" style="font-size:0.88rem;color:var(--muted);margin:0 0 14px;line-height:1.6;"></p>
+
+      <!-- 模式 A：首次設定 / 重設 4 位數密碼 -->
+      <form id="parent-pin-setup-form" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
+        <input type="password" id="parent-pin-new1" class="luxury-input" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="請設定 4 位數數字密碼（例：1234）" autocomplete="off" style="text-align:center;font-size:1.2rem;letter-spacing:6px;" required />
+        <input type="password" id="parent-pin-new2" class="luxury-input" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="請再輸入一次確認密碼" autocomplete="off" style="text-align:center;font-size:1.2rem;letter-spacing:6px;" required />
+        <p id="parent-pin-setup-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.85rem;margin:2px 0;"></p>
+        <button type="submit" class="btn btn-gold btn-lg">✅ 儲存家長密碼並繼續</button>
+      </form>
+
+      <!-- 模式 B：輸入 4 位數密碼驗證 -->
+      <form id="parent-pin-verify-form" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
+        <input type="password" id="parent-pin-input" class="luxury-input" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="輸入 4 位數密碼" autocomplete="off" style="text-align:center;font-size:1.35rem;letter-spacing:10px;" required />
+        <p id="parent-pin-verify-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.85rem;margin:2px 0;"></p>
+        <button type="submit" class="btn btn-gold btn-lg">🔓 驗證並繼續</button>
+        <button type="button" class="footer-link-btn" id="btn-parent-pin-forgot" style="margin-top:4px;font-size:0.82rem;">❓ 忘記密碼？用大人進階算式重設</button>
+      </form>
+
+      <!-- 模式 C：忘記密碼（大人進階乘法驗證重設） -->
+      <form id="parent-pin-reset-form" class="hidden" style="display:flex;flex-direction:column;gap:10px;">
+        <div id="parent-pin-math-q" style="font-size:1.15rem;font-weight:900;color:var(--ink);background:#fff8e6;border:2px dashed #e6b85c;border-radius:14px;padding:12px;"></div>
+        <input type="number" id="parent-pin-math-ans" class="luxury-input" inputmode="numeric" placeholder="請輸入正確答案以重設密碼" autocomplete="off" style="text-align:center;font-size:1.1rem;" required />
+        <p id="parent-pin-reset-err" class="hidden" style="color:#d64e3e;font-weight:900;font-size:0.85rem;margin:2px 0;"></p>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button type="button" class="btn btn-ghost" id="btn-parent-pin-back-verify">← 返回輸入密碼</button>
+          <button type="submit" class="btn btn-forest">✅ 驗證並重設密碼</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- 腳本載入 -->
   <script src="data/grade3-math-bank.js"></script>
   <script src="data/original-challenges.js"></script>
@@ -1668,7 +1707,7 @@
   <script src="deluxe-features.js?v=20261124t"></script>
   <script src="super-features.js?v=20261125f"></script>
   <script src="plus-features.js?v=20261125d"></script>
-  <script src="pro-features.js?v=20261125f"></script>
+  <script src="pro-features.js?v=20261125j"></script>
   <script src="app.js?v=20261125g"></script>
 </body>
 </html>

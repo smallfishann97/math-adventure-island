@@ -6345,8 +6345,15 @@ html, body {
 }
 
 .rw-add-form input[type="text"] {
-  flex: 1;
-  min-width: 190px;
+  flex: 1 1 280px;
+  width: 100%;
+  min-width: 260px;
+  padding: 10px 16px;
+}
+
+.rw-add-form input[type="number"] {
+  flex: 0 0 130px;
+  padding: 10px 12px;
 }
 
 .parent-rewards-grid {

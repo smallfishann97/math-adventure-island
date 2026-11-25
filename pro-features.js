@@ -8,6 +8,7 @@
 (function () {
   let api = null;
   const REWARDS_STORAGE_KEY = "mai_parent_rewards_v1";
+  const PARENT_PIN_KEY = "mai_parent_pin_v1";
   const DEFAULT_REWARDS = [
     { id: "rw_cartoon", icon: "📺", title: "看卡通／玩遊戲 20 分鐘", cost: 300 },
     { id: "rw_icecream", icon: "🍦", title: "吃一支冰淇淋／喜歡的小點心", cost: 400 },
@@ -669,7 +670,8 @@
       exportedAt: todayStr(),
       users: store.users || {},
       activeUserId: store.activeUserId || null,
-      parentRewards: loadParentRewards()
+      parentRewards: loadParentRewards(),
+      parentPin: getSavedParentPin() || ""
     };
   }
 
@@ -682,6 +684,9 @@
 
     if (Array.isArray(parsed.parentRewards) && parsed.parentRewards.length) {
       saveParentRewards(parsed.parentRewards);
+    }
+    if (typeof parsed.parentPin === "string" && /^\d{4}$/.test(parsed.parentPin)) {
+      saveParentPin(parsed.parentPin);
     }
     const cleanStore = {
       users: parsed.users,
@@ -820,7 +825,187 @@
     }
   }
 
-  // ==================== 4. 🎟️ 家長真實獎勵兌換券（金幣換生活獎勵＋自訂＋專屬金券＋核銷） ====================
+  // ==================== 4. 🎟️ 家長真實獎勵兌換券（含 🔐 家長 4 位數 PIN 碼鎖） ====================
+  function getSavedParentPin() {
+    try {
+      const p = localStorage.getItem(PARENT_PIN_KEY);
+      return p && /^\d{4}$/.test(p) ? p : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function saveParentPin(pin) {
+    try {
+      if (pin) localStorage.setItem(PARENT_PIN_KEY, pin);
+      else localStorage.removeItem(PARENT_PIN_KEY);
+    } catch (_) {}
+  }
+
+  let pinPendingCallback = null;
+  let pinPendingLabel = "";
+  let pinResetAnswer = 0;
+
+  function showParentPinMode(mode) {
+    const titleEl = document.getElementById("parent-pin-title");
+    const descEl = document.getElementById("parent-pin-desc");
+    const setupForm = document.getElementById("parent-pin-setup-form");
+    const verifyForm = document.getElementById("parent-pin-verify-form");
+    const resetForm = document.getElementById("parent-pin-reset-form");
+    const setupErr = document.getElementById("parent-pin-setup-err");
+    const verifyErr = document.getElementById("parent-pin-verify-err");
+    const resetErr = document.getElementById("parent-pin-reset-err");
+
+    [setupForm, verifyForm, resetForm].forEach((f) => f && f.classList.add("hidden"));
+    [setupErr, verifyErr, resetErr].forEach((e) => e && e.classList.add("hidden"));
+
+    if (mode === "setup") {
+      if (titleEl) titleEl.textContent = "🔐 設定家長專屬 4 位數密碼";
+      if (descEl) {
+        descEl.textContent = pinPendingLabel
+          ? `請先由爸爸媽媽設定一組 4 位數數字密碼（例：生日或手機末 4 碼），設定完成後將立即執行「${pinPendingLabel}」：`
+          : "請設定一組新的 4 位數家長數字密碼，避免小朋友誤按核銷或自行修改獎勵金幣：";
+      }
+      const n1 = document.getElementById("parent-pin-new1");
+      const n2 = document.getElementById("parent-pin-new2");
+      if (n1) n1.value = "";
+      if (n2) n2.value = "";
+      if (setupForm) setupForm.classList.remove("hidden");
+      setTimeout(() => n1 && n1.focus(), 80);
+    } else if (mode === "verify") {
+      if (titleEl) titleEl.textContent = "🔐 請輸入家長 4 位數密碼";
+      if (descEl) {
+        descEl.textContent = pinPendingLabel
+          ? `為確認是爸爸媽媽本人操作，請輸入 4 位數家長密碼以執行「${pinPendingLabel}」：`
+          : "請輸入 4 位數家長密碼以繼續：";
+      }
+      const inp = document.getElementById("parent-pin-input");
+      if (inp) inp.value = "";
+      if (verifyForm) verifyForm.classList.remove("hidden");
+      setTimeout(() => inp && inp.focus(), 80);
+    } else if (mode === "reset") {
+      const a = 17 + Math.floor(Math.random() * 22);
+      const b = 13 + Math.floor(Math.random() * 17);
+      pinResetAnswer = a * b;
+      if (titleEl) titleEl.textContent = "🧮 大人心算驗證・重設家長密碼";
+      if (descEl) descEl.textContent = "請爸爸媽媽算出下方兩位數乘法答案，答對即可重新設定新的 4 位數密碼：";
+      const qEl = document.getElementById("parent-pin-math-q");
+      const aEl = document.getElementById("parent-pin-math-ans");
+      if (qEl) qEl.textContent = `請計算：${a} × ${b} = ？`;
+      if (aEl) aEl.value = "";
+      if (resetForm) resetForm.classList.remove("hidden");
+      setTimeout(() => aEl && aEl.focus(), 80);
+    }
+  }
+
+  function requireParentPin(actionLabel, onAuthorized, forceSetup) {
+    const modal = document.getElementById("parent-pin-modal");
+    if (!modal) {
+      onAuthorized && onAuthorized();
+      return;
+    }
+    pinPendingLabel = actionLabel || "";
+    pinPendingCallback = onAuthorized || null;
+    const saved = getSavedParentPin();
+    showParentPinMode(forceSetup || !saved ? "setup" : "verify");
+    modal.classList.remove("hidden");
+  }
+
+  function initParentPinModal() {
+    const modal = document.getElementById("parent-pin-modal");
+    const btnClose = document.getElementById("btn-close-parent-pin");
+    const setupForm = document.getElementById("parent-pin-setup-form");
+    const verifyForm = document.getElementById("parent-pin-verify-form");
+    const resetForm = document.getElementById("parent-pin-reset-form");
+    const btnForgot = document.getElementById("btn-parent-pin-forgot");
+    const btnBackVerify = document.getElementById("btn-parent-pin-back-verify");
+    if (!modal) return;
+
+    function closePinModal() {
+      modal.classList.add("hidden");
+      pinPendingCallback = null;
+    }
+
+    if (btnClose) {
+      btnClose.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        closePinModal();
+      });
+    }
+    modal.addEventListener("click", (ev) => {
+      if (ev.target === modal) closePinModal();
+    });
+
+    if (setupForm) {
+      setupForm.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const n1 = (document.getElementById("parent-pin-new1")?.value || "").trim();
+        const n2 = (document.getElementById("parent-pin-new2")?.value || "").trim();
+        const err = document.getElementById("parent-pin-setup-err");
+        if (!/^\d{4}$/.test(n1)) {
+          if (err) { err.textContent = "❌ 請輸入剛好 4 位數的數字密碼（0～9）喔！"; err.classList.remove("hidden"); }
+          return;
+        }
+        if (n1 !== n2) {
+          if (err) { err.textContent = "❌ 兩次輸入的密碼不一致，請再確認一次！"; err.classList.remove("hidden"); }
+          return;
+        }
+        saveParentPin(n1);
+        window.SoundFX && window.SoundFX.playCorrect && window.SoundFX.playCorrect();
+        const cb = pinPendingCallback;
+        closePinModal();
+        if (cb) cb();
+      });
+    }
+
+    if (verifyForm) {
+      verifyForm.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const val = (document.getElementById("parent-pin-input")?.value || "").trim();
+        const err = document.getElementById("parent-pin-verify-err");
+        if (val !== getSavedParentPin()) {
+          window.SoundFX && window.SoundFX.playWrong && window.SoundFX.playWrong();
+          if (err) { err.textContent = "❌ 家長密碼不正確，請由爸爸媽媽本人輸入喔！"; err.classList.remove("hidden"); }
+          return;
+        }
+        window.SoundFX && window.SoundFX.playCorrect && window.SoundFX.playCorrect();
+        const cb = pinPendingCallback;
+        closePinModal();
+        if (cb) cb();
+      });
+    }
+
+    if (btnForgot) {
+      btnForgot.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        showParentPinMode("reset");
+      });
+    }
+
+    if (btnBackVerify) {
+      btnBackVerify.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        showParentPinMode("verify");
+      });
+    }
+
+    if (resetForm) {
+      resetForm.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const ans = Number((document.getElementById("parent-pin-math-ans")?.value || "").trim());
+        const err = document.getElementById("parent-pin-reset-err");
+        if (ans !== pinResetAnswer) {
+          window.SoundFX && window.SoundFX.playWrong && window.SoundFX.playWrong();
+          if (err) { err.textContent = "❌ 答案不正確，請再算一次喔！"; err.classList.remove("hidden"); }
+          return;
+        }
+        window.SoundFX && window.SoundFX.playCorrect && window.SoundFX.playCorrect();
+        saveParentPin("");
+        showParentPinMode("setup");
+      });
+    }
+  }
+
   function loadParentRewards() {
     try {
       const raw = localStorage.getItem(REWARDS_STORAGE_KEY);
@@ -966,11 +1151,12 @@
             window.SoundFX && window.SoundFX.playClick();
             const v = vouchers[Number(b.dataset.useVoucher)];
             if (!v || v.used) return;
-            if (!confirm(`家長確認：已兌現「${v.icon} ${v.title}」，要將此張兌換券標記為「已核銷使用」嗎？`)) return;
-            v.used = true;
-            v.usedDate = todayStr();
-            api.saveStore && api.saveStore();
-            renderParentRewardsPanel();
+            requireParentPin(`核銷「${v.icon} ${v.title}」兌換券`, () => {
+              v.used = true;
+              v.usedDate = todayStr();
+              api.saveStore && api.saveStore();
+              renderParentRewardsPanel();
+            });
           });
         });
       }
@@ -1063,18 +1249,38 @@
 
   function initParentRewardsControls() {
     const btnToggleManage = document.getElementById("btn-toggle-manage-rewards");
+    const btnChangePin = document.getElementById("btn-change-parent-pin");
     const addForm = document.getElementById("parent-reward-add-form");
     const btnReset = document.getElementById("btn-reset-default-rewards");
     const modal = document.getElementById("voucher-ticket-modal");
     const btnCloseModal = document.getElementById("btn-close-voucher-modal");
     const btnDlPng = document.getElementById("btn-download-voucher-png");
 
+    initParentPinModal();
+
     if (btnToggleManage) {
       btnToggleManage.addEventListener("click", () => {
         window.SoundFX && window.SoundFX.playClick();
-        rewardManageOpen = !rewardManageOpen;
-        btnToggleManage.textContent = rewardManageOpen ? "✅ 完成家長管理" : "👨‍👩‍👧 家長自訂獎勵項目";
-        renderParentRewardsPanel();
+        if (rewardManageOpen) {
+          rewardManageOpen = false;
+          btnToggleManage.textContent = "👨‍👩‍👧 家長自訂獎勵項目";
+          renderParentRewardsPanel();
+          return;
+        }
+        requireParentPin("開啟家長自訂獎勵管理", () => {
+          rewardManageOpen = true;
+          btnToggleManage.textContent = "✅ 完成家長管理";
+          renderParentRewardsPanel();
+        });
+      });
+    }
+
+    if (btnChangePin) {
+      btnChangePin.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        requireParentPin("重設家長 4 位數密碼", () => {
+          alert("✅ 家長 4 位數密碼已更新完成！");
+        }, true);
       });
     }
 
