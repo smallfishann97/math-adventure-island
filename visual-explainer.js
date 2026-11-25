@@ -48,9 +48,10 @@
     `;
   }
 
-  function renderPlaceValue(v) {
+  function renderPlaceValue(v, isQ) {
     const headers = ["萬位", "千位", "百位", "十位", "個位"];
     const digits = v.digits || [0, 0, 0, 0, 0];
+    const hideVals = Boolean(isQ || v.hideDigits);
     const hl = new Set(v.highlight || []);
     const cellW = 86;
     const startX = 25;
@@ -60,14 +61,16 @@
       const isHl = hl.has(i);
       const fillTop = isHl ? PALETTE.gold : PALETTE.forest;
       const fillCell = isHl ? PALETTE.goldSoft : "#ffffff";
+      const valText = hideVals ? (i === 0 ? "—" : "？") : digits[i];
       body += `
         <rect x="${x}" y="14" width="${cellW - 8}" height="32" rx="8" fill="${fillTop}" />
         <text x="${x + (cellW - 8) / 2}" y="35" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">${h}</text>
         <rect x="${x}" y="52" width="${cellW - 8}" height="52" rx="10" fill="${fillCell}" stroke="${isHl ? PALETTE.gold : PALETTE.sand}" stroke-width="2" />
-        <text x="${x + (cellW - 8) / 2}" y="87" text-anchor="middle" fill="${PALETTE.ink}" font-size="26" font-weight="900">${digits[i]}</text>
+        <text x="${x + (cellW - 8) / 2}" y="87" text-anchor="middle" fill="${hideVals ? PALETTE.muted : PALETTE.ink}" font-size="26" font-weight="900">${valText}</text>
       `;
     });
-    return wrapSvg(body, 480, 118, v.caption);
+    const cap = hideVals ? "請把題目中的國字數字對應填入千位、百位、十位、個位！" : v.caption;
+    return wrapSvg(body, 480, 118, cap);
   }
 
   function renderVerticalCalc(v) {
@@ -153,7 +156,7 @@
     return wrapSvg(body, 480, 140, v.caption);
   }
 
-  function renderRuler(v) {
+  function renderRuler(v, isQ) {
     const maxCm = Math.max(3, v.maxCm || 10);
     const totalMm = maxCm * 10;
     const padX = 28;
@@ -178,7 +181,9 @@
       }
     }
 
-    const labelText = v.hideLength ? "長度 ＝ ？ 毫米" : `${lenMm} 毫米 (${(lenMm / 10).toFixed(1)} cm)`;
+    const hideLen = Boolean(isQ || v.hideLength);
+    const labelText = hideLen ? "長度 ＝ ？ 毫米" : `${lenMm} 毫米 (${(lenMm / 10).toFixed(1)} cm)`;
+    const cap = hideLen ? "請仔細觀察直尺上的公分大格與毫米小格刻度，算出紙條長度！" : v.caption;
     const body = `
       <rect x="${xStart}" y="22" width="${Math.max(4, xEnd - xStart)}" height="28" rx="6" fill="${PALETTE.burgundy}" opacity="0.88" />
       <text x="${(xStart + xEnd) / 2}" y="41" text-anchor="middle" fill="#fff" font-size="13" font-weight="900">${esc(labelText)}</text>
@@ -188,7 +193,7 @@
       ${ticks}
       <text x="${w - 20}" y="${rulerY + 46}" text-anchor="end" fill="${PALETTE.muted}" font-size="11" font-weight="700">單位: cm</text>
     `;
-    return wrapSvg(body, w, 130, v.caption);
+    return wrapSvg(body, w, 130, cap);
   }
 
   function renderOverlap(v) {
@@ -274,25 +279,28 @@
     return wrapSvg(labels + body, 480, 110, v.caption);
   }
 
-  function renderAngles(v) {
+  function renderAngles(v, isQ) {
+    const lbl1 = isQ ? "銳角" : "銳角 (比直角小)";
+    const lbl2 = isQ ? "直角" : "直角 (90°)";
+    const lbl3 = isQ ? "鈍角" : "鈍角 (比直角大)";
     const body = `
       <!-- 銳角 -->
       <line x1="40" y1="100" x2="135" y2="100" stroke="${PALETTE.ink}" stroke-width="3" stroke-linecap="round" />
       <line x1="40" y1="100" x2="112" y2="42" stroke="${PALETTE.ink}" stroke-width="3" stroke-linecap="round" />
       <path d="M 74 100 A 34 34 0 0 0 66 78" fill="none" stroke="${PALETTE.forest}" stroke-width="3" />
-      <text x="85" y="124" text-anchor="middle" fill="${PALETTE.forest}" font-size="14" font-weight="900">銳角 (比直角小)</text>
+      <text x="85" y="124" text-anchor="middle" fill="${PALETTE.forest}" font-size="14" font-weight="900">${lbl1}</text>
 
       <!-- 直角 -->
       <line x1="195" y1="100" x2="290" y2="100" stroke="${PALETTE.ink}" stroke-width="3" stroke-linecap="round" />
       <line x1="195" y1="100" x2="195" y2="26" stroke="${PALETTE.ink}" stroke-width="3" stroke-linecap="round" />
       <polyline points="195,82 213,82 213,100" fill="none" stroke="${PALETTE.burgundy}" stroke-width="2.6" />
-      <text x="242" y="124" text-anchor="middle" fill="${PALETTE.burgundy}" font-size="14" font-weight="900">直角 (90°)</text>
+      <text x="242" y="124" text-anchor="middle" fill="${PALETTE.burgundy}" font-size="14" font-weight="900">${lbl2}</text>
 
       <!-- 鈍角 -->
       <line x1="375" y1="100" x2="455" y2="100" stroke="${PALETTE.ink}" stroke-width="3" stroke-linecap="round" />
       <line x1="375" y1="100" x2="325" y2="38" stroke="${PALETTE.ink}" stroke-width="3" stroke-linecap="round" />
       <path d="M 407 100 A 32 32 0 0 0 354 75" fill="none" stroke="${PALETTE.gold}" stroke-width="3" />
-      <text x="392" y="124" text-anchor="middle" fill="${PALETTE.gold}" font-size="14" font-weight="900">鈍角 (比直角大)</text>
+      <text x="392" y="124" text-anchor="middle" fill="${PALETTE.gold}" font-size="14" font-weight="900">${lbl3}</text>
     `;
     return wrapSvg(body, 480, 138, v.caption);
   }
@@ -458,7 +466,8 @@
     return wrapSvg(body, 480, 120, v.caption);
   }
 
-  function renderCutRearrange(v) {
+  function renderCutRearrange(v, isQ) {
+    const rightText = isQ ? "重新拼裝：新面積 ＝ ？" : "重新拼裝：總面積不變！";
     const body = `
       <rect x="70" y="24" width="84" height="84" fill="${PALETTE.goldSoft}" stroke="${PALETTE.gold}" stroke-width="2.5" />
       <line x1="70" y1="66" x2="154" y2="66" stroke="${PALETTE.burgundy}" stroke-width="2.5" stroke-dasharray="5 3" />
@@ -468,7 +477,7 @@
 
       <rect x="250" y="45" width="168" height="42" fill="${PALETTE.forestSoft}" stroke="${PALETTE.forest}" stroke-width="2.5" />
       <line x1="334" y1="45" x2="334" y2="87" stroke="${PALETTE.burgundy}" stroke-width="2" stroke-dasharray="4 3" />
-      <text x="334" y="128" text-anchor="middle" fill="${PALETTE.forest}" font-size="13" font-weight="900">重新拼裝：總面積不變！</text>
+      <text x="334" y="128" text-anchor="middle" fill="${PALETTE.forest}" font-size="13" font-weight="900">${rightText}</text>
     `;
     return wrapSvg(body, 480, 140, v.caption);
   }
@@ -597,8 +606,9 @@
     `;
   }
 
-  function renderVisual(visualSpec) {
+  function renderVisual(visualSpec, opts) {
     if (!visualSpec || !visualSpec.type) return "";
+    const isQ = Boolean(opts && opts.isQuestion);
     const map = {
       placeValue: renderPlaceValue,
       verticalCalc: renderVerticalCalc,
@@ -627,7 +637,7 @@
       twoWayTable: renderTwoWayTable
     };
     const fn = map[visualSpec.type];
-    return fn ? fn(visualSpec) : "";
+    return fn ? fn(visualSpec, isQ) : "";
   }
 
   window.MathVisual = { render: renderVisual };

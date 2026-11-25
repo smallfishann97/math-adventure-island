@@ -1076,7 +1076,7 @@
     // 題目 SVG 圖形區
     const qVisualSlot = document.getElementById("question-visual-slot");
     if (q.questionVisual && window.MathVisual) {
-      qVisualSlot.innerHTML = window.MathVisual.render(q.questionVisual);
+      qVisualSlot.innerHTML = window.MathVisual.render(q.questionVisual, { isQuestion: true });
       qVisualSlot.classList.remove("hidden");
     } else {
       qVisualSlot.innerHTML = "";

@@ -480,6 +480,23 @@
       toggleBtn.textContent = panel.classList.contains("hidden") ? "✏️ 打開草稿紙" : "✏️ 收起草稿紙";
     });
 
+    const penBadge = panel.querySelector(".pad-pen-badge");
+    function syncPenBadgeUI() {
+      if (penBadge) penBadge.classList.toggle("is-active", !isEraser);
+    }
+    syncPenBadgeUI();
+    if (penBadge) {
+      penBadge.style.cursor = "pointer";
+      penBadge.addEventListener("click", () => {
+        window.SoundFX.playClick();
+        isEraser = false;
+        document.querySelectorAll("[data-pen-color]").forEach((b) => {
+          b.classList.toggle("active", b.dataset.penColor === penColor);
+        });
+        syncPenBadgeUI();
+      });
+    }
+
     document.querySelectorAll("[data-pen-color]").forEach((btn) => {
       btn.addEventListener("click", () => {
         window.SoundFX.playClick();
@@ -492,6 +509,7 @@
           isEraser = false;
           penColor = c;
         }
+        syncPenBadgeUI();
       });
     });
 
