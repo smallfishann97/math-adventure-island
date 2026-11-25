@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125q" />
+  <link rel="stylesheet" href="styles.css?v=20261126b" />
 </head>
 <body>
   <!-- 🔥 連續答對即時連勝火苗橫幅 -->
@@ -82,7 +82,7 @@
           <span class="brand-icon" aria-hidden="true"><img src="favicon.svg?v=20261125b" alt="" class="brand-logo-svg" /></span>
           <div class="brand-text">
             <h1>數學遊戲冒險島 <span class="brand-author">Designed by Ann Lu</span></h1>
-            <p>16 單元・960 題・小學三年級數學教學題庫</p>
+            <p>16 單元・960 題・國小三年級數學教學題庫</p>
           </div>
         </button>
 
@@ -105,18 +105,11 @@
           <button class="nav-pill" id="nav-history" type="button">📜<br class="sub-br-mobile" /> 答題記錄</button>
         </nav>
 
-        <!-- 手機版精簡工具列開關（桌機版隱藏，手機版預設收合讓版面超清爽！） -->
-        <div class="mobile-tools-bar">
-          <button type="button" class="mobile-tools-toggle" id="btn-mobile-tools-toggle" aria-expanded="false">⚙️ 音樂・護眼・字體・音效 ▾</button>
-        </div>
-
-        <div class="topbar-tools" id="topbar-tools-panel">
-          <!-- 即時日期、星期與時間顯示 -->
+        <!-- 獨立常駐列：即時日期時間＋字體大小（永遠顯示，不被收合） -->
+        <div class="topbar-quick-bar">
           <div id="live-clock-pill" class="live-clock-pill" aria-live="off" title="現在日期與時間">
             <span>📅 載入中…</span>
           </div>
-
-          <!-- 字體大小調節器 -->
           <div class="font-size-control" role="group" aria-label="字體大小調整">
             <span class="tool-hint">字</span>
             <button type="button" class="fs-btn" data-fs="sm" title="小字體">小</button>
@@ -124,6 +117,14 @@
             <button type="button" class="fs-btn" data-fs="lg" title="大字體">大</button>
             <button type="button" class="fs-btn" data-fs="xl" title="特大字體">特大</button>
           </div>
+        </div>
+
+        <!-- 手機版精簡工具列開關（桌機版隱藏，手機版預設展開，可點擊收合） -->
+        <div class="mobile-tools-bar">
+          <button type="button" class="mobile-tools-toggle" id="btn-mobile-tools-toggle" aria-expanded="true">⚙️ 收合工具設定 ▴</button>
+        </div>
+
+        <div class="topbar-tools mobile-open" id="topbar-tools-panel">
 
           <div class="bgm-btn-wrap">
             <button class="bgm-pill-btn" id="btn-bgm-toggle" type="button" aria-pressed="false" title="開啟／關閉背景音樂">

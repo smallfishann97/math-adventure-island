@@ -3027,7 +3027,7 @@ h1, h2, h3, .serif {
 
 /* ==================== 頁尾非官方學習工具宣告與四大彈窗樣式 ==================== */
 .footer-disclaimer-wrap {
-  max-width: 920px;
+  max-width: 1140px;
   margin: 0 auto 16px;
   padding-bottom: 16px;
   border-bottom: 1.5px dashed var(--border);
@@ -3063,11 +3063,12 @@ h1, h2, h3, .serif {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
 .footer-link-btn {
+  white-space: nowrap;
   background: none;
   border: none;
   padding: 4px 8px;
@@ -6692,4 +6693,14 @@ html, body {
 
 .admin-gloss-row span {
   color: var(--muted);
+}
+
+
+/* 獨立常駐列：即時日期時間＋字體大小（永遠獨立顯示，不受收合工具開關影響） */
+.topbar-quick-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
