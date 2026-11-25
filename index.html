@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261125j" />
+  <link rel="stylesheet" href="styles.css?v=20261125m" />
 </head>
 <body>
   <!-- 🔥 連續答對即時連勝火苗橫幅 -->
@@ -1508,6 +1508,39 @@
           <div class="wk-kpi"><span>📊 平均每次拜訪停留時間</span><strong data-stay-avg>0 分鐘</strong></div>
         </div>
 
+        <!-- 🆕 1. 📈 近 7 天全站來訪趨勢圖（雲端長條圖） -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;">
+          <h4 style="margin:0;color:var(--ink);">📈 近 7 天全站每日來訪趨勢圖（雲端同步）</h4>
+          <button type="button" class="btn btn-ghost btn-sm" id="admin-btn-refresh-7day">🔄 重新整理數據</button>
+        </div>
+        <div id="admin-7day-chart" class="admin-7day-chart" style="margin-bottom:16px;">正在載入近 7 天雲端流量…</div>
+
+        <!-- 🆕 2. 🩺 960 題全題庫「一鍵健康體檢儀表板」 -->
+        <h4 style="margin:0 0 8px;color:var(--ink);">🩺 全站題庫＆資源一鍵健康體檢儀表板</h4>
+        <div id="admin-health-dashboard" style="margin-bottom:16px;"></div>
+
+        <!-- 🆕 3. 📝 模擬段考成績＆打卡／護眼／兌換券總覽表 -->
+        <h4 style="margin:0 0 8px;color:var(--ink);">📝 模擬段考成績＆打卡／護眼／家長兌換券總覽</h4>
+        <div id="admin-activity-summary" class="exam-review-scroll" style="max-height:220px;margin-bottom:16px;"></div>
+
+        <!-- 🆕 4. 🖼️ 112 款裝飾＆50 張名詞字卡「版主全圖鑑預覽牆」 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;">
+          <h4 style="margin:0;color:var(--ink);">🖼️ 112 款裝飾＆50 張名詞字卡・版主全圖鑑預覽牆</h4>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-gold btn-sm" id="admin-btn-gallery-items">🛍️ 展開 112 款動態裝飾</button>
+            <button type="button" class="btn btn-forest btn-sm" id="admin-btn-gallery-glossary">🃏 展開 50 張名詞字卡</button>
+            <button type="button" class="btn btn-ghost btn-sm hidden" id="admin-btn-gallery-hide">▲ 收合圖鑑牆</button>
+          </div>
+        </div>
+        <div id="admin-gallery-panel" class="admin-gallery-panel hidden" style="margin-bottom:16px;"></div>
+
+        <!-- 🆕 5. 🚀 網站版本＆PWA 快取一鍵強制更新工具 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;">
+          <h4 style="margin:0;color:var(--ink);">🚀 網站版本＆PWA 離線快取強制更新工具</h4>
+          <button type="button" class="btn btn-burgundy btn-sm" id="admin-btn-force-refresh">🧹 一鍵清除舊快取並載入最新版</button>
+        </div>
+        <div id="admin-deploy-status" class="weekly-kpi-grid" style="margin-bottom:16px;"></div>
+
         <h4 style="margin:0 0 8px;color:var(--ink);">🎁 版主一鍵測試／教學展示工具（對目前登入角色生效）</h4>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
           <button type="button" class="btn btn-gold btn-sm" id="admin-btn-add-coins">🪙 +1,000 金幣</button>
@@ -1745,7 +1778,7 @@
   <script src="mini-games.js?v=20261123f"></script>
   <script src="extras.js?v=20261125h"></script>
   <script src="deluxe-features.js?v=20261124t"></script>
-  <script src="super-features.js?v=20261125l"></script>
+  <script src="super-features.js?v=20261125m"></script>
   <script src="plus-features.js?v=20261125d"></script>
   <script src="pro-features.js?v=20261125j"></script>
   <script src="app.js?v=20261125g"></script>

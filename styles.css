@@ -6538,3 +6538,143 @@ html, body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ==================== 版主後台 5 大進階管理面板（零藍色暖金系） ==================== */
+.admin-7day-chart {
+  background: #fffdf7;
+  border: 1.5px solid #eadcc6;
+  border-radius: 16px;
+  padding: 14px 12px 10px;
+}
+
+.trend-bars-wrap {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  align-items: end;
+  height: 140px;
+}
+
+.trend-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+
+.trend-bar-val {
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.trend-bar-track {
+  flex: 1;
+  width: 100%;
+  max-width: 38px;
+  background: #f4ece0;
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.trend-bar-fill {
+  width: 100%;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f5b947 0%, #df8922 100%);
+  transition: height 0.35s ease;
+}
+
+.trend-bar-col.is-today .trend-bar-fill {
+  background: linear-gradient(180deg, #58b878 0%, #2f8b52 100%);
+}
+
+.trend-bar-lbl {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.trend-bar-col.is-today .trend-bar-lbl {
+  color: #2b7a4b;
+  font-weight: 900;
+}
+
+.admin-gallery-panel {
+  background: #fffdf7;
+  border: 1.5px dashed #e2c590;
+  border-radius: 16px;
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.admin-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.admin-gal-tile {
+  background: #fff;
+  border: 1.5px solid #eadcc6;
+  border-radius: 12px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.admin-gal-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-gal-icon svg {
+  width: 42px;
+  height: 42px;
+}
+
+.admin-gal-name {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.admin-gal-meta {
+  font-size: 0.66rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.admin-glossary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-gloss-row {
+  background: #fff;
+  border: 1px solid #eadcc6;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-gloss-row strong {
+  color: var(--ink);
+}
+
+.admin-gloss-row span {
+  color: var(--muted);
+}

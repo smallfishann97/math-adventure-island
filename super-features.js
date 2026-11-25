@@ -1602,7 +1602,7 @@
       renderCounterDOM();
     }, 1000);
 
-    // 1. 開站累計拜訪人次（背景非阻塞更新，每 20 秒同步最新全站累計）
+    // 1. 開站累計拜訪人次（背景非阻塞更新，每 20 秒同步最新全站累計）＋靜默記錄每日拜訪供後台 7 天趨勢圖使用
     async function syncAllVisits(allowBump) {
       const shouldBump = allowBump && !sessionStorage.getItem("mai_visit_v2_bumped");
       if (shouldBump) {
@@ -1610,6 +1610,12 @@
         cachedVisits = Math.max(1, cachedVisits + 1);
         localStorage.setItem("mai_cached_visits", String(cachedVisits));
         renderCounterDOM();
+        // 同步記錄當日拜訪供版主後台「近 7 天趨勢圖」使用
+        const compactDate = todayStr().replace(/-/g, "");
+        if (!sessionStorage.getItem(`mai_daily_log_${compactDate}`)) {
+          sessionStorage.setItem(`mai_daily_log_${compactDate}`, "1");
+          fetchCounterVal("hit", `visits_${compactDate}`, 4000).catch(() => {});
+        }
       }
       const val = await fetchCounterVal(shouldBump ? "hit" : "get", "visits", 4500);
       if (val !== null) {
@@ -1737,11 +1743,71 @@
       });
     }
 
-    // 5. 👑 版主專屬數據後台（點頁尾「👑 版主專屬」並輸入版主高強度密碼解鎖）
-    const ADMIN_KEY_B64 = "YW5uOTcwOThwb2lsa2ptbmIxMjNxd2Vhc2R6eGM=";
+    // 5. 👑 版主專屬數據後台（單向加鹽 SHA-256 雜湊驗證，程式碼內完全不留明文亦不可反推原密碼）
+    const ADMIN_PWD_SALT = "mai_annlu_2026_salt_v2#";
+    const ADMIN_PWD_SHA256 = "fb2e24941316bb818fd29c22a183916e883a9cce162be598cddde78f8a464005";
+    function sha256Hex(ascii) {
+      function rightRotate(val, amt) { return (val >>> amt) | (val << (32 - amt)); }
+      const maxWord = Math.pow(2, 32);
+      let result = "";
+      const words = [];
+      const bytes = unescape(encodeURIComponent(ascii));
+      const bitLen = bytes.length * 8;
+      const hash = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+      const k = [
+        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+      ];
+      const msg = bytes + "\x80";
+      const padded = msg + "\x00".repeat((56 - (msg.length % 64) + 64) % 64);
+      for (let i = 0; i < padded.length; i++) {
+        words[i >> 2] |= padded.charCodeAt(i) << ((3 - (i % 4)) * 8);
+      }
+      words[words.length] = (bitLen / maxWord) | 0;
+      words[words.length] = bitLen | 0;
+      for (let j = 0; j < words.length;) {
+        const w = words.slice(j, j += 16);
+        const oldHash = hash.slice(0);
+        for (let i = 0; i < 64; i++) {
+          const w15 = w[i - 15], w2 = w[i - 2];
+          const a = hash[0], e = hash[4];
+          const t1 = hash[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & hash[5]) ^ ((~e) & hash[6]))
+            + k[i]
+            + (w[i] = i < 16 ? w[i] : (
+                w[i - 16]
+                + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                + w[i - 7]
+                + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+              ) | 0);
+          const t2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+          hash.unshift((t1 + t2) | 0);
+          hash[4] = (hash[4] + t1) | 0;
+          hash.pop();
+        }
+        for (let i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+      }
+      for (let i = 0; i < 8; i++) {
+        for (let j = 3; j >= 0; j--) {
+          const b = (hash[i] >> (j * 8)) & 255;
+          result += (b < 16 ? "0" : "") + b.toString(16);
+        }
+      }
+      return result;
+    }
     function checkAdminPwd(str) {
       try {
-        return btoa(String(str || "").trim()) === ADMIN_KEY_B64;
+        const clean = String(str || "").trim();
+        if (!clean) return false;
+        return sha256Hex(ADMIN_PWD_SALT + clean) === ADMIN_PWD_SHA256;
       } catch (_) {
         return false;
       }
@@ -2390,6 +2456,236 @@ ${colsXml}
 
       renderAdminQuestionBrowser();
       renderAdminSystemDiagnostics();
+      renderAdminSevenDayChart();
+      renderAdminHealthDashboard();
+      renderAdminActivitySummary();
+      renderAdminDeployStatus();
+    }
+
+    // 🆕 1. 📈 近 7 天全站來訪趨勢圖（雲端長條圖）
+    async function renderAdminSevenDayChart() {
+      const box = document.getElementById("admin-7day-chart");
+      if (!box) return;
+      box.innerHTML = `<p style="margin:6px 0;font-size:0.84rem;color:var(--muted);text-align:center;">📡 正在抓取近 7 天雲端每日來訪人次…</p>`;
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        days.push({ label: `${m}/${dd}`, compact: `${y}${m}${dd}`, isToday: i === 0 });
+      }
+      const vals = await Promise.all(
+        days.map((d) => fetchCounterVal("get", `visits_${d.compact}`, 4000).then((v) => (v !== null ? v : 0)))
+      );
+      const maxVal = Math.max(1, ...vals);
+      const sumVal = vals.reduce((a, b) => a + b, 0);
+      const barsHtml = days.map((d, idx) => {
+        const v = vals[idx];
+        const pct = Math.max(6, Math.round((v / maxVal) * 100));
+        return `
+          <div class="trend-bar-col ${d.isToday ? "is-today" : ""}">
+            <span class="trend-bar-val">${v}</span>
+            <div class="trend-bar-track"><div class="trend-bar-fill" style="height:${pct}%;"></div></div>
+            <span class="trend-bar-lbl">${d.isToday ? "今日" : d.label}</span>
+          </div>
+        `;
+      }).join("");
+      box.innerHTML = `
+        <div class="trend-bars-wrap">${barsHtml}</div>
+        <div style="text-align:right;font-size:0.8rem;font-weight:800;color:var(--muted);margin-top:6px;">
+          近 7 天雲端累計：<strong>${sumVal.toLocaleString("zh-TW")}</strong> 人次（今日：<strong>${vals[6]}</strong> 人次）
+        </div>
+      `;
+    }
+
+    const btnRefresh7Day = document.getElementById("admin-btn-refresh-7day");
+    if (btnRefresh7Day) {
+      btnRefresh7Day.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        renderAdminSevenDayChart();
+      });
+    }
+
+    // 🆕 2. 🩺 960 題全題庫「一鍵健康體檢儀表板」
+    function renderAdminHealthDashboard() {
+      const box = document.getElementById("admin-health-dashboard");
+      if (!box) return;
+      const bank = (api && api.getBank && api.getBank()) || window.GRADE3_MATH_BANK;
+      const units = (bank && bank.units) || [];
+      const orig = window.ORIGINAL_MATH_CHALLENGES || [];
+      const glossary = window.MATH_GLOSSARY || [];
+      const shopItems = (window.MathExtras && window.MathExtras.SHOP_ITEMS) || [];
+
+      let bankTotal = 0;
+      let badCount = 0;
+      const idSet = new Set();
+      let dupCount = 0;
+
+      units.forEach((u) => {
+        (u.questions || []).forEach((q) => {
+          bankTotal += 1;
+          if (!q.prompt || !q.answer || !q.explanation) badCount += 1;
+          if (q.id) {
+            if (idSet.has(q.id)) dupCount += 1;
+            else idSet.add(q.id);
+          }
+        });
+      });
+
+      let origTotal = 0;
+      orig.forEach((t) => {
+        (t.questions || []).forEach((q) => {
+          origTotal += 1;
+          if (!q.prompt || !q.answer || !q.explanation) badCount += 1;
+        });
+      });
+
+      const allHealthy = badCount === 0 && dupCount === 0 && bankTotal === 800 && origTotal === 160;
+      box.innerHTML = `
+        <div class="weekly-kpi-grid" style="margin-bottom:8px;">
+          <div class="wk-kpi"><span>📘 16 單元主線題庫</span><strong>${units.length} 單元 / ${bankTotal} 題</strong></div>
+          <div class="wk-kpi"><span>✨ 8 大原創挑戰</span><strong>${orig.length} 主題 / ${origTotal} 題</strong></div>
+          <div class="wk-kpi"><span>🃏 字卡 / 🛍️ 裝飾</span><strong>${glossary.length} 卡 / ${shopItems.length} 款</strong></div>
+          <div class="wk-kpi"><span>🩺 題庫完整度體檢</span><strong style="color:${allHealthy ? "#2b7a4b" : "#c74534"};">${allHealthy ? "✅ 100% 健康" : `⚠️ 異常 ${badCount + dupCount}`}</strong></div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);font-weight:700;">
+          即時掃描結果：共 <strong>${bankTotal + origTotal}</strong> 題（缺題幹／缺解答／缺解析：<b>${badCount}</b> 題｜重複題號：<b>${dupCount}</b> 筆｜過關小遊戲：<b>20</b> 款）。
+        </div>
+      `;
+    }
+
+    // 🆕 3. 📝 模擬段考成績＆打卡／護眼／兌換券總覽表
+    function renderAdminActivitySummary() {
+      const box = document.getElementById("admin-activity-summary");
+      if (!box) return;
+      let usersMap = {};
+      try {
+        const raw = localStorage.getItem("grade3_math_atelier_accounts_v2");
+        if (raw) usersMap = (JSON.parse(raw) || {}).users || {};
+      } catch (_) {}
+      const users = Object.values(usersMap);
+      const pinSet = /^\d{4}$/.test(localStorage.getItem("mai_parent_pin_v1") || "");
+      if (!users.length) {
+        box.innerHTML = `<p style="text-align:center;color:var(--muted);font-weight:800;padding:10px;">目前尚未建立冒險者角色。</p>`;
+        return;
+      }
+      box.innerHTML = `
+        <div style="font-size:0.82rem;font-weight:800;color:var(--ink-soft);margin-bottom:8px;">
+          🔐 家長 4 位數 PIN 碼鎖狀態：<strong>${pinSet ? "✅ 已啟用保護" : "⚪ 尚未設定（首次操作時會引導家長設定）"}</strong>
+        </div>
+        ${users.map((u) => {
+          const exams = Array.isArray(u.mockExamHistory) ? u.mockExamHistory : [];
+          const bestExam = exams.length ? Math.max(...exams.map((e) => Number(e.score) || 0)) : null;
+          const stamps = Array.isArray(u.dailyQStamps) ? u.dailyQStamps.length : 0;
+          const rests = Number(u.eyeCareRestCount || 0);
+          const vouchers = Array.isArray(u.parentVouchers) ? u.parentVouchers : [];
+          const usedV = vouchers.filter((v) => v.used).length;
+          return `
+            <div class="exam-rev-row ok" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+              <strong>🧑‍🎓 ${esc(u.name)}</strong>
+              <span>📝 模擬考：<b>${exams.length} 次${bestExam !== null ? `（最高 ${bestExam} 分）` : ""}</b> ｜ 🗓️ 打卡：<b>${stamps} 天</b> ｜ 👀 護眼：<b>${rests} 次</b> ｜ 🎟️ 兌換券：<b>${vouchers.length} 張（已核銷 ${usedV}）</b></span>
+            </div>
+          `;
+        }).join("")}
+      `;
+    }
+
+    // 🆕 4. 🖼️ 112 款裝飾＆50 張名詞字卡「版主全圖鑑預覽牆」
+    const galleryPanel = document.getElementById("admin-gallery-panel");
+    const btnGalItems = document.getElementById("admin-btn-gallery-items");
+    const btnGalGloss = document.getElementById("admin-btn-gallery-glossary");
+    const btnGalHide = document.getElementById("admin-btn-gallery-hide");
+
+    if (btnGalItems && galleryPanel) {
+      btnGalItems.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        const items = (window.MathExtras && window.MathExtras.SHOP_ITEMS) || [];
+        galleryPanel.innerHTML = `
+          <div style="font-size:0.82rem;font-weight:900;color:var(--ink);margin-bottom:8px;">🛍️ 全站 ${items.length} 款動態商店裝飾一覽（免金幣直接品管檢視）：</div>
+          <div class="admin-gallery-grid">
+            ${items.map((it) => `
+              <div class="admin-gal-tile">
+                <div class="admin-gal-icon">${window.MathIcons ? window.MathIcons.renderIcon(it.id, "svg-shop-icon") : esc(it.icon)}</div>
+                <div class="admin-gal-name">${esc(it.name)}</div>
+                <div class="admin-gal-meta">${esc(it.cat)}・🪙${it.price}</div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+        galleryPanel.classList.remove("hidden");
+        if (btnGalHide) btnGalHide.classList.remove("hidden");
+      });
+    }
+
+    if (btnGalGloss && galleryPanel) {
+      btnGalGloss.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        const cards = window.MATH_GLOSSARY || [];
+        galleryPanel.innerHTML = `
+          <div style="font-size:0.82rem;font-weight:900;color:var(--ink);margin-bottom:8px;">🃏 全站 ${cards.length} 張數學名詞字卡總覽：</div>
+          <div class="admin-glossary-list">
+            ${cards.map((c, idx) => `
+              <div class="admin-gloss-row">
+                <strong>#${String(idx + 1).padStart(2, "0")} ${esc(c.term)}</strong>
+                <span>${esc(c.shortDef || c.detail || "")}</span>
+              </div>
+            `).join("")}
+          </div>
+        `;
+        galleryPanel.classList.remove("hidden");
+        if (btnGalHide) btnGalHide.classList.remove("hidden");
+      });
+    }
+
+    if (btnGalHide && galleryPanel) {
+      btnGalHide.addEventListener("click", () => {
+        window.SoundFX && window.SoundFX.playClick();
+        galleryPanel.classList.add("hidden");
+        btnGalHide.classList.add("hidden");
+      });
+    }
+
+    // 🆕 5. 🚀 網站版本＆PWA 離線快取強制更新工具
+    async function renderAdminDeployStatus() {
+      const box = document.getElementById("admin-deploy-status");
+      if (!box) return;
+      const verText = document.querySelector("[data-auto-ver]")?.textContent || "v2.5.x";
+      const dateText = document.querySelector("[data-auto-date]")?.textContent || todayStr();
+      let cacheInfo = "無快取";
+      try {
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          cacheInfo = keys.length ? `${keys.length} 組（${keys[0]}）` : "尚未建立";
+        }
+      } catch (_) {}
+      const swState = "serviceWorker" in navigator && navigator.serviceWorker.controller ? "✅ 運作中" : "⚪ 未接管";
+      box.innerHTML = `
+        <div class="wk-kpi"><span>🏷️ 線上運行版本</span><strong>${esc(verText)}</strong></div>
+        <div class="wk-kpi"><span>📅 最新 Build 同步</span><strong style="font-size:0.86rem;">${esc(dateText)}</strong></div>
+        <div class="wk-kpi"><span>📱 PWA 離線服務</span><strong>${swState}</strong></div>
+        <div class="wk-kpi"><span>📦 快取清單</span><strong style="font-size:0.8rem;">${esc(cacheInfo)}</strong></div>
+      `;
+    }
+
+    const btnForceRefresh = document.getElementById("admin-btn-force-refresh");
+    if (btnForceRefresh) {
+      btnForceRefresh.addEventListener("click", async () => {
+        window.SoundFX && window.SoundFX.playClick();
+        if (!confirm("確定要清除本機 PWA 舊快取並立即重新載入最新版網頁嗎？（您的冒險者學習記錄與金幣完全不會遺失！）")) return;
+        try {
+          if ("caches" in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+          }
+          if ("serviceWorker" in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((r) => r.unregister()));
+          }
+        } catch (_) {}
+        location.reload(true);
+      });
     }
 
     const btnStopAdminMg = document.getElementById("admin-btn-stop-minigame");
