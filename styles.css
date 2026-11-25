@@ -2140,6 +2140,48 @@ h1, h2, h3, .serif {
   border-color: var(--gold);
 }
 
+.shop-item-card.can-afford {
+  background: #fffdf9;
+  border-color: #eab95c;
+  box-shadow: 0 6px 16px rgba(217, 150, 38, 0.14);
+}
+
+.shop-item-card.cannot-afford {
+  background: #e9e7e3;
+  border-color: #d2cec7;
+  box-shadow: none;
+  cursor: not-allowed;
+  pointer-events: none;
+  user-select: none;
+}
+
+.shop-item-card.cannot-afford:hover {
+  transform: none;
+  border-color: #d2cec7;
+}
+
+.shop-item-card.cannot-afford .shop-icon {
+  filter: grayscale(0.95) opacity(0.5);
+  animation: none !important;
+}
+
+.shop-item-card.cannot-afford h4 {
+  color: #7d7972;
+}
+
+.shop-item-card.cannot-afford p {
+  color: #96928b;
+}
+
+.btn-shop-locked {
+  background: #d8d5cf !important;
+  color: #75716b !important;
+  border: 1.5px solid #c4c0b9 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.92;
+}
+
 .shop-item-card.owned {
   background: var(--forest-soft);
   border-color: var(--forest);

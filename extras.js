@@ -337,17 +337,21 @@
         const owned = user.ownedItems.includes(item.id);
         const placed = user.placedItems.includes(item.id);
         const canBuy = (user.coins || 0) >= item.price;
+        const locked = !owned && !canBuy;
         let btnHtml = "";
         if (!owned) {
-          btnHtml = `<button type="button" class="btn ${canBuy ? "btn-gold" : "btn-ghost"} btn-sm" data-shop-buy="${item.id}" ${canBuy ? "" : "disabled"}>🪙 ${item.price} 購買</button>`;
+          btnHtml = canBuy
+            ? `<button type="button" class="btn btn-gold btn-sm" data-shop-buy="${item.id}">🪙 ${item.price} 立即購買</button>`
+            : `<button type="button" class="btn btn-shop-locked btn-sm" disabled aria-disabled="true">🔒 金幣不足（需 🪙 ${item.price}）</button>`;
         } else {
           btnHtml = `<button type="button" class="btn ${placed ? "btn-forest" : "btn-burgundy"} btn-sm" data-shop-toggle="${item.id}">${placed ? "🏝️ 已擺在島上（點此收回）" : "✨ 擺上我的冒險島"}</button>`;
         }
         const isChar = Boolean(CHARACTER_QUOTES[item.id]);
+        const cardStateCls = owned ? "owned" : canBuy ? "can-afford" : "cannot-afford";
         return `
-          <article class="shop-item-card ${owned ? "owned" : ""}">
-            <div class="shop-icon ${item.anim || "anim-bounce"} ${isChar ? "shop-char-voice" : ""}" ${isChar ? `data-preview-voice="${item.id}" title="點我聽聽看說話！"` : ""}>${window.MathIcons ? window.MathIcons.renderIcon(item.id, "svg-shop-icon") : item.icon}</div>
-            <h4>${item.name}${isChar ? ' <span class="voice-mini-tag">🔊點我說話</span>' : ""}</h4>
+          <article class="shop-item-card ${cardStateCls}" ${locked ? 'aria-disabled="true"' : ""}>
+            <div class="shop-icon ${locked ? "" : (item.anim || "anim-bounce")} ${isChar && !locked ? "shop-char-voice" : ""}" ${isChar && !locked ? `data-preview-voice="${item.id}" title="點我聽聽看說話！"` : ""}>${window.MathIcons ? window.MathIcons.renderIcon(item.id, "svg-shop-icon") : item.icon}</div>
+            <h4>${item.name}${isChar && !locked ? ' <span class="voice-mini-tag">🔊點我說話</span>' : ""}</h4>
             <p>${item.desc}</p>
             ${btnHtml}
           </article>
@@ -355,6 +359,7 @@
       }).join("");
 
       shopGrid.onclick = (ev) => {
+        if (ev.target.closest(".shop-item-card.cannot-afford")) return;
         const voiceEl = ev.target.closest("[data-preview-voice]");
         if (voiceEl) {
           const quotes = CHARACTER_QUOTES[voiceEl.dataset.previewVoice];
