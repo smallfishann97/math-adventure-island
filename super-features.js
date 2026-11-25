@@ -2453,24 +2453,44 @@ ${colsXml}
         el.textContent = today;
       });
       try {
-        const res = await fetch("https://api.github.com/repos/smallfishann97/math-adventure-island/commits?per_page=1");
-        if (!res.ok) return;
-        const link = res.headers.get("Link") || "";
+        const [countRes, listRes] = await Promise.all([
+          fetch("https://api.github.com/repos/smallfishann97/math-adventure-island/commits?per_page=1"),
+          fetch("https://api.github.com/repos/smallfishann97/math-adventure-island/commits?per_page=8")
+        ]);
+        if (!countRes.ok) return;
+        const link = countRes.headers.get("Link") || "";
         const m = link.match(/[&?]page=(\d+)>;\s*rel="last"/);
-        const totalCommits = m ? Number(m[1]) : 45;
-        const data = await res.json();
+        const totalCommits = m ? Number(m[1]) : 96;
+        const data = await countRes.json();
         const latestCommit = Array.isArray(data) && data[0] ? data[0] : null;
         const commitDate = latestCommit && latestCommit.commit && latestCommit.commit.committer
           ? latestCommit.commit.committer.date.slice(0, 10)
           : today;
-        const patchNum = Math.max(0, totalCommits - 44);
-        const autoVer = `v2.2.${patchNum}`;
+        const patchNum = Math.max(0, totalCommits - 90);
+        const autoVer = `v2.5.${patchNum}`;
         document.querySelectorAll("[data-auto-ver]").forEach((el) => {
           el.textContent = autoVer;
         });
         document.querySelectorAll("[data-auto-date]").forEach((el) => {
           el.textContent = `${commitDate}・Build #${totalCommits}`;
         });
+
+        const liveBox = document.getElementById("changelog-live-commits");
+        if (liveBox && listRes && listRes.ok) {
+          const commits = await listRes.json();
+          if (Array.isArray(commits) && commits.length) {
+            const rows = commits.map((c) => {
+              const sha = (c.sha || "").slice(0, 7);
+              const dt = (c.commit && c.commit.committer && c.commit.committer.date || "").slice(0, 10);
+              const msg = ((c.commit && c.commit.message) || "").split("\n")[0];
+              return `<li style="margin-bottom:4px;"><span style="color:var(--gold-dark);font-weight:900;">[${esc(dt)}]</span> <code style="font-size:0.78rem;background:#fff4d6;padding:1px 5px;border-radius:6px;">${esc(sha)}</code> ${esc(msg)}</li>`;
+            }).join("");
+            liveBox.innerHTML = `
+              <h4 style="margin:0 0 8px;">📡 最新自動同步更新明細（最近 ${commits.length} 次進版・自動即時更新）</h4>
+              <ul style="margin:0;padding-left:18px;font-size:0.84rem;line-height:1.55;">${rows}</ul>
+            `;
+          }
+        }
       } catch (_) {}
     }
     syncAutoChangelogVersion();
