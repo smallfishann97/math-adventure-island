@@ -2526,7 +2526,8 @@ ${colsXml}
       units.forEach((u) => {
         (u.questions || []).forEach((q) => {
           bankTotal += 1;
-          if (!q.prompt || !q.answer || !q.explanation) badCount += 1;
+          const qText = q.question || q.prompt;
+          if (!qText || q.answer === undefined || q.answer === "" || !q.explanation) badCount += 1;
           if (q.id) {
             if (idSet.has(q.id)) dupCount += 1;
             else idSet.add(q.id);
@@ -2538,7 +2539,8 @@ ${colsXml}
       orig.forEach((t) => {
         (t.questions || []).forEach((q) => {
           origTotal += 1;
-          if (!q.prompt || !q.answer || !q.explanation) badCount += 1;
+          const qText = q.question || q.prompt;
+          if (!qText || q.answer === undefined || q.answer === "" || !q.explanation) badCount += 1;
         });
       });
 

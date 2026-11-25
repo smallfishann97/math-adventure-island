@@ -472,7 +472,7 @@
         return `
           <div class="exam-rev-row ${ok ? "ok" : "bad"}">
             <strong>第 ${i + 1} 題（${esc(q.unitTitle)}）</strong>
-            <p>${esc(q.prompt)}</p>
+            <p>${esc(q.question || q.prompt)}</p>
             <div>你的答案：<b>${esc(ua || "未作答")}</b> ｜ 正確答案：<b style="color:var(--forest);">${esc(q.answer)}</b> ${ok ? "✅" : "❌"}</div>
             ${!ok && q.explanation ? `<div class="exam-exp-note">💡 解析：${esc(q.explanation)}</div>` : ""}
           </div>`;
@@ -543,8 +543,9 @@
     }).join("");
 
     let inputHtml = "";
-    if (q.choices && q.choices.length) {
-      inputHtml = `<div class="exam-choices">${q.choices.map((ch) => `
+    const opts = q.options || q.choices;
+    if (opts && opts.length) {
+      inputHtml = `<div class="exam-choices">${opts.map((ch) => `
         <button type="button" class="exam-choice-btn ${curAns === ch ? "selected" : ""}" data-exam-choice="${esc(ch)}">${esc(ch)}</button>
       `).join("")}</div>`;
     } else {
@@ -567,7 +568,7 @@
       <div class="exam-dots-bar">${navDots}</div>
       <div class="exam-q-card">
         <div class="exam-q-meta">第 ${proExamState.idx + 1} / ${total} 題（已作答 ${answeredCount} 題）｜ 第 ${String(q.unitOrder).padStart(2, "0")} 單元：${esc(q.unitTitle)}</div>
-        <div class="exam-q-prompt">${esc(q.prompt)}</div>
+        <div class="exam-q-prompt">${esc(q.question || q.prompt)}</div>
         ${q.visualSvg ? `<div class="exam-q-svg">${q.visualSvg}</div>` : ""}
         ${inputHtml}
       </div>
