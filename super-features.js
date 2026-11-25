@@ -1571,42 +1571,29 @@
   }
 
   async function initSiteCounters() {
-    // 0. 📅 今日來訪人次（依當日日期獨立累計，每天 00:00 自動歸零重算，每 20 秒同步雲端最新數字）
-    async function syncTodayVisits(allowBump) {
-      const todayKey = todayStr();
-      const compactDate = todayKey.replace(/-/g, "");
-      if (cachedTodayDate !== todayKey) {
-        cachedTodayDate = todayKey;
-        cachedTodayVisits = 0;
-        localStorage.setItem("mai_cached_today_date", todayKey);
-        localStorage.setItem("mai_cached_today_visits", "0");
+    // 0. 🟢 即時線上人數（3 分鐘滑動雲端心跳桶，每 20 秒同步，每個分頁每桶只記 1 次，離開自動遞減）
+    async function syncLiveOnline() {
+      const BUCKET_MS = 180000; // 3 分鐘滑動在線視窗
+      const now = Date.now();
+      const bucket = Math.floor(now / BUCKET_MS);
+      const secInBucket = Math.floor((now % BUCKET_MS) / 1000);
+      const lastHitBucket = Number(sessionStorage.getItem("mai_live_hit_bucket") || 0);
+      const shouldHit = lastHitBucket !== bucket;
+      if (shouldHit) {
+        sessionStorage.setItem("mai_live_hit_bucket", String(bucket));
       }
-      const bumpFlagKey = `mai_today_v2_bumped_${compactDate}`;
-      const shouldBump = allowBump && !sessionStorage.getItem(bumpFlagKey);
-      if (shouldBump) {
-        sessionStorage.setItem(bumpFlagKey, "1");
-        cachedTodayVisits = Math.max(1, cachedTodayVisits + 1);
-        localStorage.setItem("mai_cached_today_date", todayKey);
-        localStorage.setItem("mai_cached_today_visits", String(cachedTodayVisits));
-        renderCounterDOM();
-      } else if (cachedTodayVisits < 1) {
-        cachedTodayVisits = 1;
-        renderCounterDOM();
+      const curVal = await fetchCounterVal(shouldHit ? "hit" : "get", `live_${bucket}`, 4500);
+      let count = curVal !== null ? curVal : onlineCount;
+      // 剛換桶前 45 秒內平滑銜接上一桶人數，避免跨分界瞬間閃成 1
+      if (secInBucket < 45) {
+        const prevVal = await fetchCounterVal("get", `live_${bucket - 1}`, 3500);
+        if (prevVal !== null) count = Math.max(count || 1, prevVal);
       }
-      const val = await fetchCounterVal(shouldBump ? "hit" : "get", `visits_${compactDate}`, 4500);
-      if (val !== null) {
-        cachedTodayVisits = Math.max(1, cachedTodayVisits, val);
-        localStorage.setItem("mai_cached_today_date", todayKey);
-        localStorage.setItem("mai_cached_today_visits", String(cachedTodayVisits));
-        if (cachedTodayVisits > cachedVisits) {
-          cachedVisits = cachedTodayVisits;
-          localStorage.setItem("mai_cached_visits", String(cachedVisits));
-        }
-        renderCounterDOM();
-      }
+      onlineCount = Math.max(1, Number(count) || 1);
+      renderCounterDOM();
     }
-    syncTodayVisits(true);
-    setInterval(() => syncTodayVisits(false), 20000);
+    syncLiveOnline();
+    setInterval(syncLiveOnline, 20000);
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
