@@ -2052,11 +2052,8 @@ h1, h2, h3, .serif {
   display: block;
   border-radius: 12px;
   border: 1.5px solid var(--border);
-  background-color: #fffdf7;
-  background-image:
-    linear-gradient(to right, rgba(240, 222, 194, 0.45) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(240, 222, 194, 0.45) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: #ffffff;
+  background-image: none;
   touch-action: none;
   cursor: crosshair;
 }
@@ -6218,11 +6215,18 @@ html, body {
 
 /* ==================== 四大實用進階模組 (pro-features.js) — 零藍色暖金森綠系 ==================== */
 .scratchpad-canvas.grid-on {
-  background-color: #fffdf6;
+  background-color: #fffdf4;
   background-image:
-    linear-gradient(to right, rgba(210, 178, 126, 0.28) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(210, 178, 126, 0.28) 1px, transparent 1px);
+    linear-gradient(to right, rgba(194, 148, 78, 0.46) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(194, 148, 78, 0.46) 1px, transparent 1px);
   background-size: 28px 28px;
+}
+
+#btn-scratchpad-grid.active,
+#btn-gpad-grid.active {
+  background: linear-gradient(180deg, #ffefc2 0%, #ffd97d 100%);
+  border-color: #d98c1e;
+  color: #5a3812;
 }
 
 .exam-top-toolbar {
