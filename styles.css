@@ -2147,8 +2147,8 @@ h1, h2, h3, .serif {
 }
 
 .shop-item-card.cannot-afford {
-  background: #e9e7e3;
-  border-color: #d2cec7;
+  background: #fff;
+  border-color: var(--border);
   box-shadow: none;
   cursor: not-allowed;
   pointer-events: none;
@@ -2157,27 +2157,19 @@ h1, h2, h3, .serif {
 
 .shop-item-card.cannot-afford:hover {
   transform: none;
-  border-color: #d2cec7;
+  border-color: var(--border);
 }
 
 .shop-item-card.cannot-afford .shop-icon {
-  filter: grayscale(0.95) opacity(0.5);
   animation: none !important;
 }
 
-.shop-item-card.cannot-afford h4 {
-  color: #7d7972;
-}
-
-.shop-item-card.cannot-afford p {
-  color: #96928b;
-}
-
 .btn-shop-locked {
-  background: #d8d5cf !important;
+  background: #e2e0dc !important;
   color: #75716b !important;
-  border: 1.5px solid #c4c0b9 !important;
+  border: 1.5px solid #ccc8c1 !important;
   box-shadow: none !important;
+  filter: grayscale(1);
   cursor: not-allowed !important;
   opacity: 0.92;
 }
