@@ -1384,8 +1384,8 @@
   function renderCounterDOM() {
     const localIds = getLocalMemberIds();
     const tv = Math.max(1, cachedTodayVisits);
-    const v = Math.max(1, cachedVisits, tv, localIds.length);
-    const m = Math.max(localIds.length, cachedMembers, 1);
+    const v = Math.max(1, cachedVisits);
+    const m = Math.max(1, cachedMembers || localIds.length);
     const curSec = Math.max(1, Math.floor((Date.now() - sessionStartMs) / 1000));
     const totalSec = priorTotalStaySec + curSec;
     const totalMin = Math.max(1, Math.round(totalSec / 60));
@@ -1571,9 +1571,9 @@
   }
 
   async function initSiteCounters() {
-    // 0. 🟢 即時線上人數（3 分鐘滑動雲端心跳桶，每 20 秒同步，每個分頁每桶只記 1 次，離開自動遞減）
+    // 0. 🟢 線上人數（5 分鐘雲端心跳桶＋90 秒跨桶重疊防時鐘誤差，每 15 秒及切回分頁立即同步）
     async function syncLiveOnline() {
-      const BUCKET_MS = 180000; // 3 分鐘滑動在線視窗
+      const BUCKET_MS = 300000; // 5 分鐘在線視窗，大幅減少手機與電腦系統時鐘誤差造成不同桶
       const now = Date.now();
       const bucket = Math.floor(now / BUCKET_MS);
       const secInBucket = Math.floor((now % BUCKET_MS) / 1000);
@@ -1582,18 +1582,24 @@
       if (shouldHit) {
         sessionStorage.setItem("mai_live_hit_bucket", String(bucket));
       }
-      const curVal = await fetchCounterVal(shouldHit ? "hit" : "get", `live_${bucket}`, 4500);
+      const curVal = await fetchCounterVal(shouldHit ? "hit" : "get", `live5_${bucket}`, 4500);
       let count = curVal !== null ? curVal : onlineCount;
-      // 剛換桶前 45 秒內平滑銜接上一桶人數，避免跨分界瞬間閃成 1
-      if (secInBucket < 45) {
-        const prevVal = await fetchCounterVal("get", `live_${bucket - 1}`, 3500);
+      // 換桶前 90 秒內平滑銜接上一桶人數，避免兩台裝置時鐘差幾秒或尚未心跳時數字不同步
+      if (secInBucket < 90) {
+        const prevVal = await fetchCounterVal("get", `live5_${bucket - 1}`, 3500);
         if (prevVal !== null) count = Math.max(count || 1, prevVal);
       }
       onlineCount = Math.max(1, Number(count) || 1);
       renderCounterDOM();
     }
     syncLiveOnline();
-    setInterval(syncLiveOnline, 20000);
+    setInterval(syncLiveOnline, 15000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        syncLiveOnline();
+        syncAllVisits(false);
+      }
+    });
 
     // 每秒更新停留時間並定期寫回本機累計停留秒數
     setInterval(() => {
@@ -1619,7 +1625,7 @@
       }
       const val = await fetchCounterVal(shouldBump ? "hit" : "get", "visits", 4500);
       if (val !== null) {
-        cachedVisits = Math.max(cachedVisits, val);
+        cachedVisits = Math.max(1, val);
         localStorage.setItem("mai_cached_visits", String(cachedVisits));
         renderCounterDOM();
       }
@@ -1641,7 +1647,7 @@
       } else {
         const val = await fetchCounterVal("get", "members", 4500);
         if (val !== null) {
-          cachedMembers = Math.max(cachedMembers, val);
+          cachedMembers = Math.max(1, val);
           localStorage.setItem("mai_cached_members", String(cachedMembers));
           renderCounterDOM();
         }
