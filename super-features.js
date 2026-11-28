@@ -2671,7 +2671,7 @@ ${colsXml}
       const swState = "serviceWorker" in navigator && navigator.serviceWorker.controller ? "✅ 運作中" : "⚪ 未接管";
       box.innerHTML = `
         <div class="wk-kpi"><span>🏷️ 線上運行版本</span><strong>${esc(verText)}</strong></div>
-        <div class="wk-kpi"><span>📅 最新 Build 同步</span><strong style="font-size:0.86rem;">${esc(dateText)}</strong></div>
+        <div class="wk-kpi"><span>📅 最新版本同步</span><strong style="font-size:0.86rem;">${esc(dateText)}</strong></div>
         <div class="wk-kpi"><span>📱 PWA 離線服務</span><strong>${swState}</strong></div>
         <div class="wk-kpi"><span>📦 快取清單</span><strong style="font-size:0.8rem;">${esc(cacheInfo)}</strong></div>
       `;
@@ -2776,22 +2776,64 @@ ${colsXml}
           el.textContent = autoVer;
         });
         document.querySelectorAll("[data-auto-date]").forEach((el) => {
-          el.textContent = `${commitDate}・Build #${totalCommits}`;
+          el.textContent = `${commitDate}・第 ${totalCommits} 版`;
         });
+
+        function formatCommitMessageZh(rawMsg, sha) {
+          const msg = String(rawMsg || "").trim();
+          const low = msg.toLowerCase();
+          // 若原本已是繁體中文說明（無長段英文句子），直接保留顯示
+          if (/[\u4e00-\u9fff]{4,}/.test(msg) && !/[a-zA-Z]{6,}\s+[a-zA-Z]{4,}/.test(msg)) {
+            return msg;
+          }
+          // 對應近期版本更新代碼（精準繁體中文說明）
+          const shaMap = {
+            "4fdf5c6": "全站 960 題（16 單元主線 800 題＋8 大原創主題 160 題）全面改寫，每題皆為獨立生活情境與不同考法",
+            "724cf2b": "修正跨裝置「累計拜訪人數」與「線上人數」雲端即時同步機制（5 分鐘心跳桶與自動對齊）",
+            "63123c3": "修正手寫計算紙關閉格線時顯示純白畫布，開啟格線時顯示直式對齊格線",
+            "6fa6f54": "更換手寫計算紙清除按鈕為可愛 Q 版垃圾桶圖示",
+            "337fde9": "修正題目配圖防暴雷機制（作答前隱藏答案提示，詳解再完整顯示）與畫筆／橡皮擦按壓切換樣式",
+            "c835f6a": "修正版主後台 960 題題庫健康體檢欄位與自選單元模擬段考題目讀取",
+            "e708a90": "強化版主後台密碼為單向加鹽雜湊驗證，全面保護後台安全",
+            "7357dcb": "版主後台新增五大管理面板（7 天流量趨勢圖、960 題體檢、活動總覽、112 款圖鑑牆、快取強制更新）與進版自動同步日誌",
+            "1f04a79": "優化頁尾單行排版與手機版頂部時鐘、字體大小固定列顯示",
+            "de7908b": "家長真實獎勵兌換券新增 4 位數 PIN 碼鎖保護（含大人乘法忘記密碼重設）",
+            "b2d72ec": "新增四大進階功能：直式格線計算紙、自選單元限時模擬段考、LINE 換機搬家代碼與家長真實獎勵兌換券",
+            "fb47871": "升級浮空島立體岩層、漂浮碎岩、前後景浮雲與桌面滑鼠微傾視差特效",
+          };
+          if (sha && shaMap[sha]) return shaMap[sha];
+
+          // 依關鍵字自動轉譯為繁體中文，避免畫面出現英文原稿
+          if (low.includes("960") || low.includes("question") || low.includes("bank")) return "更新與優化全站 960 題數學題庫內容與詳解";
+          if (low.includes("counter") || low.includes("online") || low.includes("visit") || low.includes("sync")) return "優化跨裝置雲端「累計拜訪人數」與「線上人數」同步機制";
+          if (low.includes("scratchpad") || low.includes("grid") || low.includes("trash") || low.includes("eraser")) return "優化手寫電子計算紙格線、橡皮擦切換與工具列按鈕";
+          if (low.includes("spoiler") || low.includes("visual") || low.includes("svg")) return "優化題目配圖與視覺圖解顯示（防暴雷與圖示細節調整）";
+          if (low.includes("mock") || low.includes("exam") || low.includes("health")) return "修正自選單元模擬段考與版主後台題庫健康體檢功能";
+          if (low.includes("sha-256") || low.includes("password") || low.includes("auth") || low.includes("pin")) return "強化版主後台與家長 PIN 碼安全驗證機制";
+          if (low.includes("admin") || low.includes("changelog") || low.includes("dashboard")) return "更新版主專屬後台數據儀表板與系統進版日誌";
+          if (low.includes("footer") || low.includes("mobile") || low.includes("topbar") || low.includes("layout")) return "優化電腦版頁尾與手機版頂部工具列排版體驗";
+          if (low.includes("island") || low.includes("parallax") || low.includes("cloud")) return "升級冒險浮空島視覺層次與互動動畫效果";
+          if (low.includes("shop") || low.includes("voucher") || low.includes("reward")) return "優化商店裝飾顯示與家長真實獎勵兌換券功能";
+          if (low.includes("pet") || low.includes("minigame") || low.includes("game")) return "優化電子寵物互動與過關小遊戲體驗";
+          if (low.includes("pwa") || low.includes("sw.js") || low.includes("cache")) return "更新離線快取版本與全站資源同步";
+          return "系統功能優化、介面細節微調與穩定度更新";
+        }
 
         const liveBox = document.getElementById("changelog-live-commits");
         if (liveBox && listRes && listRes.ok) {
           const commits = await listRes.json();
           if (Array.isArray(commits) && commits.length) {
-            const rows = commits.map((c) => {
+            const rows = commits.map((c, idx) => {
               const sha = (c.sha || "").slice(0, 7);
               const dt = (c.commit && c.commit.committer && c.commit.committer.date || "").slice(0, 10);
-              const msg = ((c.commit && c.commit.message) || "").split("\n")[0];
-              return `<li style="margin-bottom:4px;"><span style="color:var(--gold-dark);font-weight:900;">[${esc(dt)}]</span> <code style="font-size:0.78rem;background:#fff4d6;padding:1px 5px;border-radius:6px;">${esc(sha)}</code> ${esc(msg)}</li>`;
+              const rawMsg = ((c.commit && c.commit.message) || "").split("\n")[0];
+              const zhMsg = formatCommitMessageZh(rawMsg, sha);
+              const verNo = Math.max(1, totalCommits - idx);
+              return `<li style="margin-bottom:5px;"><span style="color:var(--gold-dark);font-weight:900;">[${esc(dt)}]</span> <span style="font-size:0.78rem;background:#fff4d6;color:#7a5210;font-weight:800;padding:1px 7px;border-radius:6px;margin-right:4px;">第 ${verNo} 版</span> ${esc(zhMsg)}</li>`;
             }).join("");
             liveBox.innerHTML = `
               <h4 style="margin:0 0 8px;">📡 最新自動同步更新明細（最近 ${commits.length} 次進版・自動即時更新）</h4>
-              <ul style="margin:0;padding-left:18px;font-size:0.84rem;line-height:1.55;">${rows}</ul>
+              <ul style="margin:0;padding-left:18px;font-size:0.84rem;line-height:1.6;">${rows}</ul>
             `;
           }
         }
