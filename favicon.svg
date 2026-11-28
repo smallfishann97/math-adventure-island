@@ -1,81 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="數學遊戲冒險島 Q版 Logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="數學遊戲冒險島 App Logo">
   <defs>
-    <clipPath id="roundedSquircle">
-      <rect x="2" y="2" width="60" height="60" rx="16" ry="16"/>
+    <clipPath id="appCardClip">
+      <rect x="6" y="6" width="116" height="116" rx="28" ry="28"/>
     </clipPath>
-    <linearGradient id="qSky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FFFBE8"/>
-      <stop offset="68%" stop-color="#FFEBBF"/>
-      <stop offset="100%" stop-color="#C8F0DE"/>
+    <linearGradient id="bgWarm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF4C2"/>
+      <stop offset="62%" stop-color="#FFE08A"/>
+      <stop offset="100%" stop-color="#FFD066"/>
     </linearGradient>
-    <linearGradient id="qSea" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#8FDCC0"/>
-      <stop offset="100%" stop-color="#55B594"/>
+    <linearGradient id="seaMint" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7EE0B5"/>
+      <stop offset="100%" stop-color="#45B889"/>
     </linearGradient>
-    <linearGradient id="qIsland" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#A8E882"/>
-      <stop offset="100%" stop-color="#5DB862"/>
+    <linearGradient id="islandGrass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9BE564"/>
+      <stop offset="100%" stop-color="#53B85A"/>
     </linearGradient>
-    <linearGradient id="qBelly" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FFE6A8"/>
-      <stop offset="100%" stop-color="#E8B058"/>
+    <linearGradient id="islandRock" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F5BA62"/>
+      <stop offset="100%" stop-color="#D68635"/>
+    </linearGradient>
+    <linearGradient id="roofCoral" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF7F6B"/>
+      <stop offset="100%" stop-color="#E85342"/>
     </linearGradient>
   </defs>
 
-  <!-- 底層鋪滿與啟動畫面同色的暖奶油底（不透明、零黑角，且在 App 啟動畫面自動融合成圓角！） -->
-  <rect x="0" y="0" width="64" height="64" fill="#FFF8EA"/>
+  <!-- 圓角主體內容區 -->
+  <g clip-path="url(#appCardClip)">
+    <!-- 溫暖陽光奶油黃背景 -->
+    <rect x="6" y="6" width="116" height="116" fill="url(#bgWarm)"/>
 
-  <!-- 圓角裁切內容區 -->
-  <g clip-path="url(#roundedSquircle)">
-    <rect x="2" y="2" width="60" height="60" fill="url(#qSky)"/>
+    <!-- 上方柔和亮光弧線（增加精品 App 玻璃光澤） -->
+    <ellipse cx="64" cy="14" rx="58" ry="22" fill="#FFFDF2" opacity="0.55"/>
 
-    <!-- 底部薄荷奶綠海面與波紋 -->
-    <path d="M0 46 Q16 42.5 32 45.5 T64 45.5 L64 64 L0 64 Z" fill="url(#qSea)"/>
-    <path d="M11 55 Q18 53 25 55 M39 56 Q46 54 53 56" fill="none" stroke="#ECFFF7" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+    <!-- 底部薄荷綠微笑海面（粗黑框線） -->
+    <path d="M 4 94 Q 34 86 64 93 T 124 92 L 124 124 L 4 124 Z" fill="url(#seaMint)" stroke="#1E1B18" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M 22 108 Q 36 104 50 108 M 78 109 Q 92 105 106 109" fill="none" stroke="#E8FFF5" stroke-width="3.6" stroke-linecap="round"/>
 
-    <!-- 右上角微笑 Q 版小太陽 -->
-    <circle cx="50" cy="14" r="6" fill="#FFD452" stroke="#D98B1E" stroke-width="1.6"/>
-    <circle cx="48.2" cy="13.5" r="0.9" fill="#5A4031"/>
-    <circle cx="51.8" cy="13.5" r="0.9" fill="#5A4031"/>
-    <path d="M48.6 15.6 Q50 17 51.4 15.6" fill="none" stroke="#5A4031" stroke-width="1.1" stroke-linecap="round"/>
+    <!-- 左上角＆右上角簡潔粗黑框數學符號徽章（＋、×） -->
+    <g transform="translate(27, 29)">
+      <circle cx="0" cy="0" r="12" fill="#FFFDF7" stroke="#1E1B18" stroke-width="4"/>
+      <path d="M -5 0 H 5 M 0 -5 V 5" stroke="#E85342" stroke-width="3.6" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(101, 29)">
+      <circle cx="0" cy="0" r="12" fill="#FFFDF7" stroke="#1E1B18" stroke-width="4"/>
+      <path d="M -4.2 -4.2 L 4.2 4.2 M 4.2 -4.2 L -4.2 4.2" stroke="#E58B17" stroke-width="3.6" stroke-linecap="round"/>
+    </g>
 
-    <!-- 左上角軟綿綿棉花糖雲朵 -->
-    <path d="M9 17.5 C9 15 11.2 13.5 13.4 14 C14.4 11.6 17.6 11.4 19.2 13.2 C21.4 13 23 14.7 23 16.8 C23 18.4 21.6 19.5 19.8 19.5 L11.5 19.5 C10 19.5 9 18.7 9 17.5 Z" fill="#FFFDF8" stroke="#E5C48E" stroke-width="1.2"/>
+    <!-- 圓潤浮空島暖金底座（粗黑框） -->
+    <path d="M 24 81 C 24 97 42 105 64 105 C 86 105 104 97 104 81 C 92 87 36 87 24 81 Z" fill="url(#islandRock)" stroke="#1E1B18" stroke-width="5" stroke-linejoin="round"/>
 
-    <!-- 圓滾滾浮空島暖金底座 -->
-    <path d="M12 42 C12 49.5 21 53.5 32 53.5 C43 53.5 52 49.5 52 42 C46 45 18 45 12 42 Z" fill="url(#qBelly)" stroke="#6B482B" stroke-width="2" stroke-linejoin="round"/>
+    <!-- 超 Q 圓胖抹茶草坡小島（粗黑框） -->
+    <path d="M 21 80 C 21 53 40 44 64 44 C 88 44 107 53 107 80 C 93 88 35 88 21 80 Z" fill="url(#islandGrass)" stroke="#1E1B18" stroke-width="5" stroke-linejoin="round"/>
+    <!-- 草坡高光 -->
+    <ellipse cx="43" cy="56" rx="9" ry="4.2" transform="rotate(-18 43 56)" fill="#D8F9B8" opacity="0.8"/>
 
-    <!-- 超 Q 圓胖抹茶草坡主體（帶可愛微笑臉蛋！） -->
-    <path d="M11 41.5 C11 28.5 20.5 23.5 32 23.5 C43.5 23.5 53 28.5 53 41.5 C46.5 45.5 17.5 45.5 11 41.5 Z" fill="url(#qIsland)" stroke="#5A4031" stroke-width="2.1" stroke-linejoin="round"/>
-    <ellipse cx="22" cy="29" rx="4.5" ry="2.2" transform="rotate(-18 22 29)" fill="#D4F9B8" opacity="0.75"/>
+    <!-- 島嶼可愛水汪汪大眼睛 + 粉嫩腮紅 + 開心貓嘴 -->
+    <circle cx="49" cy="70" r="5.2" fill="#1E1B18"/>
+    <circle cx="50.8" cy="68.2" r="2" fill="#FFFFFF"/>
+    <circle cx="79" cy="70" r="5.2" fill="#1E1B18"/>
+    <circle cx="80.8" cy="68.2" r="2" fill="#FFFFFF"/>
+    <ellipse cx="38" cy="75.5" rx="6.2" ry="3.8" fill="#FF8599" opacity="0.9"/>
+    <ellipse cx="90" cy="75.5" rx="6.2" ry="3.8" fill="#FF8599" opacity="0.9"/>
+    <path d="M 58 73.5 Q 61 78.2 64 74.8 Q 67 78.2 70 73.5" fill="none" stroke="#1E1B18" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
 
-    <!-- 島嶼超 Q 水汪汪大眼睛 + 粉嫩腮紅 + 貓咪笑嘴 -->
-    <circle cx="24.5" cy="36.2" r="2.7" fill="#4A3224"/>
-    <circle cx="25.3" cy="35.2" r="1.05" fill="#FFFFFF"/>
-    <circle cx="39.5" cy="36.2" r="2.7" fill="#4A3224"/>
-    <circle cx="40.3" cy="35.2" r="1.05" fill="#FFFFFF"/>
-    <ellipse cx="19.5" cy="39.2" rx="3.1" ry="1.9" fill="#FF8FA3" opacity="0.88"/>
-    <ellipse cx="44.5" cy="39.2" rx="3.1" ry="1.9" fill="#FF8FA3" opacity="0.88"/>
-    <path d="M29.2 38.2 Q30.6 40.3 32 38.7 Q33.4 40.3 34.8 38.2" fill="none" stroke="#4A3224" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 島頂超可愛粗黑框草莓紅小屋 -->
+    <rect x="49" y="30" width="30" height="20" rx="6" fill="#FFFDF5" stroke="#1E1B18" stroke-width="4.5"/>
+    <path d="M 43 34 C 48 18 80 18 85 34 Z" fill="url(#roofCoral)" stroke="#1E1B18" stroke-width="4.5" stroke-linejoin="round"/>
+    <rect x="59" y="37" width="10" height="13" rx="4" fill="#D4844A" stroke="#1E1B18" stroke-width="3.4"/>
+    <circle cx="64" cy="27.5" r="3.4" fill="#FFE055" stroke="#1E1B18" stroke-width="2.4"/>
 
-    <!-- 頭頂迷你圓滾滾草莓紅小屋 -->
-    <rect x="25.5" y="16.5" width="13" height="9.2" rx="3.2" fill="#FFFDF5" stroke="#5A4031" stroke-width="1.8"/>
-    <path d="M23 18.2 C25 11.8 39 11.8 41 18.2 Z" fill="#F27868" stroke="#5A4031" stroke-width="1.8" stroke-linejoin="round"/>
-    <rect x="29.8" y="20.2" width="4.4" height="5.5" rx="1.8" fill="#C97C46" stroke="#5A4031" stroke-width="1.3"/>
-    <circle cx="32" cy="15.5" r="1.6" fill="#FFE066" stroke="#5A4031" stroke-width="0.9"/>
-
-    <!-- 左邊圓球棒棒糖樹 -->
-    <line x1="17.5" y1="22.5" x2="17.5" y2="27.5" stroke="#7A4F2C" stroke-width="2.4" stroke-linecap="round"/>
-    <circle cx="17.5" cy="21" r="4.6" fill="#63C76A" stroke="#5A4031" stroke-width="1.6"/>
-    <circle cx="16" cy="19.4" r="1.4" fill="#C9F7B8"/>
-
-    <!-- 右邊閃耀小金星 -->
-    <path d="M46.5 21.5 L47.9 24.4 L51 24.8 L48.7 27 L49.3 30.1 L46.5 28.6 L43.7 30.1 L44.3 27 L42 24.8 L45.1 24.4 Z" fill="#FFD24A" stroke="#9C5D12" stroke-width="1.2" stroke-linejoin="round"/>
-
-    <!-- 頭頂閃亮星光 -->
-    <path d="M32 5.2 L33.1 8 L36 8.5 L33.8 10.4 L34.4 13.2 L32 11.8 L29.6 13.2 L30.2 10.4 L28 8.5 L30.9 8 Z" fill="#FFD24A" stroke="#B56E16" stroke-width="1" stroke-linejoin="round"/>
+    <!-- 屋頂閃耀小金星 -->
+    <path d="M 64 10 L 66.2 15.2 L 71.8 15.8 L 67.6 19.4 L 68.8 24.8 L 64 22 L 59.2 24.8 L 60.4 19.4 L 56.2 15.8 L 61.8 15.2 Z" fill="#FFD54F" stroke="#1E1B18" stroke-width="2.6" stroke-linejoin="round"/>
   </g>
 
-  <!-- 柔和暖金圓角描邊框 -->
-  <rect x="2" y="2" width="60" height="60" rx="16" ry="16" fill="none" stroke="#E6A13C" stroke-width="2.6"/>
+  <!-- 內層柔和白色反光細框 -->
+  <rect x="10.5" y="10.5" width="107" height="107" rx="23.5" ry="23.5" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.55"/>
+
+  <!-- 最外層醒目「粗黑框 + 大圓角」App 外框 -->
+  <rect x="6" y="6" width="116" height="116" rx="28" ry="28" fill="none" stroke="#1E1B18" stroke-width="7"/>
 </svg>

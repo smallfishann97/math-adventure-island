@@ -11,10 +11,10 @@
   "lang": "zh-Hant",
   "icons": [
     {
-      "src": "favicon.svg?v=20261125b",
+      "src": "favicon.svg?v=20261128c",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
